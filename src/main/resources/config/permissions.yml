@@ -1,0 +1,137 @@
+# Permissions configuration
+# Each permission maps to a bit position in the access_rights BIGINT field
+# Check: (accessRights & bitValue) != 0
+
+permissions:
+  - name: VIEW_ITEMS
+    bit: 0
+    label: View Items
+    module: Inventory
+
+  - name: CREATE_ITEMS
+    bit: 1
+    label: Create Items
+    module: Inventory
+
+  - name: EDIT_ITEMS
+    bit: 2
+    label: Edit Items
+    module: Inventory
+
+  - name: VIEW_STOCK
+    bit: 3
+    label: View Stock
+    module: Inventory
+
+  - name: STOCK_IN
+    bit: 4
+    label: Stock In
+    module: Inventory
+
+  - name: STOCK_OUT
+    bit: 5
+    label: Stock Out
+    module: Inventory
+
+  - name: STOCK_ADJUST
+    bit: 6
+    label: Stock Adjust
+    module: Inventory
+
+  - name: VIEW_TRANSACTIONS
+    bit: 7
+    label: View Transactions
+    module: Inventory
+
+  - name: APPROVE_TRANSACTIONS
+    bit: 8
+    label: Approve Transactions
+    module: Inventory
+
+  - name: CANCEL_TRANSACTIONS
+    bit: 9
+    label: Cancel Transactions
+    module: Inventory
+
+  - name: VIEW_CUSTOMERS
+    bit: 10
+    label: View Customers
+    module: Master Data
+
+  - name: MANAGE_CUSTOMERS
+    bit: 11
+    label: Manage Customers
+    module: Master Data
+
+  - name: VIEW_SUPPLIERS
+    bit: 12
+    label: View Suppliers
+    module: Master Data
+
+  - name: MANAGE_SUPPLIERS
+    bit: 13
+    label: Manage Suppliers
+    module: Master Data
+
+  - name: MANAGE_ADDONS
+    bit: 14
+    label: Manage Add-ons
+    module: Master Data
+
+  - name: POS_SALE
+    bit: 15
+    label: POS Sales
+    module: POS
+
+  - name: POS_VOID
+    bit: 16
+    label: Void Sales
+    module: POS
+
+  - name: POS_DISCOUNT
+    bit: 17
+    label: Apply Discounts
+    module: POS
+
+  - name: VIEW_SALES
+    bit: 18
+    label: View Sales
+    module: POS
+
+  - name: VIEW_SHIFTS
+    bit: 19
+    label: View Shifts
+    module: POS
+
+  - name: MANAGE_USERS
+    bit: 20
+    label: Manage Users
+    module: Administration
+
+  - name: MANAGE_SETTINGS
+    bit: 21
+    label: Manage Settings
+    module: Administration
+
+  - name: VIEW_AUDIT
+    bit: 22
+    label: View Audit Trail
+    module: Administration
+
+  - name: VIEW_REPORTS
+    bit: 23
+    label: View Reports
+    module: Reports
+
+  - name: REPRINT
+    bit: 24
+    label: Reprint Documents
+    module: General
+
+# Role presets (convenience - frontend uses these to pre-fill permissions on user create)
+role_presets:
+  ADMIN: 33554431       # All 25 bits set (2^25 - 1)
+  MANAGER: 33554431     # Same as admin
+  CASHIER: 32505856     # POS_SALE, VIEW_SALES, VIEW_SHIFTS, VIEW_ITEMS, VIEW_STOCK, POS_DISCOUNT, REPRINT
+  STOCK_CLERK: 2039     # VIEW_ITEMS, CREATE_ITEMS, EDIT_ITEMS, VIEW_STOCK, STOCK_IN, STOCK_OUT, STOCK_ADJUST, VIEW_TRANSACTIONS, APPROVE_TRANSACTIONS
+  VIEWER: 8397833       # All VIEW_* permissions only

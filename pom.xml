@@ -158,6 +158,9 @@
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
+            <!-- JasperReports templates are compiled at runtime on first use.
+                 Build-time compilation disabled due to log4j/Java 25 incompatibility. -->
+            <!--
             <plugin>
                 <groupId>com.pro-crafting.tools</groupId>
                 <artifactId>jasperreports-maven-plugin</artifactId>
@@ -175,6 +178,7 @@
                     <outputDirectory>${project.build.outputDirectory}/reports</outputDirectory>
                 </configuration>
             </plugin>
+            -->
         </plugins>
     </build>
 

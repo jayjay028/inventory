@@ -1,0 +1,195 @@
+# Forms configuration - defines field layout and validation rules per form
+# Used by the frontend to dynamically render forms
+
+categories:
+  title: Category
+  fields:
+    - name: name
+      label: Category Name
+      type: text
+      required: true
+      maxLength: 100
+      placeholder: Enter category name
+    - name: description
+      label: Description
+      type: textarea
+      required: false
+      maxLength: 255
+      placeholder: Enter description
+
+items:
+  title: Item
+  fields:
+    - name: name
+      label: Item Name
+      type: text
+      required: true
+      maxLength: 200
+      placeholder: Enter item name
+    - name: description
+      label: Description
+      type: textarea
+      required: false
+      placeholder: Enter item description
+    - name: categoryId
+      label: Category
+      type: select
+      required: true
+      optionsUrl: /api/categories/active
+      optionLabel: name
+      optionValue: id
+    - name: unit
+      label: Unit of Measure
+      type: text
+      required: true
+      maxLength: 30
+      placeholder: e.g., pcs, kg, box
+    - name: price
+      label: Selling Price
+      type: number
+      required: true
+      min: 0
+      step: 0.01
+    - name: costPrice
+      label: Cost Price
+      type: number
+      required: true
+      min: 0
+      step: 0.01
+    - name: reorderLevel
+      label: Reorder Level
+      type: number
+      required: true
+      min: 0
+    - name: taxable
+      label: Taxable
+      type: checkbox
+      default: true
+
+customers:
+  title: Customer
+  fields:
+    - name: name
+      label: Customer Name
+      type: text
+      required: true
+      maxLength: 200
+      placeholder: Enter customer name
+    - name: tin
+      label: TIN
+      type: text
+      required: false
+      maxLength: 20
+      placeholder: Tax Identification Number
+    - name: address
+      label: Address
+      type: textarea
+      required: false
+      maxLength: 500
+    - name: contactPerson
+      label: Contact Person
+      type: text
+      required: false
+      maxLength: 150
+    - name: contactNumber
+      label: Contact Number
+      type: text
+      required: false
+      maxLength: 20
+      placeholder: e.g., 09XX-XXX-XXXX
+    - name: email
+      label: Email
+      type: email
+      required: false
+      maxLength: 150
+
+suppliers:
+  title: Supplier
+  fields:
+    - name: name
+      label: Supplier Name
+      type: text
+      required: true
+      maxLength: 200
+      placeholder: Enter supplier name
+    - name: tin
+      label: TIN
+      type: text
+      required: false
+      maxLength: 20
+      placeholder: Tax Identification Number
+    - name: address
+      label: Address
+      type: textarea
+      required: false
+      maxLength: 500
+    - name: contactPerson
+      label: Contact Person
+      type: text
+      required: false
+      maxLength: 150
+    - name: contactNumber
+      label: Contact Number
+      type: text
+      required: false
+      maxLength: 20
+      placeholder: e.g., 09XX-XXX-XXXX
+    - name: email
+      label: Email
+      type: email
+      required: false
+      maxLength: 150
+
+users:
+  title: User
+  fields:
+    - name: username
+      label: Username
+      type: text
+      required: true
+      maxLength: 50
+      placeholder: Enter username
+    - name: password
+      label: Password
+      type: password
+      required: true
+      minLength: 6
+      maxLength: 100
+      placeholder: Enter password
+    - name: fullName
+      label: Full Name
+      type: text
+      required: true
+      maxLength: 150
+      placeholder: Enter full name
+    - name: email
+      label: Email
+      type: email
+      required: false
+      maxLength: 150
+    - name: role
+      label: Role
+      type: select
+      required: true
+      options:
+        - { label: Admin, value: ADMIN }
+        - { label: Manager, value: MANAGER }
+        - { label: Cashier, value: CASHIER }
+        - { label: Stock Clerk, value: STOCK_CLERK }
+        - { label: Viewer, value: VIEWER }
+
+addons:
+  title: Add-on Charge
+  fields:
+    - name: name
+      label: Add-on Name
+      type: text
+      required: true
+      maxLength: 100
+      placeholder: e.g., Delivery Fee, Handling Charge
+    - name: defaultAmount
+      label: Default Amount
+      type: number
+      required: true
+      min: 0
+      step: 0.01

@@ -28,6 +28,25 @@ public interface AuditTrailRepository extends JpaRepository<AuditTrail, Long> {
     List<AuditTrail> findByEntityNameAndEntityId(String entityName, Long entityId);
 
     /**
+     * Finds audit trail entries by entity name and entity ID with pagination.
+     *
+     * @param entityName the name of the entity
+     * @param entityId   the ID of the entity
+     * @param pageable   pagination information
+     * @return a page of audit trail entries for the specified entity
+     */
+    Page<AuditTrail> findByEntityNameAndEntityId(String entityName, Long entityId, Pageable pageable);
+
+    /**
+     * Finds audit trail entries by entity name with pagination.
+     *
+     * @param entityName the name of the entity
+     * @param pageable   pagination information
+     * @return a page of audit trail entries for the specified entity name
+     */
+    Page<AuditTrail> findByEntityName(String entityName, Pageable pageable);
+
+    /**
      * Finds audit trail entries by the user who performed the action, with pagination.
      *
      * @param username the username of the performer

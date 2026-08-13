@@ -1,0 +1,77 @@
+# Navigation menu configuration
+# permission: bitwise permission constant name required to see this item
+
+navigation:
+  - label: Dashboard
+    icon: bi-speedometer2
+    route: /dashboard
+    permission: null
+
+  - label: Inventory
+    icon: bi-box-seam
+    children:
+      - label: Items
+        route: /items
+        permission: VIEW_ITEMS
+      - label: Categories
+        route: /categories
+        permission: VIEW_ITEMS
+      - label: Stock Overview
+        route: /stock
+        permission: VIEW_STOCK
+      - label: Stock In
+        route: /stock/in
+        permission: STOCK_IN
+      - label: Stock Out
+        route: /stock/out
+        permission: STOCK_OUT
+      - label: Stock Adjust
+        route: /stock/adjust
+        permission: STOCK_ADJUST
+      - label: Transactions
+        route: /transactions
+        permission: VIEW_TRANSACTIONS
+
+  - label: POS
+    icon: bi-cart3
+    children:
+      - label: Terminal
+        route: /pos
+        permission: POS_SALE
+      - label: Sales History
+        route: /pos/sales
+        permission: VIEW_SALES
+      - label: Shifts
+        route: /pos/shifts
+        permission: VIEW_SHIFTS
+
+  - label: Master Data
+    icon: bi-database
+    children:
+      - label: Customers
+        route: /customers
+        permission: VIEW_CUSTOMERS
+      - label: Suppliers
+        route: /suppliers
+        permission: VIEW_SUPPLIERS
+      - label: Add-ons
+        route: /addons
+        permission: MANAGE_ADDONS
+
+  - label: Reports
+    icon: bi-file-earmark-bar-graph
+    route: /reports
+    permission: VIEW_REPORTS
+
+  - label: Administration
+    icon: bi-gear
+    children:
+      - label: Users
+        route: /users
+        permission: MANAGE_USERS
+      - label: Settings
+        route: /settings
+        permission: MANAGE_SETTINGS
+      - label: Audit Trail
+        route: /audit
+        permission: VIEW_AUDIT

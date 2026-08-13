@@ -10,9 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Implementation of {@link AppSettingService} providing access to
@@ -129,5 +133,37 @@ public class AppSettingServiceImpl implements AppSettingService {
                     }
                 })
                 .orElse(defaultValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, String> getAll() {
+        List<AppSetting> settings = appSettingRepository.findByActiveTrue();
+        Map<String, String> result = new LinkedHashMap<>();
+        for (AppSetting setting : settings) {
+            result.put(setting.getSettingKey(), setting.getSettingValue());
+        }
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public void updateAll(Map<String, String> settings) {
+        String currentUser = getCurrentUsername();
+        updateValues(settings, currentUser);
+    }
+
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return authentication.getName();
+        }
+        return "system";
     }
 }

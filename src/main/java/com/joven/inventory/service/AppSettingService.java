@@ -82,4 +82,19 @@ public interface AppSettingService {
      * @return the BigDecimal value of the setting
      */
     BigDecimal getDecimalValue(String key, BigDecimal defaultValue);
+
+    /**
+     * Retrieves all active settings as a key-value map.
+     *
+     * @return a map of setting keys to their values
+     */
+    Map<String, String> getAll();
+
+    /**
+     * Updates multiple settings at once (without requiring updatedBy parameter).
+     * Uses the current authenticated user from the security context.
+     *
+     * @param settings a map of setting keys to new values
+     */
+    void updateAll(Map<String, String> settings);
 }

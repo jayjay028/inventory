@@ -1,0 +1,114 @@
+# Reports configuration
+# Groups reports by category with endpoint, parameters, and display info
+
+reports:
+  - category: Inventory
+    items:
+      - name: stock-level
+        label: Current Stock Level
+        endpoint: /api/reports/stock-level
+        parameters: []
+      - name: stock-movement
+        label: Stock Movement
+        endpoint: /api/reports/stock-movement
+        parameters:
+          - { name: from, type: date, label: From Date, required: true }
+          - { name: to, type: date, label: To Date, required: true }
+      - name: low-stock
+        label: Low Stock Alert
+        endpoint: /api/reports/low-stock
+        parameters: []
+      - name: transaction-summary
+        label: Transaction Summary
+        endpoint: /api/reports/transaction-summary
+        parameters:
+          - { name: from, type: date, label: From Date, required: true }
+          - { name: to, type: date, label: To Date, required: true }
+      - name: item-list
+        label: Item Catalog
+        endpoint: /api/reports/item-list
+        parameters: []
+      - name: inventory-count
+        label: Inventory Count Sheet
+        endpoint: /api/reports/inventory-count
+        parameters: []
+      - name: stock-valuation
+        label: Stock Valuation
+        endpoint: /api/reports/stock-valuation
+        parameters: []
+
+  - category: Financial
+    items:
+      - name: gross-profit
+        label: Gross Profit
+        endpoint: /api/reports/gross-profit
+        parameters:
+          - { name: from, type: date, label: From Date, required: true }
+          - { name: to, type: date, label: To Date, required: true }
+      - name: profit-share
+        label: Profit Share Breakdown
+        endpoint: /api/reports/profit-share
+        parameters:
+          - { name: from, type: date, label: From Date, required: true }
+          - { name: to, type: date, label: To Date, required: true }
+      - name: sales-summary
+        label: Sales Summary
+        endpoint: /api/reports/sales-summary
+        parameters:
+          - { name: from, type: date, label: From Date, required: true }
+          - { name: to, type: date, label: To Date, required: true }
+      - name: purchase-summary
+        label: Purchase Summary
+        endpoint: /api/reports/purchase-summary
+        parameters:
+          - { name: from, type: date, label: From Date, required: true }
+          - { name: to, type: date, label: To Date, required: true }
+      - name: vat-summary
+        label: VAT Summary
+        endpoint: /api/reports/vat-summary
+        parameters:
+          - { name: from, type: date, label: From Date, required: true }
+          - { name: to, type: date, label: To Date, required: true }
+
+  - category: POS
+    items:
+      - name: daily-sales
+        label: Daily Sales (Z-Reading)
+        endpoint: /api/reports/daily-sales
+        parameters:
+          - { name: date, type: date, label: Date, required: true }
+      - name: shift-report
+        label: Shift Report (X-Reading)
+        endpoint: /api/reports/shift-report
+        parameters:
+          - { name: shiftId, type: number, label: Shift ID, required: true }
+      - name: sales-by-payment
+        label: Sales by Payment Method
+        endpoint: /api/reports/sales-by-payment
+        parameters:
+          - { name: from, type: date, label: From Date, required: true }
+          - { name: to, type: date, label: To Date, required: true }
+      - name: sales-by-cashier
+        label: Sales by Cashier
+        endpoint: /api/reports/sales-by-cashier
+        parameters:
+          - { name: from, type: date, label: From Date, required: true }
+          - { name: to, type: date, label: To Date, required: true }
+      - name: top-selling
+        label: Top Selling Items
+        endpoint: /api/reports/top-selling
+        parameters:
+          - { name: from, type: date, label: From Date, required: true }
+          - { name: to, type: date, label: To Date, required: true }
+          - { name: limit, type: number, label: Top N, required: false }
+      - name: voided-transactions
+        label: Voided Transactions
+        endpoint: /api/reports/voided-transactions
+        parameters:
+          - { name: from, type: date, label: From Date, required: true }
+          - { name: to, type: date, label: To Date, required: true }
+      - name: hourly-sales
+        label: Hourly Sales
+        endpoint: /api/reports/hourly-sales
+        parameters:
+          - { name: date, type: date, label: Date, required: true }
