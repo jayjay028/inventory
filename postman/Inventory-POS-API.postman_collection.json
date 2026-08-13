@@ -1,0 +1,138 @@
+{
+  "info": {
+    "name": "Inventory + POS System API",
+    "description": "Complete API collection for the Inventory and POS System. Run requests in folder order for proper variable setup.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{accessToken}}"}]},
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {"name": "Login", "request": {"method": "POST", "url": "{{baseUrl}}/auth/login", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"username\": \"admin\", \"password\": \"admin123\"}"}}, "event": [{"listen": "test", "script": {"exec": ["var json = pm.response.json();", "if(json.success) {", "  pm.environment.set('accessToken', json.data.accessToken);", "  pm.environment.set('refreshToken', json.data.refreshToken);", "}", "pm.test('Login successful', () => pm.response.to.have.status(200));", "pm.test('Has access token', () => pm.expect(json.data.accessToken).to.not.be.empty);"]}}]},
+        {"name": "Refresh Token", "request": {"method": "POST", "url": "{{baseUrl}}/auth/refresh", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"refreshToken\": \"{{refreshToken}}\"}"}}},
+        {"name": "Current User (me)", "request": {"method": "GET", "url": "{{baseUrl}}/auth/me"}, "event": [{"listen": "test", "script": {"exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"]}}]},
+        {"name": "Logout", "request": {"method": "POST", "url": "{{baseUrl}}/auth/logout"}}
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {"name": "Create Category", "request": {"method": "POST", "url": "{{baseUrl}}/categories", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"name\": \"Electronics\", \"description\": \"Electronic devices and accessories\"}"}}, "event": [{"listen": "test", "script": {"exec": ["var json = pm.response.json();", "if(json.data) pm.environment.set('categoryId', json.data.id);", "pm.test('Created', () => pm.response.to.have.status(201));"]}}]},
+        {"name": "Get All Categories", "request": {"method": "GET", "url": "{{baseUrl}}/categories?page=0&size=20"}},
+        {"name": "Get Category by ID", "request": {"method": "GET", "url": "{{baseUrl}}/categories/{{categoryId}}"}},
+        {"name": "Update Category", "request": {"method": "PUT", "url": "{{baseUrl}}/categories/{{categoryId}}", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"name\": \"Electronics & Gadgets\", \"description\": \"Updated description\"}"}}},
+        {"name": "Deactivate Category", "request": {"method": "PATCH", "url": "{{baseUrl}}/categories/{{categoryId}}/status?active=false"}},
+        {"name": "Activate Category", "request": {"method": "PATCH", "url": "{{baseUrl}}/categories/{{categoryId}}/status?active=true"}}
+      ]
+    },
+    {
+      "name": "Items",
+      "item": [
+        {"name": "Create Item", "request": {"method": "POST", "url": "{{baseUrl}}/items", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"itemCode\": \"ITM-00001\", \"name\": \"USB Cable Type-C\", \"categoryId\": {{categoryId}}, \"unit\": \"pcs\", \"price\": 150.00, \"costPrice\": 80.00, \"reorderLevel\": 10, \"taxable\": true}"}}, "event": [{"listen": "test", "script": {"exec": ["var json = pm.response.json();", "if(json.data) pm.environment.set('itemId', json.data.id);", "pm.test('Created', () => pm.response.to.have.status(201));"]}}]},
+        {"name": "Get All Items", "request": {"method": "GET", "url": "{{baseUrl}}/items?page=0&size=20"}},
+        {"name": "Get Item by ID", "request": {"method": "GET", "url": "{{baseUrl}}/items/{{itemId}}"}},
+        {"name": "Search Items", "request": {"method": "GET", "url": "{{baseUrl}}/items/search?q=USB"}},
+        {"name": "Update Item", "request": {"method": "PUT", "url": "{{baseUrl}}/items/{{itemId}}", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"itemCode\": \"ITM-00001\", \"name\": \"USB Cable Type-C 1m\", \"categoryId\": {{categoryId}}, \"unit\": \"pcs\", \"price\": 175.00, \"costPrice\": 85.00, \"reorderLevel\": 15, \"taxable\": true}"}}},
+        {"name": "Get Low Stock Items", "request": {"method": "GET", "url": "{{baseUrl}}/items/low-stock"}},
+        {"name": "Deactivate Item", "request": {"method": "PATCH", "url": "{{baseUrl}}/items/{{itemId}}/status?active=false"}}
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {"name": "Create Customer", "request": {"method": "POST", "url": "{{baseUrl}}/customers", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"name\": \"Juan Dela Cruz\", \"tin\": \"123-456-789-000\", \"address\": \"Manila, Philippines\", \"contactPerson\": \"Juan\", \"contactNumber\": \"09171234567\", \"email\": \"juan@email.com\"}"}}, "event": [{"listen": "test", "script": {"exec": ["var json = pm.response.json();", "if(json.data) pm.environment.set('customerId', json.data.id);", "pm.test('Created', () => pm.response.to.have.status(201));"]}}]},
+        {"name": "Get All Customers", "request": {"method": "GET", "url": "{{baseUrl}}/customers?page=0&size=20"}},
+        {"name": "Get Customer by ID", "request": {"method": "GET", "url": "{{baseUrl}}/customers/{{customerId}}"}},
+        {"name": "Search Customers", "request": {"method": "GET", "url": "{{baseUrl}}/customers/search?q=juan"}},
+        {"name": "Update Customer", "request": {"method": "PUT", "url": "{{baseUrl}}/customers/{{customerId}}", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"name\": \"Juan Dela Cruz Jr.\", \"tin\": \"123-456-789-000\", \"address\": \"Quezon City\", \"contactPerson\": \"Juan Jr\", \"contactNumber\": \"09171234567\", \"email\": \"juan.jr@email.com\"}"}}},
+        {"name": "Deactivate Customer", "request": {"method": "PATCH", "url": "{{baseUrl}}/customers/{{customerId}}/status?active=false"}}
+      ]
+    },
+    {
+      "name": "Suppliers",
+      "item": [
+        {"name": "Create Supplier", "request": {"method": "POST", "url": "{{baseUrl}}/suppliers", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"name\": \"Tech Supplies Inc.\", \"tin\": \"987-654-321-000\", \"address\": \"Makati City\", \"contactPerson\": \"Maria\", \"contactNumber\": \"09181234567\", \"email\": \"maria@techsupplies.com\"}"}}, "event": [{"listen": "test", "script": {"exec": ["var json = pm.response.json();", "if(json.data) pm.environment.set('supplierId', json.data.id);", "pm.test('Created', () => pm.response.to.have.status(201));"]}}]},
+        {"name": "Get All Suppliers", "request": {"method": "GET", "url": "{{baseUrl}}/suppliers?page=0&size=20"}},
+        {"name": "Get Supplier by ID", "request": {"method": "GET", "url": "{{baseUrl}}/suppliers/{{supplierId}}"}},
+        {"name": "Search Suppliers", "request": {"method": "GET", "url": "{{baseUrl}}/suppliers/search?q=tech"}},
+        {"name": "Update Supplier", "request": {"method": "PUT", "url": "{{baseUrl}}/suppliers/{{supplierId}}", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"name\": \"Tech Supplies International\", \"tin\": \"987-654-321-000\", \"address\": \"BGC, Taguig\", \"contactPerson\": \"Maria Santos\", \"contactNumber\": \"09181234567\", \"email\": \"maria@techintl.com\"}"}}},
+        {"name": "Deactivate Supplier", "request": {"method": "PATCH", "url": "{{baseUrl}}/suppliers/{{supplierId}}/status?active=false"}}
+      ]
+    },
+    {
+      "name": "Stock Operations",
+      "item": [
+        {"name": "Stock In", "request": {"method": "POST", "url": "{{baseUrl}}/stock/in", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"itemId\": {{itemId}}, \"quantity\": 100, \"unitCost\": 80.00, \"supplierId\": {{supplierId}}, \"documentType\": \"RR\", \"transactionDate\": \"2026-08-13T10:00:00\", \"taxEnabled\": false, \"remarks\": \"Initial stock\"}"}}, "event": [{"listen": "test", "script": {"exec": ["var json = pm.response.json();", "if(json.data) pm.environment.set('transactionId', json.data.id);", "pm.test('Created', () => pm.response.to.have.status(201));"]}}]},
+        {"name": "Stock Out", "request": {"method": "POST", "url": "{{baseUrl}}/stock/out", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"itemId\": {{itemId}}, \"quantity\": 5, \"unitPrice\": 150.00, \"customerId\": {{customerId}}, \"discountType\": \"NONE\", \"discountValue\": 0, \"documentType\": \"OR\", \"transactionDate\": \"2026-08-13T11:00:00\", \"taxEnabled\": false}"}}},
+        {"name": "Stock Adjustment", "request": {"method": "POST", "url": "{{baseUrl}}/stock/adjust", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"itemId\": {{itemId}}, \"quantity\": 95, \"transactionDate\": \"2026-08-13T12:00:00\", \"remarks\": \"Physical count correction\"}"}}},
+        {"name": "Get All Stock", "request": {"method": "GET", "url": "{{baseUrl}}/stock?page=0&size=20"}},
+        {"name": "Get Stock by Item", "request": {"method": "GET", "url": "{{baseUrl}}/stock/{{itemId}}"}},
+        {"name": "Approve Transaction", "request": {"method": "PATCH", "url": "{{baseUrl}}/stock/transactions/{{transactionId}}/approve"}},
+        {"name": "Cancel Transaction", "request": {"method": "PATCH", "url": "{{baseUrl}}/stock/transactions/{{transactionId}}/cancel"}}
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {"name": "Get All Transactions", "request": {"method": "GET", "url": "{{baseUrl}}/transactions?page=0&size=20"}},
+        {"name": "Get Transaction by ID", "request": {"method": "GET", "url": "{{baseUrl}}/transactions/{{transactionId}}"}},
+        {"name": "Get Pending Transactions", "request": {"method": "GET", "url": "{{baseUrl}}/transactions/pending"}}
+      ]
+    },
+    {
+      "name": "POS - Shifts",
+      "item": [
+        {"name": "Open Shift", "request": {"method": "POST", "url": "{{baseUrl}}/pos/shifts/open", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"openingAmount\": 5000.00}"}}, "event": [{"listen": "test", "script": {"exec": ["var json = pm.response.json();", "if(json.data) pm.environment.set('shiftId', json.data.id);", "pm.test('Shift opened', () => pm.response.to.have.status(201));"]}}]},
+        {"name": "Get Current Shift", "request": {"method": "GET", "url": "{{baseUrl}}/pos/shifts/current"}},
+        {"name": "Get All Shifts", "request": {"method": "GET", "url": "{{baseUrl}}/pos/shifts?page=0&size=20"}},
+        {"name": "Close Shift", "request": {"method": "POST", "url": "{{baseUrl}}/pos/shifts/{{shiftId}}/close", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"closingAmount\": 5300.00, \"remarks\": \"End of shift\"}"}}}
+      ]
+    },
+    {
+      "name": "POS - Sales",
+      "item": [
+        {"name": "Create Sale", "request": {"method": "POST", "url": "{{baseUrl}}/pos/sales", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"items\": [{\"itemId\": {{itemId}}, \"quantity\": 2, \"unitPrice\": 150.00, \"discountType\": \"NONE\", \"discountValue\": 0}], \"discountType\": \"NONE\", \"discountValue\": 0, \"taxEnabled\": false, \"documentType\": \"OR\"}"}}, "event": [{"listen": "test", "script": {"exec": ["var json = pm.response.json();", "if(json.data) pm.environment.set('saleId', json.data.id);", "pm.test('Sale created', () => pm.response.to.have.status(201));"]}}]},
+        {"name": "Get All Sales", "request": {"method": "GET", "url": "{{baseUrl}}/pos/sales?page=0&size=20"}},
+        {"name": "Get Sale by ID", "request": {"method": "GET", "url": "{{baseUrl}}/pos/sales/{{saleId}}"}},
+        {"name": "Update Sale Items", "request": {"method": "PUT", "url": "{{baseUrl}}/pos/sales/{{saleId}}/items", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "[{\"itemId\": {{itemId}}, \"quantity\": 3, \"unitPrice\": 150.00, \"discountType\": \"NONE\", \"discountValue\": 0}]"}}},
+        {"name": "Process Payment", "request": {"method": "POST", "url": "{{baseUrl}}/pos/sales/{{saleId}}/pay", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"paymentMethod\": \"CASH\", \"amountTendered\": 500.00}"}}},
+        {"name": "Close Sale", "request": {"method": "PATCH", "url": "{{baseUrl}}/pos/sales/{{saleId}}/close"}},
+        {"name": "Void Sale", "request": {"method": "POST", "url": "{{baseUrl}}/pos/sales/{{saleId}}/void", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"voidReason\": \"Customer requested cancellation\"}"}}},
+        {"name": "Get Receipt", "request": {"method": "GET", "url": "{{baseUrl}}/pos/sales/{{saleId}}/receipt"}},
+        {"name": "Get Open Sales", "request": {"method": "GET", "url": "{{baseUrl}}/pos/sales/open"}},
+        {"name": "Get Today Sales", "request": {"method": "GET", "url": "{{baseUrl}}/pos/sales/today"}},
+        {"name": "POS Item Search", "request": {"method": "GET", "url": "{{baseUrl}}/pos/items/search?q=USB"}}
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {"name": "Get Dashboard", "request": {"method": "GET", "url": "{{baseUrl}}/dashboard"}, "event": [{"listen": "test", "script": {"exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"]}}]}
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {"name": "Get All Settings", "request": {"method": "GET", "url": "{{baseUrl}}/settings"}},
+        {"name": "Update Settings", "request": {"method": "PUT", "url": "{{baseUrl}}/settings", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"business_name\": \"My Store\", \"business_tin\": \"123-456-789-000\", \"tax_enabled\": \"true\", \"default_tax_rate\": \"12.00\"}"}}}
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {"name": "Create User", "request": {"method": "POST", "url": "{{baseUrl}}/users", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"username\": \"cashier1\", \"password\": \"password123\", \"fullName\": \"Maria Santos\", \"email\": \"maria@store.com\", \"role\": \"STAFF\", \"accessRights\": 82435}"}}},
+        {"name": "Get All Users", "request": {"method": "GET", "url": "{{baseUrl}}/users"}},
+        {"name": "Update User", "request": {"method": "PUT", "url": "{{baseUrl}}/users/2", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"fullName\": \"Maria Santos-Cruz\", \"email\": \"maria.cruz@store.com\", \"role\": \"STAFF\", \"accessRights\": 82435}"}}},
+        {"name": "Reset Password", "request": {"method": "PATCH", "url": "{{baseUrl}}/users/2/password", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"newPassword\": \"newpass123\"}"}}},
+        {"name": "Deactivate User", "request": {"method": "PATCH", "url": "{{baseUrl}}/users/2/status?active=false"}}
+      ]
+    },
+    {
+      "name": "Audit Trail",
+      "item": [
+        {"name": "Get Audit Trail", "request": {"method": "GET", "url": "{{baseUrl}}/audit?page=0&size=20"}}
+      ]
+    }
+  ]
+}

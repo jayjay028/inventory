@@ -57,7 +57,7 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true
       try {
         const response = await authApi.login(credentials)
-        const { accessToken, refreshToken, user } = response.data
+        const { accessToken, refreshToken, user } = response.data.data
 
         this.setTokens(accessToken, refreshToken)
         this.user = user
@@ -80,7 +80,7 @@ export const useAuthStore = defineStore('auth', {
     async refreshTokenAction() {
       try {
         const response = await authApi.refresh(this.refreshToken)
-        const { accessToken, refreshToken } = response.data
+        const { accessToken, refreshToken } = response.data.data
 
         this.setTokens(accessToken, refreshToken)
 
@@ -95,7 +95,7 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true
       try {
         const response = await authApi.me()
-        this.user = response.data
+        this.user = response.data.data
 
         return response
       } finally {
