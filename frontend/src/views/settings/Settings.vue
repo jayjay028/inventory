@@ -163,18 +163,28 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import settingsApi from '@/api/settings'
 import PageHeader from '@/components/common/PageHeader.vue'
 import FormInput from '@/components/common/FormInput.vue'
 import { useAppStore } from '@/stores/app'
 import { PERMISSIONS } from '@/stores/auth'
 
+const route = useRoute()
+
 const appStore = useAppStore()
 
 const loading = ref(true)
 const saving = ref(false)
-const activeTab = ref('company')
+const activeTab = ref(route.query.tab || 'company')
+
+// Watch route query changes from right sidebar navigation
+watch(() => route.query.tab, (newTab) => {
+  if (newTab && tabs.some(t => t.key === newTab)) {
+    activeTab.value = newTab
+  }
+})
 
 const tabs = [
   { key: 'company', label: 'Company Info', icon: 'bi bi-building' },

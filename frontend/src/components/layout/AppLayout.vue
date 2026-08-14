@@ -11,6 +11,7 @@
         </router-view>
       </main>
     </div>
+    <RightSidebar />
   </div>
 </template>
 
@@ -18,6 +19,7 @@
 import { useAppStore } from '@/stores/app'
 import Navbar from './Navbar.vue'
 import Sidebar from './Sidebar.vue'
+import RightSidebar from './RightSidebar.vue'
 
 const appStore = useAppStore()
 </script>

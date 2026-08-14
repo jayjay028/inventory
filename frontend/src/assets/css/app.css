@@ -1,50 +1,67 @@
-/* ============================================
-   Inventory + POS System - Custom Styles
-   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* ------------------------------------------
-   CSS Variables
-   ------------------------------------------ */
+/* ============================================================
+   Enterprise ERP Theme — Classic Corporate
+   Design: Clean, refined, professional
+   ============================================================ */
+
 :root {
-  --color-primary: #0d6efd;
-  --color-primary-hover: #0b5ed7;
-  --color-primary-light: #e7f1ff;
-  --color-sidebar-bg: #1e293b;
-  --color-sidebar-hover: #334155;
+  /* Primary Palette */
+  --color-primary: #1e40af;
+  --color-primary-hover: #1e3a8a;
+  --color-primary-light: #eff6ff;
+
+  /* Sidebar */
+  --color-sidebar-bg: #0f172a;
+  --color-sidebar-hover: #1e293b;
   --color-sidebar-text: #e2e8f0;
-  --color-sidebar-active: #0d6efd;
-  --color-body-bg: #f8f9fa;
+  --color-sidebar-active: #1e40af;
+
+  /* Layout */
+  --color-body-bg: #f9fafb;
   --color-card-bg: #ffffff;
-  --color-text: #212529;
-  --color-text-muted: #6c757d;
-  --color-border: #dee2e6;
-  --color-success: #198754;
-  --color-warning: #ffc107;
-  --color-danger: #dc3545;
-  --color-info: #0dcaf0;
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-border: #e5e7eb;
+
+  /* Semantic Colors */
+  --color-success: #059669;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --color-info: #0284c7;
+
+  /* Layout Dimensions */
   --sidebar-width: 250px;
   --header-height: 60px;
-  --transition-speed: 0.3s;
-  --border-radius: 0.375rem;
-  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.125);
+
+  /* Effects */
+  --transition-speed: 0.2s;
+  --border-radius: 8px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
-/* ------------------------------------------
-   Body Defaults
-   ------------------------------------------ */
+/* ============================================================
+   Base Reset & Typography
+   ============================================================ */
+
 body {
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: var(--color-body-bg);
-  color: var(--color-text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
   line-height: 1.6;
+  color: var(--color-text);
+  background-color: var(--color-body-bg);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ------------------------------------------
-   Sidebar Styles
-   ------------------------------------------ */
+/* ============================================================
+   Sidebar
+   ============================================================ */
+
 .app-sidebar {
   position: fixed;
   top: 0;
@@ -61,32 +78,35 @@ body {
 .app-sidebar .sidebar-brand {
   display: flex;
   align-items: center;
-  padding: 1rem 1.25rem;
-  font-size: 1.25rem;
+  padding: 1.25rem 1.25rem;
+  font-size: 1.125rem;
   font-weight: 600;
   color: #ffffff;
-  border-bottom: 1px solid var(--color-sidebar-hover);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  letter-spacing: -0.01em;
 }
 
 .app-sidebar .sidebar-nav {
-  padding: 0.5rem 0;
+  padding: 0.75rem 0;
   list-style: none;
   margin: 0;
 }
 
 .app-sidebar .nav-item {
-  margin: 0.125rem 0.5rem;
+  margin: 2px 0.625rem;
 }
 
 .app-sidebar .nav-link {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.625rem 1rem;
+  padding: 0.6rem 1rem;
   color: var(--color-sidebar-text);
   text-decoration: none;
-  border-radius: var(--border-radius);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
 }
 
 .app-sidebar .nav-link:hover {
@@ -101,23 +121,29 @@ body {
 }
 
 .app-sidebar .nav-link i {
-  font-size: 1.1rem;
+  font-size: 1rem;
   width: 1.5rem;
   text-align: center;
+  opacity: 0.85;
+}
+
+.app-sidebar .nav-link.active i {
+  opacity: 1;
 }
 
 .app-sidebar .sidebar-section-title {
-  padding: 1rem 1.25rem 0.5rem;
-  font-size: 0.7rem;
-  font-weight: 700;
+  padding: 1.25rem 1.25rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #94a3b8;
+  letter-spacing: 0.06em;
+  color: #64748b;
 }
 
-/* ------------------------------------------
-   Content Area
-   ------------------------------------------ */
+/* ============================================================
+   Main Content Area
+   ============================================================ */
+
 .app-content {
   margin-left: var(--sidebar-width);
   min-height: 100vh;
@@ -141,14 +167,17 @@ body {
 }
 
 .page-title {
-  font-size: 1.5rem;
+  font-size: 1.375rem;
   font-weight: 600;
   margin: 0;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
 }
 
-/* ------------------------------------------
-   Data Table Styles
-   ------------------------------------------ */
+/* ============================================================
+   Tables
+   ============================================================ */
+
 .table-responsive {
   border-radius: var(--border-radius);
   overflow: hidden;
@@ -156,16 +185,16 @@ body {
 
 .data-table {
   margin-bottom: 0;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .data-table thead th {
-  background-color: #f1f5f9;
-  border-bottom: 2px solid var(--color-border);
+  background-color: #f9fafb;
+  border-bottom: 1px solid var(--color-border);
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.025em;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
   padding: 0.75rem 1rem;
   white-space: nowrap;
   color: var(--color-text-muted);
@@ -174,11 +203,12 @@ body {
 .data-table tbody td {
   padding: 0.75rem 1rem;
   vertical-align: middle;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f3f4f6;
+  color: var(--color-text);
 }
 
 .data-table tbody tr:hover {
-  background-color: var(--color-primary-light);
+  background-color: #f9fafb;
 }
 
 .data-table .text-end {
@@ -189,13 +219,15 @@ body {
   text-align: center;
 }
 
-/* ------------------------------------------
-   Card Styles
-   ------------------------------------------ */
+/* ============================================================
+   Cards
+   ============================================================ */
+
 .card {
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
+  background-color: var(--color-card-bg);
   transition: box-shadow var(--transition-speed) ease, transform var(--transition-speed) ease;
 }
 
@@ -204,40 +236,59 @@ body {
 }
 
 .card-clickable:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   cursor: pointer;
 }
 
+/* Stat Cards */
 .stat-card {
-  border-left: 4px solid var(--color-primary);
+  border-left: 3px solid var(--color-primary);
 }
 
 .stat-card .stat-value {
-  font-size: 1.75rem;
+  font-size: 1.625rem;
   font-weight: 700;
   color: var(--color-text);
+  letter-spacing: -0.02em;
 }
 
 .stat-card .stat-label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: var(--color-text-muted);
+  font-weight: 500;
 }
 
-/* ------------------------------------------
-   Form Input Styles
-   ------------------------------------------ */
+/* ============================================================
+   Forms
+   ============================================================ */
+
 .form-control:focus,
 .form-select:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+.form-control {
+  border-color: var(--color-border);
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  padding: 0.5rem 0.75rem;
+  transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.form-select {
+  border-color: var(--color-border);
+  border-radius: 6px;
+  font-size: 0.8125rem;
 }
 
 .form-label {
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   margin-bottom: 0.375rem;
+  color: var(--color-text);
 }
 
 .form-label .required {
@@ -246,13 +297,149 @@ body {
 }
 
 .input-group-text {
-  background-color: #f8f9fa;
+  background-color: #f9fafb;
   border-color: var(--color-border);
+  font-size: 0.8125rem;
 }
 
-/* ------------------------------------------
-   Toast Notification Styles
-   ------------------------------------------ */
+/* ============================================================
+   Buttons
+   ============================================================ */
+
+.btn {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  transition: all var(--transition-speed) ease;
+  letter-spacing: 0.01em;
+}
+
+.btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.15);
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background-color: #6b7280;
+  border-color: #6b7280;
+  color: #ffffff;
+}
+
+.btn-secondary:hover {
+  background-color: #4b5563;
+  border-color: #4b5563;
+  color: #ffffff;
+}
+
+.btn-success {
+  background-color: var(--color-success);
+  border-color: var(--color-success);
+  color: #ffffff;
+}
+
+.btn-success:hover {
+  background-color: #047857;
+  border-color: #047857;
+  color: #ffffff;
+}
+
+.btn-danger {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+  color: #ffffff;
+}
+
+.btn-warning {
+  background-color: var(--color-warning);
+  border-color: var(--color-warning);
+  color: #ffffff;
+}
+
+.btn-warning:hover {
+  background-color: #b45309;
+  border-color: #b45309;
+  color: #ffffff;
+}
+
+.btn-info {
+  background-color: var(--color-info);
+  border-color: var(--color-info);
+  color: #ffffff;
+}
+
+.btn-info:hover {
+  background-color: #0369a1;
+  border-color: #0369a1;
+  color: #ffffff;
+}
+
+.btn-light {
+  background-color: #ffffff;
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.btn-light:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+  color: var(--color-text);
+}
+
+.btn-outline-primary {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.btn-outline-secondary {
+  border-color: #6b7280;
+  color: #6b7280;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #6b7280;
+  border-color: #6b7280;
+  color: #ffffff;
+}
+
+.btn-outline-danger {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+  color: #ffffff;
+}
+
+/* ============================================================
+   Toast Notifications
+   ============================================================ */
+
 .toast-container {
   position: fixed;
   top: 1rem;
@@ -264,38 +451,40 @@ body {
 }
 
 .app-toast {
-  min-width: 300px;
-  padding: 0.75rem 1rem;
+  min-width: 320px;
+  padding: 0.875rem 1rem;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-md);
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  animation: slideInRight 0.3s ease;
+  animation: slideInRight 0.25s ease-out;
+  font-size: 0.8125rem;
+  font-weight: 500;
 }
 
 .app-toast.toast-success {
-  background-color: #d1e7dd;
-  border: 1px solid #badbcc;
-  color: #0f5132;
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
 }
 
 .app-toast.toast-error {
-  background-color: #f8d7da;
-  border: 1px solid #f5c2c7;
-  color: #842029;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
 }
 
 .app-toast.toast-warning {
-  background-color: #fff3cd;
-  border: 1px solid #ffecb5;
-  color: #664d03;
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
 }
 
 .app-toast.toast-info {
-  background-color: #cff4fc;
-  border: 1px solid #b6effb;
-  color: #055160;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
 }
 
 @keyframes slideInRight {
@@ -309,9 +498,10 @@ body {
   }
 }
 
-/* ------------------------------------------
-   POS Terminal Layout
-   ------------------------------------------ */
+/* ============================================================
+   POS Terminal
+   ============================================================ */
+
 .pos-terminal {
   position: fixed;
   top: 0;
@@ -332,14 +522,14 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1.25rem;
-  background-color: var(--color-sidebar-bg);
+  background-color: #0f172a;
   color: #ffffff;
 }
 
 .pos-terminal .pos-products {
   grid-column: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 1.25rem;
 }
 
 .pos-terminal .pos-cart {
@@ -359,8 +549,8 @@ body {
 
 .pos-terminal .pos-cart-total {
   padding: 1rem;
-  border-top: 2px solid var(--color-border);
-  background-color: #f8f9fa;
+  border-top: 1px solid var(--color-border);
+  background-color: #f9fafb;
 }
 
 .pos-product-card {
@@ -369,7 +559,8 @@ body {
   padding: 1rem;
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
-  transition: all 0.2s ease;
+  background-color: var(--color-card-bg);
+  transition: all var(--transition-speed) ease;
 }
 
 .pos-product-card:hover {
@@ -378,74 +569,76 @@ body {
 }
 
 .pos-product-card:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
-/* ------------------------------------------
-   Stock Badge Colors
-   ------------------------------------------ */
+/* ============================================================
+   Stock & Status Badges
+   ============================================================ */
+
 .badge-stock-normal {
-  background-color: var(--color-success);
-  color: #ffffff;
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
 }
 
 .badge-stock-low {
-  background-color: var(--color-warning);
-  color: #212529;
+  background-color: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
 }
 
 .badge-stock-out {
-  background-color: var(--color-danger);
-  color: #ffffff;
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
 }
 
-/* ------------------------------------------
-   Status Badge Styles
-   ------------------------------------------ */
 .badge-status {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
   padding: 0.25rem 0.625rem;
   border-radius: 50rem;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 500;
 }
 
 .badge-status-active {
-  background-color: #d1e7dd;
-  color: #0f5132;
+  background-color: #ecfdf5;
+  color: #065f46;
 }
 
 .badge-status-inactive {
-  background-color: #e2e3e5;
-  color: #41464b;
+  background-color: #f3f4f6;
+  color: #4b5563;
 }
 
 .badge-status-pending {
-  background-color: #fff3cd;
-  color: #664d03;
+  background-color: #fffbeb;
+  color: #92400e;
 }
 
 .badge-status-completed {
-  background-color: #cff4fc;
-  color: #055160;
+  background-color: #eff6ff;
+  color: #1e40af;
 }
 
 .badge-status-cancelled {
-  background-color: #f8d7da;
-  color: #842029;
+  background-color: #fef2f2;
+  color: #991b1b;
 }
 
 .badge-status-void {
-  background-color: #f5f5f5;
-  color: #6c757d;
+  background-color: #f9fafb;
+  color: #9ca3af;
   text-decoration: line-through;
 }
 
-/* ------------------------------------------
-   Loading Spinner Overlay
-   ------------------------------------------ */
+/* ============================================================
+   Loading States
+   ============================================================ */
+
 .loading-overlay {
   position: fixed;
   top: 0;
@@ -455,17 +648,17 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.9);
   z-index: 1100;
 }
 
 .loading-spinner {
-  width: 3rem;
-  height: 3rem;
-  border: 0.3rem solid #e9ecef;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid #e5e7eb;
   border-top-color: var(--color-primary);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.7s linear infinite;
 }
 
 .loading-inline {
@@ -473,13 +666,13 @@ body {
   align-items: center;
   gap: 0.5rem;
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .loading-inline .spinner-sm {
-  width: 1rem;
-  height: 1rem;
-  border-width: 0.15rem;
+  width: 0.875rem;
+  height: 0.875rem;
+  border-width: 2px;
 }
 
 @keyframes spin {
@@ -488,9 +681,10 @@ body {
   }
 }
 
-/* ------------------------------------------
-   Page Transitions (Fade)
-   ------------------------------------------ */
+/* ============================================================
+   Transitions
+   ============================================================ */
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;
@@ -502,26 +696,27 @@ body {
 }
 
 .slide-fade-enter-active {
-  transition: all 0.25s ease-out;
+  transition: all 0.2s ease-out;
 }
 
 .slide-fade-leave-active {
-  transition: all 0.2s ease-in;
+  transition: all 0.15s ease-in;
 }
 
 .slide-fade-enter-from {
-  transform: translateY(10px);
+  transform: translateY(8px);
   opacity: 0;
 }
 
 .slide-fade-leave-to {
-  transform: translateY(-10px);
+  transform: translateY(-8px);
   opacity: 0;
 }
 
-/* ------------------------------------------
-   Mobile Breakpoints
-   ------------------------------------------ */
+/* ============================================================
+   Responsive — Tablet
+   ============================================================ */
+
 @media (max-width: 991.98px) {
   .app-sidebar {
     transform: translateX(-100%);
@@ -546,13 +741,17 @@ body {
   }
 }
 
+/* ============================================================
+   Responsive — Mobile
+   ============================================================ */
+
 @media (max-width: 767.98px) {
   .app-content .content-body {
     padding: 1rem;
   }
 
   .page-title {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
   }
 
   .pos-terminal {
@@ -573,9 +772,10 @@ body {
   }
 }
 
-/* ------------------------------------------
+/* ============================================================
    Print Styles
-   ------------------------------------------ */
+   ============================================================ */
+
 @media print {
   .app-sidebar,
   .content-header,
@@ -603,12 +803,13 @@ body {
   }
 
   .data-table thead th {
-    background-color: #e9ecef !important;
+    background-color: #f3f4f6 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
   body {
     background-color: #ffffff;
+    color: #000000;
   }
 }

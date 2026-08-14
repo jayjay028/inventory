@@ -1,47 +1,49 @@
 <template>
   <aside class="sidebar" :class="{ collapsed: appStore.sidebarCollapsed }">
-    <div class="sidebar-brand d-flex align-items-center px-3 py-3">
-      <i class="bi bi-box-seam-fill fs-4 text-primary me-2"></i>
-      <span class="brand-text fw-bold">Inventory</span>
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <i class="bi bi-box-seam-fill brand-icon"></i>
+      <span class="brand-text">Inventory + POS</span>
     </div>
 
+    <!-- Navigation -->
     <nav class="sidebar-nav">
-      <ul class="nav flex-column">
+      <ul class="nav-list">
         <template v-for="item in filteredNavigation" :key="item.label">
           <!-- Single link (no children) -->
           <li v-if="!item.children" class="nav-item">
             <router-link
               :to="item.route"
-              class="nav-link d-flex align-items-center gap-2"
+              class="nav-link"
               active-class="active"
             >
-              <i :class="['bi', item.icon]"></i>
-              <span>{{ item.label }}</span>
+              <i :class="['bi', item.icon, 'nav-icon']"></i>
+              <span class="nav-label">{{ item.label }}</span>
             </router-link>
           </li>
 
           <!-- Group with children -->
           <li v-else class="nav-item nav-group">
+            <div class="nav-group-header">{{ item.label }}</div>
             <button
-              class="nav-link nav-group-toggle d-flex align-items-center gap-2 w-100 border-0 bg-transparent"
+              class="nav-group-toggle"
               type="button"
               :class="{ open: expandedGroups[item.label] }"
               @click="toggleGroup(item.label)"
             >
-              <i :class="['bi', item.icon]"></i>
-              <span class="flex-grow-1 text-start">{{ item.label }}</span>
-              <i class="bi bi-chevron-down chevron-icon"></i>
+              <i :class="['bi', item.icon, 'nav-icon']"></i>
+              <span class="nav-label">{{ item.label }}</span>
+              <i class="bi bi-chevron-right chevron-icon"></i>
             </button>
             <transition name="slide">
-              <ul v-show="expandedGroups[item.label]" class="nav flex-column nav-children">
+              <ul v-show="expandedGroups[item.label]" class="nav-children">
                 <li v-for="child in item.children" :key="child.label" class="nav-item">
                   <router-link
                     :to="child.route"
-                    class="nav-link d-flex align-items-center gap-2 ps-4"
+                    class="nav-link child-link"
                     active-class="active"
                   >
-                    <i class="bi bi-dot"></i>
-                    <span>{{ child.label }}</span>
+                    <span class="nav-label">{{ child.label }}</span>
                   </router-link>
                 </li>
               </ul>
@@ -53,36 +55,29 @@
 
     <!-- Recent Transactions -->
     <div v-if="authStore.hasPermission(13)" class="sidebar-transactions">
-      <div class="sidebar-section-header d-flex align-items-center justify-content-between px-3 py-2">
-        <span class="small fw-bold text-uppercase">Recent Transactions</span>
-        <router-link to="/transactions" class="text-decoration-none">
-          <i class="bi bi-arrow-right-circle small"></i>
+      <div class="transactions-header">
+        <span class="transactions-title">Recent Transactions</span>
+        <router-link to="/transactions" class="transactions-link">
+          <i class="bi bi-arrow-right-short"></i>
         </router-link>
       </div>
-      <div v-if="loadingTransactions" class="text-center py-2">
-        <span class="spinner-border spinner-border-sm text-secondary"></span>
+      <div v-if="loadingTransactions" class="transactions-loading">
+        <span class="spinner-border spinner-border-sm"></span>
       </div>
-      <ul v-else class="transaction-list">
+      <ul v-else class="transactions-list">
         <li
           v-for="tx in recentTransactions"
           :key="tx.id"
-          class="transaction-item px-3 py-2"
+          class="transaction-item"
         >
-          <div class="d-flex align-items-center gap-2">
-            <i :class="['bi', getTransactionIcon(tx.type)]" class="tx-icon"></i>
-            <div class="flex-grow-1 min-width-0">
-              <div class="tx-code text-truncate">{{ tx.documentNumber || tx.id }}</div>
-              <div class="tx-meta d-flex align-items-center gap-1">
-                <span :class="['tx-badge', 'tx-badge-' + (tx.status || 'created').toLowerCase()]">
-                  {{ tx.status || 'CREATED' }}
-                </span>
-                <span class="tx-date">{{ formatDate(tx.createdAt || tx.transactionDate) }}</span>
-              </div>
-            </div>
+          <div class="tx-row">
+            <span class="tx-status-dot" :class="'dot-' + (tx.status || 'created').toLowerCase()"></span>
+            <span class="tx-doc-number">{{ tx.documentNumber || tx.id }}</span>
+            <span class="tx-time">{{ formatDate(tx.createdAt || tx.transactionDate) }}</span>
           </div>
         </li>
-        <li v-if="recentTransactions.length === 0" class="px-3 py-2 text-center">
-          <small class="text-muted">No recent transactions</small>
+        <li v-if="recentTransactions.length === 0" class="transaction-empty">
+          No recent transactions
         </li>
       </ul>
     </div>
@@ -231,161 +226,195 @@ onMounted(() => {
   left: 0;
   bottom: 0;
   width: 250px;
-  background-color: var(--sidebar-bg, #1e293b);
-  color: #cbd5e1;
+  background-color: #0f172a;
+  color: #94a3b8;
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 1030;
-  transition: transform 0.3s ease;
+  transition: transform 0.2s ease;
   display: flex;
   flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: #1e293b #0f172a;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
 }
 
 .sidebar.collapsed {
   transform: translateX(-100%);
 }
 
+/* Brand */
 .sidebar-brand {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 1.125rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
+}
+
+.brand-icon {
+  font-size: 1.25rem;
+  color: #818cf8;
 }
 
 .brand-text {
-  color: #f8fafc;
-  font-size: 1.1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  letter-spacing: -0.01em;
 }
 
+/* Navigation */
 .sidebar-nav {
-  padding: 0.5rem 0;
   flex: 1;
   overflow-y: auto;
+  padding: 0.75rem 0;
+  scrollbar-width: thin;
+  scrollbar-color: #1e293b #0f172a;
 }
 
-.sidebar-nav .nav-link {
-  color: #94a3b8;
-  padding: 0.6rem 1rem;
-  font-size: 0.875rem;
-  border-radius: 0;
-  transition: background-color 0.15s, color 0.15s;
+.sidebar-nav::-webkit-scrollbar {
+  width: 5px;
 }
 
-.sidebar-nav .nav-link:hover {
-  color: #f1f5f9;
-  background-color: rgba(255, 255, 255, 0.05);
+.sidebar-nav::-webkit-scrollbar-track {
+  background: #0f172a;
 }
 
-.sidebar-nav .nav-link.active {
-  color: #fff;
-  background-color: var(--bs-primary, #0d6efd);
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
 }
 
-.nav-group-toggle {
-  cursor: pointer;
-}
-
-.nav-group-toggle .chevron-icon {
-  font-size: 0.7rem;
-  transition: transform 0.2s ease;
-}
-
-.nav-group-toggle.open .chevron-icon {
-  transform: rotate(180deg);
-}
-
-.nav-children {
-  background-color: rgba(0, 0, 0, 0.15);
-}
-
-.nav-children .nav-link {
-  padding-left: 2.5rem;
-  font-size: 0.8125rem;
-}
-
-/* Recent Transactions Section */
-.sidebar-transactions {
-  flex-shrink: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  max-height: 280px;
-  overflow-y: auto;
-}
-
-.sidebar-section-header {
-  color: #64748b;
-  position: sticky;
-  top: 0;
-  background-color: var(--sidebar-bg, #1e293b);
-  z-index: 1;
-}
-
-.sidebar-section-header a {
-  color: #64748b;
-}
-
-.sidebar-section-header a:hover {
-  color: #94a3b8;
-}
-
-.transaction-list {
+.nav-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.transaction-item {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  transition: background-color 0.15s;
+.nav-item {
+  margin: 1px 0;
 }
 
-.transaction-item:hover {
+.nav-group {
+  margin-top: 0.5rem;
+}
+
+.nav-group-header {
+  display: none;
+}
+
+/* Nav links */
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 1.25rem;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  border-left: 2px solid transparent;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  color: #e2e8f0;
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.nav-link.active {
+  color: #f8fafc;
+  border-left-color: #818cf8;
   background-color: rgba(255, 255, 255, 0.03);
 }
 
-.transaction-item:last-child {
-  border-bottom: none;
-}
-
-.tx-icon {
-  font-size: 0.85rem;
-  color: #64748b;
+.nav-icon {
+  font-size: 0.9375rem;
+  width: 1.25rem;
+  text-align: center;
   flex-shrink: 0;
+  opacity: 0.7;
 }
 
-.tx-code {
-  font-size: 0.75rem;
+.nav-link.active .nav-icon {
+  opacity: 1;
+}
+
+.nav-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Group toggle */
+.nav-group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 0.5rem 1.25rem;
+  color: #94a3b8;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  background: none;
+  border: none;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.nav-group-toggle:hover {
   color: #e2e8f0;
-  font-family: monospace;
+  background-color: rgba(255, 255, 255, 0.04);
 }
 
-.tx-meta {
-  font-size: 0.65rem;
-  color: #64748b;
+.chevron-icon {
+  font-size: 0.625rem;
+  margin-left: auto;
+  transition: transform 0.2s ease;
+  opacity: 0.5;
 }
 
-.tx-badge {
-  display: inline-block;
-  padding: 0.05rem 0.35rem;
-  border-radius: 3px;
-  font-size: 0.6rem;
-  font-weight: 600;
-  text-transform: uppercase;
+.nav-group-toggle.open .chevron-icon {
+  transform: rotate(90deg);
 }
 
-.tx-badge-created { background: #854d0e; color: #fef3c7; }
-.tx-badge-approved { background: #166534; color: #dcfce7; }
-.tx-badge-cancelled { background: #991b1b; color: #fee2e2; }
-.tx-badge-pending { background: #854d0e; color: #fef3c7; }
-
-.tx-date {
-  color: #475569;
+/* Children */
+.nav-children {
+  list-style: none;
+  padding: 0.125rem 0 0.375rem 0;
+  margin: 0;
 }
 
-.min-width-0 {
-  min-width: 0;
+.child-link {
+  padding: 0.375rem 1.25rem 0.375rem 2.75rem;
+  font-size: 0.8125rem;
 }
 
+.child-link.active {
+  border-left-color: #818cf8;
+}
+
+/* Transitions */
 .slide-enter-active,
 .slide-leave-active {
-  transition: max-height 0.25s ease, opacity 0.2s ease;
+  transition: max-height 0.2s ease, opacity 0.15s ease;
   overflow: hidden;
 }
 
@@ -401,16 +430,151 @@ onMounted(() => {
   opacity: 1;
 }
 
+/* Recent Transactions */
+.sidebar-transactions {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  max-height: 240px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #1e293b #0f172a;
+}
+
+.sidebar-transactions::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar-transactions::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+.sidebar-transactions::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+
+.transactions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem 0.5rem;
+  position: sticky;
+  top: 0;
+  background-color: #0f172a;
+  z-index: 1;
+}
+
+.transactions-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.transactions-link {
+  color: #64748b;
+  text-decoration: none;
+  font-size: 1rem;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.transactions-link:hover {
+  color: #94a3b8;
+}
+
+.transactions-loading {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.transactions-loading .spinner-border {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-width: 2px;
+  color: #475569;
+}
+
+.transactions-list {
+  list-style: none;
+  padding: 0 0 0.5rem;
+  margin: 0;
+}
+
+.transaction-item {
+  padding: 0.375rem 1.25rem;
+  transition: background-color 0.15s ease;
+}
+
+.transaction-item:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.tx-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tx-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-created,
+.dot-pending {
+  background-color: #f59e0b;
+}
+
+.dot-approved,
+.dot-completed {
+  background-color: #10b981;
+}
+
+.dot-cancelled,
+.dot-void {
+  background-color: #ef4444;
+}
+
+.tx-doc-number {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.6875rem;
+  color: #cbd5e1;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tx-time {
+  font-size: 0.625rem;
+  color: #475569;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.transaction-empty {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.6875rem;
+  color: #475569;
+  text-align: center;
+}
+
+/* Backdrop */
 .sidebar-backdrop {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   z-index: 1025;
 }
 
+/* Responsive */
 @media (max-width: 991.98px) {
   .sidebar {
     transform: translateX(-100%);
