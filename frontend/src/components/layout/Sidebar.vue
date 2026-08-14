@@ -50,6 +50,42 @@
         </template>
       </ul>
     </nav>
+
+    <!-- Recent Transactions -->
+    <div v-if="authStore.hasPermission(13)" class="sidebar-transactions">
+      <div class="sidebar-section-header d-flex align-items-center justify-content-between px-3 py-2">
+        <span class="small fw-bold text-uppercase">Recent Transactions</span>
+        <router-link to="/transactions" class="text-decoration-none">
+          <i class="bi bi-arrow-right-circle small"></i>
+        </router-link>
+      </div>
+      <div v-if="loadingTransactions" class="text-center py-2">
+        <span class="spinner-border spinner-border-sm text-secondary"></span>
+      </div>
+      <ul v-else class="transaction-list">
+        <li
+          v-for="tx in recentTransactions"
+          :key="tx.id"
+          class="transaction-item px-3 py-2"
+        >
+          <div class="d-flex align-items-center gap-2">
+            <i :class="['bi', getTransactionIcon(tx.type)]" class="tx-icon"></i>
+            <div class="flex-grow-1 min-width-0">
+              <div class="tx-code text-truncate">{{ tx.documentNumber || tx.id }}</div>
+              <div class="tx-meta d-flex align-items-center gap-1">
+                <span :class="['tx-badge', 'tx-badge-' + (tx.status || 'created').toLowerCase()]">
+                  {{ tx.status || 'CREATED' }}
+                </span>
+                <span class="tx-date">{{ formatDate(tx.createdAt || tx.transactionDate) }}</span>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li v-if="recentTransactions.length === 0" class="px-3 py-2 text-center">
+          <small class="text-muted">No recent transactions</small>
+        </li>
+      </ul>
+    </div>
   </aside>
 
   <!-- Backdrop for mobile -->
@@ -61,14 +97,17 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
+import transactionsApi from '@/api/transactions'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
 
 const expandedGroups = ref({})
+const recentTransactions = ref([])
+const loadingTransactions = ref(false)
 
 const navigation = [
   { label: 'Dashboard', icon: 'bi-speedometer2', route: '/dashboard', permission: 0 },
@@ -134,6 +173,55 @@ const filteredNavigation = computed(() => {
 function toggleGroup(label) {
   expandedGroups.value[label] = !expandedGroups.value[label]
 }
+
+function getTransactionIcon(type) {
+  if (!type) return 'bi-arrow-left-right'
+  const t = type.toUpperCase()
+  if (t.includes('IN') || t === 'STOCK_IN') return 'bi-box-arrow-in-down'
+  if (t.includes('OUT') || t === 'STOCK_OUT') return 'bi-box-arrow-up'
+  if (t.includes('ADJ') || t === 'ADJUSTMENT') return 'bi-sliders'
+  return 'bi-arrow-left-right'
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  const now = new Date()
+  const diffMs = now - date
+  const diffMins = Math.floor(diffMs / 60000)
+
+  if (diffMins < 1) return 'Just now'
+  if (diffMins < 60) return `${diffMins}m ago`
+
+  const diffHours = Math.floor(diffMins / 60)
+  if (diffHours < 24) return `${diffHours}h ago`
+
+  const diffDays = Math.floor(diffHours / 24)
+  if (diffDays < 7) return `${diffDays}d ago`
+
+  return date.toLocaleDateString('en-PH', { month: 'short', day: 'numeric' })
+}
+
+async function loadRecentTransactions() {
+  if (!authStore.hasPermission(13)) return
+  loadingTransactions.value = true
+  try {
+    const { data } = await transactionsApi.getAll({ page: 0, size: 8, sort: 'createdAt,desc' })
+    const payload = data.data || data
+    recentTransactions.value = payload.content || payload || []
+  } catch (error) {
+    // Silently fail - sidebar shouldn't break if API fails
+    recentTransactions.value = []
+  } finally {
+    loadingTransactions.value = false
+  }
+}
+
+onMounted(() => {
+  loadRecentTransactions()
+  // Refresh every 60 seconds
+  setInterval(loadRecentTransactions, 60000)
+})
 </script>
 
 <style scoped>
@@ -149,6 +237,8 @@ function toggleGroup(label) {
   overflow-x: hidden;
   z-index: 1030;
   transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar.collapsed {
@@ -157,6 +247,7 @@ function toggleGroup(label) {
 
 .sidebar-brand {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .brand-text {
@@ -166,6 +257,8 @@ function toggleGroup(label) {
 
 .sidebar-nav {
   padding: 0.5rem 0;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .sidebar-nav .nav-link {
@@ -206,6 +299,88 @@ function toggleGroup(label) {
 .nav-children .nav-link {
   padding-left: 2.5rem;
   font-size: 0.8125rem;
+}
+
+/* Recent Transactions Section */
+.sidebar-transactions {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.sidebar-section-header {
+  color: #64748b;
+  position: sticky;
+  top: 0;
+  background-color: var(--sidebar-bg, #1e293b);
+  z-index: 1;
+}
+
+.sidebar-section-header a {
+  color: #64748b;
+}
+
+.sidebar-section-header a:hover {
+  color: #94a3b8;
+}
+
+.transaction-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.transaction-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.15s;
+}
+
+.transaction-item:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.tx-icon {
+  font-size: 0.85rem;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.tx-code {
+  font-size: 0.75rem;
+  color: #e2e8f0;
+  font-family: monospace;
+}
+
+.tx-meta {
+  font-size: 0.65rem;
+  color: #64748b;
+}
+
+.tx-badge {
+  display: inline-block;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.tx-badge-created { background: #854d0e; color: #fef3c7; }
+.tx-badge-approved { background: #166534; color: #dcfce7; }
+.tx-badge-cancelled { background: #991b1b; color: #fee2e2; }
+.tx-badge-pending { background: #854d0e; color: #fef3c7; }
+
+.tx-date {
+  color: #475569;
+}
+
+.min-width-0 {
+  min-width: 0;
 }
 
 .slide-enter-active,
