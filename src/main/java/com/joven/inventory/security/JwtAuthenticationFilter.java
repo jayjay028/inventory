@@ -43,16 +43,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /** User details service for loading user data */
     private final CustomUserDetailsService customUserDetailsService;
 
+    /** Token deny list for invalidated tokens */
+    private final TokenDenyList tokenDenyList;
+
     /**
      * Constructs the filter with required dependencies.
      *
-     * @param jwtTokenProvider       the JWT token provider
+     * @param jwtTokenProvider         the JWT token provider
      * @param customUserDetailsService the user details service
+     * @param tokenDenyList            the token deny list
      */
     public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider,
-                                   CustomUserDetailsService customUserDetailsService) {
+                                   CustomUserDetailsService customUserDetailsService,
+                                   TokenDenyList tokenDenyList) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.customUserDetailsService = customUserDetailsService;
+        this.tokenDenyList = tokenDenyList;
     }
 
     /**
@@ -73,6 +79,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = extractTokenFromRequest(request);
 
             if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+                // Check if the token has been invalidated (e.g., via logout)
+                if (tokenDenyList.isDenied(token)) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+
                 String username = jwtTokenProvider.getUsernameFromToken(token);
 
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);

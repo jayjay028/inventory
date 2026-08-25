@@ -8,7 +8,9 @@
       </div>
       <div class="pos-header__center">
         <span class="pos-header__shift">
-          <i class="bi bi-clock me-1"></i>Active Session
+          <i class="bi bi-clock me-1"></i>
+          <template v-if="currentShift">Shift #{{ currentShift.id }} — Active</template>
+          <template v-else>No Active Shift</template>
         </span>
       </div>
       <div class="pos-header__right">
@@ -165,8 +167,8 @@
               <span class="pos-totals__label">Discount</span>
               <span class="pos-totals__value">−{{ formatCurrency(discountAmount) }}</span>
             </div>
-            <div class="pos-totals__row">
-              <span class="pos-totals__label">Tax (12%)</span>
+            <div v-if="taxSettings.enabled && taxAmount > 0" class="pos-totals__row">
+              <span class="pos-totals__label">Tax ({{ taxSettings.rate }}%){{ taxSettings.inclusive ? ' incl.' : '' }}</span>
               <span class="pos-totals__value">{{ formatCurrency(taxAmount) }}</span>
             </div>
             <div class="pos-totals__row pos-totals__row--grand">
@@ -178,6 +180,15 @@
           <!-- Action Buttons -->
           <div class="pos-actions">
             <button
+              v-if="requireShift && !currentShift"
+              class="pos-actions__pay"
+              @click="openNewShift"
+            >
+              <i class="bi bi-play-circle me-2"></i>
+              Open Shift to Start
+            </button>
+            <button
+              v-else
               class="pos-actions__pay"
               :disabled="!cart.length || processing"
               @click="processSale"
@@ -201,9 +212,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import posApi from '@/api/pos'
+import settingsApi from '@/api/settings'
 import { useAppStore } from '@/stores/app'
 
 const router = useRouter()
@@ -214,13 +226,46 @@ const searchResults = ref([])
 const searchLoading = ref(false)
 const cart = ref([])
 const processing = ref(false)
+const currentShift = ref(null)
+const requireShift = ref(false)
 
 const discount = reactive({
   type: '',
   value: 0
 })
 
+// Tax settings loaded from backend
+const taxSettings = ref({
+  enabled: true,
+  rate: 12,
+  inclusive: false
+})
+
 let searchTimeout = null
+
+// Load tax settings and shift on mount
+onMounted(async () => {
+  try {
+    const { data } = await settingsApi.getAll()
+    const settings = data.data || data
+    taxSettings.value = {
+      enabled: settings.taxEnabled !== undefined ? settings.taxEnabled : true,
+      rate: settings.taxRate !== undefined ? Number(settings.taxRate) : 12,
+      inclusive: settings.taxInclusive !== undefined ? settings.taxInclusive : false
+    }
+    requireShift.value = settings.requireShift !== undefined ? settings.requireShift : false
+  } catch {
+    // Keep defaults if API fails
+  }
+
+  // Load current shift
+  try {
+    const { data } = await posApi.getCurrentShift()
+    currentShift.value = data.data || data || null
+  } catch {
+    currentShift.value = null
+  }
+})
 
 const subtotal = computed(() =>
   cart.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
@@ -228,16 +273,34 @@ const subtotal = computed(() =>
 
 const discountAmount = computed(() => {
   if (discount.type === 'PERCENTAGE') {
-    return subtotal.value * (Number(discount.value) / 100)
+    const pct = Math.min(Number(discount.value) || 0, 100)
+    return subtotal.value * (pct / 100)
   } else if (discount.type === 'FIXED') {
-    return Number(discount.value) || 0
+    return Math.min(Number(discount.value) || 0, subtotal.value)
   }
   return 0
 })
 
-const taxAmount = computed(() => (subtotal.value - discountAmount.value) * 0.12)
+const taxAmount = computed(() => {
+  if (!taxSettings.value.enabled) return 0
+  if (taxSettings.value.inclusive) {
+    // Tax is already included in prices — extract it for display
+    const taxableAmount = subtotal.value - discountAmount.value
+    const rate = taxSettings.value.rate / 100
+    return taxableAmount - (taxableAmount / (1 + rate))
+  }
+  // Tax is exclusive — add on top
+  return (subtotal.value - discountAmount.value) * (taxSettings.value.rate / 100)
+})
 
-const total = computed(() => subtotal.value - discountAmount.value + taxAmount.value)
+const total = computed(() => {
+  if (taxSettings.value.inclusive) {
+    // Prices already include tax, total is just subtotal minus discount
+    return Math.max(0, subtotal.value - discountAmount.value)
+  }
+  // Tax is exclusive — add tax on top
+  return Math.max(0, subtotal.value - discountAmount.value + taxAmount.value)
+})
 
 function handleSearch() {
   clearTimeout(searchTimeout)
@@ -313,6 +376,7 @@ function setQty(index, value) {
 
 async function processSale() {
   processing.value = true
+  const idempotencyKey = crypto.randomUUID()
   try {
     const payload = {
       items: cart.value.map(item => ({
@@ -325,7 +389,9 @@ async function processSale() {
       paymentMethod: 'CASH'
     }
 
-    await posApi.createSale(payload)
+    await posApi.createSale(payload, {
+      headers: { 'X-Idempotency-Key': idempotencyKey }
+    })
     appStore.showToast('Sale completed successfully!')
     cart.value = []
     discount.type = ''
@@ -337,6 +403,17 @@ async function processSale() {
     appStore.showToast(msg, 'error')
   } finally {
     processing.value = false
+  }
+}
+
+async function openNewShift() {
+  try {
+    const { data } = await posApi.openShift({ startingCash: 0 })
+    currentShift.value = data.data || data
+    appStore.showToast('Shift opened successfully!')
+  } catch (error) {
+    const msg = error.response?.data?.message || 'Failed to open shift'
+    appStore.showToast(msg, 'error')
   }
 }
 

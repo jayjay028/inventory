@@ -287,8 +287,10 @@ class StockTransactionServiceImplTest {
     void approve_givenCreatedOutTransaction_approvesAndDeductsStock() {
         // Arrange
         StockTransaction transaction = createTransaction(TransactionType.OUT, TransactionStatus.CREATED, 5);
+        Stock stock = createStock(transaction.getItem(), 100);
 
         when(stockTransactionRepository.findById(1L)).thenReturn(Optional.of(transaction));
+        when(stockRepository.findByItemId(1L)).thenReturn(Optional.of(stock));
         when(stockTransactionRepository.save(any(StockTransaction.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
         lenient().when(transactionAddonRepository.findByTransactionId(1L))

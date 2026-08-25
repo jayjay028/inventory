@@ -7,6 +7,8 @@ import com.joven.inventory.dto.request.StockInRequest;
 import com.joven.inventory.dto.request.StockOutRequest;
 import com.joven.inventory.dto.response.StockResponse;
 import com.joven.inventory.dto.response.StockTransactionResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.StockService;
 import com.joven.inventory.service.StockTransactionService;
 import jakarta.validation.Valid;
@@ -45,6 +47,7 @@ public class StockController {
      * @return the API response containing a page of stock records
      */
     @GetMapping
+    @RequiresPermission(Permission.VIEW_STOCK)
     public ResponseEntity<ApiResponse<PageResponse<StockResponse>>> getAll(
             @PageableDefault(size = 20) Pageable pageable) {
         PageResponse<StockResponse> response = stockService.getAll(pageable);
@@ -58,6 +61,7 @@ public class StockController {
      * @return the API response containing the stock data for the item
      */
     @GetMapping("/{itemId}")
+    @RequiresPermission(Permission.VIEW_STOCK)
     public ResponseEntity<ApiResponse<StockResponse>> getByItemId(@PathVariable Long itemId) {
         StockResponse response = stockService.getByItemId(itemId);
         return ResponseEntity.ok(ApiResponse.success("Stock retrieved successfully", response));
@@ -72,6 +76,7 @@ public class StockController {
      * @return the API response containing the created stock transaction
      */
     @PostMapping("/in")
+    @RequiresPermission(Permission.MANAGE_STOCK_IN)
     public ResponseEntity<ApiResponse<StockTransactionResponse>> createStockIn(
             @Valid @RequestBody StockInRequest request) {
         StockTransactionResponse response = stockTransactionService.createStockIn(request);
@@ -88,6 +93,7 @@ public class StockController {
      * @return the API response containing the created stock transaction
      */
     @PostMapping("/out")
+    @RequiresPermission(Permission.MANAGE_STOCK_OUT)
     public ResponseEntity<ApiResponse<StockTransactionResponse>> createStockOut(
             @Valid @RequestBody StockOutRequest request) {
         StockTransactionResponse response = stockTransactionService.createStockOut(request);
@@ -104,6 +110,7 @@ public class StockController {
      * @return the API response containing the created stock transaction
      */
     @PostMapping("/adjust")
+    @RequiresPermission(Permission.MANAGE_STOCK_ADJ)
     public ResponseEntity<ApiResponse<StockTransactionResponse>> createStockAdjust(
             @Valid @RequestBody StockAdjustRequest request) {
         StockTransactionResponse response = stockTransactionService.createStockAdjust(request);
@@ -119,6 +126,7 @@ public class StockController {
      * @return the API response containing the approved stock transaction
      */
     @PatchMapping("/transactions/{id}/approve")
+    @RequiresPermission(Permission.APPROVE_TRANSACTIONS)
     public ResponseEntity<ApiResponse<StockTransactionResponse>> approve(@PathVariable Long id) {
         StockTransactionResponse response = stockTransactionService.approve(id);
         return ResponseEntity.ok(ApiResponse.success("Transaction approved successfully", response));
@@ -132,6 +140,7 @@ public class StockController {
      * @return the API response containing the cancelled stock transaction
      */
     @PatchMapping("/transactions/{id}/cancel")
+    @RequiresPermission(Permission.CANCEL_TRANSACTIONS)
     public ResponseEntity<ApiResponse<StockTransactionResponse>> cancel(@PathVariable Long id) {
         StockTransactionResponse response = stockTransactionService.cancel(id);
         return ResponseEntity.ok(ApiResponse.success("Transaction cancelled successfully", response));

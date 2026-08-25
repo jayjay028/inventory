@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
 import transactionsApi from '@/api/transactions'
@@ -212,10 +212,19 @@ async function loadRecentTransactions() {
   }
 }
 
+let refreshInterval = null
+
 onMounted(() => {
   loadRecentTransactions()
   // Refresh every 60 seconds
-  setInterval(loadRecentTransactions, 60000)
+  refreshInterval = setInterval(loadRecentTransactions, 60000)
+})
+
+onBeforeUnmount(() => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval)
+    refreshInterval = null
+  }
 })
 </script>
 

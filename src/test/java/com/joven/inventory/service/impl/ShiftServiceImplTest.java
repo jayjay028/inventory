@@ -138,8 +138,8 @@ class ShiftServiceImplTest {
 
         when(shiftRepository.findById(1L)).thenReturn(Optional.of(shift));
         when(saleRepository.findByShiftId(1L)).thenReturn(shiftSales);
-        when(salePaymentRepository.findBySaleId(1L)).thenReturn(List.of(payment1));
-        when(salePaymentRepository.findBySaleId(2L)).thenReturn(List.of(payment2));
+        when(salePaymentRepository.findBySaleIdIn(List.of(1L, 2L)))
+                .thenReturn(List.of(payment1, payment2));
         when(shiftRepository.save(any(Shift.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         CloseShiftRequest request = CloseShiftRequest.builder()

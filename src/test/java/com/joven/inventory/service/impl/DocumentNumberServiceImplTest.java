@@ -56,7 +56,7 @@ class DocumentNumberServiceImplTest {
     void generateNextNumber_givenOrType_returnsFormattedNumber() {
         // Arrange
         when(appSettingService.getValueOrDefault("or_prefix", "OR-")).thenReturn("OR-");
-        when(appSettingService.getIntValue("or_next_number", 1)).thenReturn(1);
+        when(appSettingService.getAndIncrementIntValue("or_next_number", 1)).thenReturn(1);
 
         // Act
         String result = documentNumberService.generateNextNumber(DocumentType.OR);
@@ -65,8 +65,6 @@ class DocumentNumberServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result).matches("OR-\\d{6}-\\d{5}");
         assertThat(result).isEqualTo("OR-" + currentYearMonth + "-00001");
-
-        verify(appSettingService).updateValue("or_next_number", "2", "testuser");
     }
 
     // --- SI Type ---
@@ -76,7 +74,7 @@ class DocumentNumberServiceImplTest {
     void generateNextNumber_givenSiType_returnsFormattedNumber() {
         // Arrange
         when(appSettingService.getValueOrDefault("si_prefix", "SI-")).thenReturn("SI-");
-        when(appSettingService.getIntValue("si_next_number", 1)).thenReturn(5);
+        when(appSettingService.getAndIncrementIntValue("si_next_number", 1)).thenReturn(5);
 
         // Act
         String result = documentNumberService.generateNextNumber(DocumentType.SI);
@@ -86,8 +84,6 @@ class DocumentNumberServiceImplTest {
         assertThat(result).contains("SI-");
         assertThat(result).contains("00005");
         assertThat(result).isEqualTo("SI-" + currentYearMonth + "-00005");
-
-        verify(appSettingService).updateValue("si_next_number", "6", "testuser");
     }
 
     // --- NONE Type ---
@@ -129,7 +125,7 @@ class DocumentNumberServiceImplTest {
     void generateNextNumber_givenPoType_incrementsCounter() {
         // Arrange
         when(appSettingService.getValueOrDefault("po_prefix", "PO-")).thenReturn("PO-");
-        when(appSettingService.getIntValue("po_next_number", 1)).thenReturn(100);
+        when(appSettingService.getAndIncrementIntValue("po_next_number", 1)).thenReturn(100);
 
         // Act
         String result = documentNumberService.generateNextNumber(DocumentType.PO);
@@ -139,7 +135,5 @@ class DocumentNumberServiceImplTest {
         assertThat(result).contains("PO-");
         assertThat(result).contains("00100");
         assertThat(result).isEqualTo("PO-" + currentYearMonth + "-00100");
-
-        verify(appSettingService).updateValue("po_next_number", "101", "testuser");
     }
 }

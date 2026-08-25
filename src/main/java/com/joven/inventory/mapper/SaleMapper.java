@@ -14,6 +14,7 @@ import com.joven.inventory.repository.SaleItemRepository;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -187,15 +188,29 @@ public final class SaleMapper {
 
     /**
      * Converts a {@link Page} of {@link Sale} entities to a {@link PageResponse} of {@link SaleResponse}.
-     * Counts items for each sale using the provided repository.
+     * Counts items for all sales in a single batch query to avoid N+1 problem.
      *
      * @param page               the page of sale entities
      * @param saleItemRepository the sale item repository for counting items
      * @return the page response containing sale response DTOs
      */
     public static PageResponse<SaleResponse> toPageResponse(Page<Sale> page, SaleItemRepository saleItemRepository) {
+        List<Sale> sales = page.getContent();
+
+        // Batch query: get item counts for all sale IDs in a single call
+        List<Long> saleIds = sales.stream().map(Sale::getId).collect(Collectors.toList());
+        Map<Long, Integer> itemCountMap = new HashMap<>();
+        if (!saleIds.isEmpty()) {
+            List<Object[]> counts = saleItemRepository.countItemsBySaleIds(saleIds);
+            for (Object[] row : counts) {
+                Long saleId = (Long) row[0];
+                int count = ((Number) row[1]).intValue();
+                itemCountMap.put(saleId, count);
+            }
+        }
+
         Page<SaleResponse> responsePage = page.map(sale -> {
-            int itemCount = saleItemRepository.findBySaleId(sale.getId()).size();
+            int itemCount = itemCountMap.getOrDefault(sale.getId(), 0);
             return toResponse(sale, itemCount);
         });
         return PageResponse.of(responsePage);

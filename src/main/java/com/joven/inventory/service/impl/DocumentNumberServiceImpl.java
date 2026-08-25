@@ -50,8 +50,8 @@ public class DocumentNumberServiceImpl implements DocumentNumberService {
         // Read prefix from app_settings
         String prefix = appSettingService.getValueOrDefault(prefixKey, documentType.name() + "-");
 
-        // Read and increment the next number atomically within the transaction
-        int nextNumber = appSettingService.getIntValue(nextNumberKey, 1);
+        // Atomically read and increment the next number using pessimistic lock
+        int nextNumber = appSettingService.getAndIncrementIntValue(nextNumberKey, 1);
 
         // Generate the year-month portion
         String yearMonth = LocalDateTime.now().format(YEAR_MONTH_FORMATTER);
@@ -59,11 +59,8 @@ public class DocumentNumberServiceImpl implements DocumentNumberService {
         // Format: {prefix}{YYYYMM}-{NNNNN}
         String documentNumber = String.format(Constants.DOCUMENT_NUMBER_FORMAT, prefix, yearMonth, nextNumber);
 
-        // Increment the next number in app_settings
-        String updatedBy = AuditContext.getCurrentUser();
-        appSettingService.updateValue(nextNumberKey, String.valueOf(nextNumber + 1), updatedBy);
-
-        log.info("Generated document number '{}' for type '{}' by '{}'", documentNumber, documentType, updatedBy);
+        log.info("Generated document number '{}' for type '{}' by '{}'",
+                documentNumber, documentType, AuditContext.getCurrentUser());
 
         return documentNumber;
     }

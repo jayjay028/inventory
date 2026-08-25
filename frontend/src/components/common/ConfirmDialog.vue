@@ -3,6 +3,7 @@
     <div v-if="show" class="cd-backdrop" @click="handleCancel"></div>
     <div
       v-if="show"
+      ref="overlayRef"
       class="cd-overlay"
       tabindex="-1"
       role="dialog"
@@ -36,7 +37,9 @@
 </template>
 
 <script setup>
-defineProps({
+import { watch, nextTick, ref } from 'vue'
+
+const props = defineProps({
   show: {
     type: Boolean,
     default: false
@@ -64,6 +67,7 @@ defineProps({
 })
 
 const emit = defineEmits(['confirm', 'cancel'])
+const overlayRef = ref(null)
 
 function handleConfirm() {
   emit('confirm')
@@ -72,6 +76,23 @@ function handleConfirm() {
 function handleCancel() {
   emit('cancel')
 }
+
+function onKeydown(e) {
+  if (e.key === 'Escape') {
+    handleCancel()
+  }
+}
+
+watch(() => props.show, (visible) => {
+  if (visible) {
+    document.addEventListener('keydown', onKeydown)
+    nextTick(() => {
+      overlayRef.value?.focus()
+    })
+  } else {
+    document.removeEventListener('keydown', onKeydown)
+  }
+}, { immediate: true })
 </script>
 
 <style scoped>

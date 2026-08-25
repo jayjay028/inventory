@@ -10,8 +10,10 @@ import com.joven.inventory.repository.UserRepository;
 import com.joven.inventory.security.CustomUserDetails;
 import com.joven.inventory.security.JwtTokenProvider;
 import com.joven.inventory.service.AuthService;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,6 +37,9 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+
+    @Value("${app.jwt.access-token-expiry}")
+    private long accessTokenExpiry;
 
     /**
      * {@inheritDoc}
@@ -100,6 +105,12 @@ public class AuthServiceImpl implements AuthService {
             throw new UnauthorizedException("Invalid or expired refresh token");
         }
 
+        // Verify this is actually a refresh token, not an access token
+        Claims claims = jwtTokenProvider.getClaimsFromToken(token);
+        if (!"refresh".equals(claims.get("type"))) {
+            throw new UnauthorizedException("Invalid token type: not a refresh token");
+        }
+
         String username = jwtTokenProvider.getUsernameFromToken(token);
 
         User user = userRepository.findByUsername(username)
@@ -150,7 +161,7 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
-                .expiresIn(1800L)
+                .expiresIn(accessTokenExpiry / 1000)
                 .user(buildUserInfo(user))
                 .build();
     }

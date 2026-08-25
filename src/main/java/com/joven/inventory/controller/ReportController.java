@@ -1,5 +1,7 @@
 package com.joven.inventory.controller;
 
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -38,6 +40,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/stock-level")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getStockLevelReport(
             @RequestParam(required = false) Long categoryId) {
 
@@ -55,6 +58,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/stock-movement")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getStockMovementReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
@@ -71,6 +75,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/low-stock")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getLowStockReport() {
 
         byte[] pdfBytes = reportService.generateLowStockReport();
@@ -87,6 +92,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/transaction-summary")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getTransactionSummaryReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
@@ -104,6 +110,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/item-list")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getItemListReport(
             @RequestParam(required = false) Long categoryId) {
 
@@ -119,6 +126,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/inventory-count")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getInventoryCountReport(
             @RequestParam(required = false) Long categoryId) {
 
@@ -134,6 +142,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/stock-valuation")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getStockValuationReport(
             @RequestParam(required = false) Long categoryId) {
 
@@ -153,6 +162,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/gross-profit")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getGrossProfitReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
@@ -172,6 +182,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/profit-share")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getProfitShareReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
@@ -190,6 +201,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/sales-summary")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getSalesSummaryReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
@@ -208,6 +220,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/purchase-summary")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getPurchaseSummaryReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
@@ -226,6 +239,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/vat-summary")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getVatSummaryReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
@@ -244,6 +258,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/pos/daily-sales")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getDailySalesReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
@@ -259,6 +274,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/pos/shift")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getShiftReport(
             @RequestParam(required = false) Long shiftId) {
 
@@ -275,6 +291,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/pos/sales-by-payment")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getSalesByPaymentReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
@@ -292,6 +309,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/pos/sales-by-cashier")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getSalesByCashierReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
@@ -310,6 +328,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/pos/top-selling")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getTopSellingReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
@@ -328,6 +347,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/pos/voided")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getVoidedTransactionsReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
@@ -344,6 +364,7 @@ public class ReportController {
      * @return the PDF report as a byte array with appropriate headers
      */
     @GetMapping("/pos/hourly-sales")
+    @RequiresPermission(Permission.VIEW_REPORTS)
     public ResponseEntity<byte[]> getHourlySalesReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 

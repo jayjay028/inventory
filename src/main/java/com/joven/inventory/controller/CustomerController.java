@@ -4,6 +4,8 @@ import com.joven.inventory.common.ApiResponse;
 import com.joven.inventory.common.PageResponse;
 import com.joven.inventory.dto.request.CustomerRequest;
 import com.joven.inventory.dto.response.CustomerResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,7 @@ public class CustomerController {
      * @return the API response containing a page of customers
      */
     @GetMapping
+    @RequiresPermission(Permission.VIEW_CUSTOMERS)
     public ResponseEntity<ApiResponse<PageResponse<CustomerResponse>>> getAll(
             @PageableDefault(size = 20) Pageable pageable) {
         PageResponse<CustomerResponse> response = customerService.getAll(pageable);
@@ -54,6 +57,7 @@ public class CustomerController {
      * @return the API response containing the customer data
      */
     @GetMapping("/{id}")
+    @RequiresPermission(Permission.VIEW_CUSTOMERS)
     public ResponseEntity<ApiResponse<CustomerResponse>> getById(@PathVariable Long id) {
         CustomerResponse response = customerService.getById(id);
         return ResponseEntity.ok(ApiResponse.success("Customer retrieved successfully", response));
@@ -67,6 +71,7 @@ public class CustomerController {
      * @return the API response containing a page of matching customers
      */
     @GetMapping("/search")
+    @RequiresPermission(Permission.VIEW_CUSTOMERS)
     public ResponseEntity<ApiResponse<PageResponse<CustomerResponse>>> search(
             @RequestParam String q,
             @PageableDefault(size = 20) Pageable pageable) {
@@ -81,6 +86,7 @@ public class CustomerController {
      * @return the API response containing the created customer
      */
     @PostMapping
+    @RequiresPermission(Permission.MANAGE_CUSTOMERS)
     public ResponseEntity<ApiResponse<CustomerResponse>> create(@Valid @RequestBody CustomerRequest request) {
         CustomerResponse response = customerService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -95,6 +101,7 @@ public class CustomerController {
      * @return the API response containing the updated customer
      */
     @PutMapping("/{id}")
+    @RequiresPermission(Permission.MANAGE_CUSTOMERS)
     public ResponseEntity<ApiResponse<CustomerResponse>> update(
             @PathVariable Long id,
             @Valid @RequestBody CustomerRequest request) {
@@ -110,6 +117,7 @@ public class CustomerController {
      * @return the API response containing the updated customer
      */
     @PatchMapping("/{id}/status")
+    @RequiresPermission(Permission.MANAGE_CUSTOMERS)
     public ResponseEntity<ApiResponse<CustomerResponse>> updateStatus(
             @PathVariable Long id,
             @RequestParam boolean active) {

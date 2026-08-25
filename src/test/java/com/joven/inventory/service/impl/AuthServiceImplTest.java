@@ -10,6 +10,8 @@ import com.joven.inventory.exception.UnauthorizedException;
 import com.joven.inventory.repository.UserRepository;
 import com.joven.inventory.security.CustomUserDetails;
 import com.joven.inventory.security.JwtTokenProvider;
+import io.jsonwebtoken.Claims;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +22,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
@@ -51,6 +54,11 @@ class AuthServiceImplTest {
 
     @InjectMocks
     private AuthServiceImpl authService;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(authService, "accessTokenExpiry", 1800000L);
+    }
 
     // --- Helper Methods ---
 
@@ -152,7 +160,11 @@ class AuthServiceImplTest {
         User user = createTestUser();
         RefreshTokenRequest request = createRefreshTokenRequest("valid-refresh-token");
 
+        Claims claims = mock(Claims.class);
+        when(claims.get("type")).thenReturn("refresh");
+
         when(jwtTokenProvider.validateToken("valid-refresh-token")).thenReturn(true);
+        when(jwtTokenProvider.getClaimsFromToken("valid-refresh-token")).thenReturn(claims);
         when(jwtTokenProvider.getUsernameFromToken("valid-refresh-token")).thenReturn("admin");
         when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
         when(jwtTokenProvider.generateAccessToken(any(CustomUserDetails.class))).thenReturn("new-access-token");
@@ -170,7 +182,7 @@ class AuthServiceImplTest {
         assertThat(response.getUser().getUsername()).isEqualTo("admin");
 
         verify(jwtTokenProvider).validateToken("valid-refresh-token");
-        verify(jwtTokenProvider).getUsernameFromToken("valid-refresh-token");
+        verify(jwtTokenProvider).getClaimsFromToken("valid-refresh-token");
         verify(userRepository).findByUsername("admin");
     }
 
@@ -195,7 +207,11 @@ class AuthServiceImplTest {
         User inactiveUser = createInactiveUser();
         RefreshTokenRequest request = createRefreshTokenRequest("valid-refresh-token");
 
+        Claims claims = mock(Claims.class);
+        when(claims.get("type")).thenReturn("refresh");
+
         when(jwtTokenProvider.validateToken("valid-refresh-token")).thenReturn(true);
+        when(jwtTokenProvider.getClaimsFromToken("valid-refresh-token")).thenReturn(claims);
         when(jwtTokenProvider.getUsernameFromToken("valid-refresh-token")).thenReturn("admin");
         when(userRepository.findByUsername("admin")).thenReturn(Optional.of(inactiveUser));
 

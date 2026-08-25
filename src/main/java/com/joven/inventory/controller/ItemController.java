@@ -4,6 +4,8 @@ import com.joven.inventory.common.ApiResponse;
 import com.joven.inventory.common.PageResponse;
 import com.joven.inventory.dto.request.ItemRequest;
 import com.joven.inventory.dto.response.ItemResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,7 @@ public class ItemController {
      * @return the API response containing a page of items
      */
     @GetMapping
+    @RequiresPermission(Permission.VIEW_ITEMS)
     public ResponseEntity<ApiResponse<PageResponse<ItemResponse>>> getAll(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String search,
@@ -69,6 +72,7 @@ public class ItemController {
      * @return the API response containing the item details
      */
     @GetMapping("/{id}")
+    @RequiresPermission(Permission.VIEW_ITEMS)
     public ResponseEntity<ApiResponse<ItemResponse>> getById(@PathVariable Long id) {
         ItemResponse response = itemService.getById(id);
         return ResponseEntity.ok(ApiResponse.success("Item retrieved successfully", response));
@@ -81,6 +85,7 @@ public class ItemController {
      * @return the API response containing the created item
      */
     @PostMapping
+    @RequiresPermission(Permission.MANAGE_ITEMS)
     public ResponseEntity<ApiResponse<ItemResponse>> create(@Valid @RequestBody ItemRequest request) {
         ItemResponse response = itemService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -95,6 +100,7 @@ public class ItemController {
      * @return the API response containing the updated item
      */
     @PutMapping("/{id}")
+    @RequiresPermission(Permission.MANAGE_ITEMS)
     public ResponseEntity<ApiResponse<ItemResponse>> update(
             @PathVariable Long id,
             @Valid @RequestBody ItemRequest request) {
@@ -110,6 +116,7 @@ public class ItemController {
      * @return the API response containing the updated item
      */
     @PatchMapping("/{id}/status")
+    @RequiresPermission(Permission.MANAGE_ITEMS)
     public ResponseEntity<ApiResponse<ItemResponse>> updateStatus(
             @PathVariable Long id,
             @RequestParam boolean active) {
@@ -125,6 +132,7 @@ public class ItemController {
      * @return the API response containing matching items
      */
     @GetMapping("/search")
+    @RequiresPermission(Permission.VIEW_ITEMS)
     public ResponseEntity<ApiResponse<PageResponse<ItemResponse>>> search(
             @RequestParam String q,
             Pageable pageable) {
@@ -139,6 +147,7 @@ public class ItemController {
      * @return the API response containing low-stock items
      */
     @GetMapping("/low-stock")
+    @RequiresPermission(Permission.VIEW_ITEMS)
     public ResponseEntity<ApiResponse<PageResponse<ItemResponse>>> getLowStock(Pageable pageable) {
         PageResponse<ItemResponse> response = itemService.getLowStock(pageable);
         return ResponseEntity.ok(ApiResponse.success("Low stock items retrieved successfully", response));

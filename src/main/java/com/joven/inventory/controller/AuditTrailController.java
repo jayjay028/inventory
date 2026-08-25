@@ -2,6 +2,8 @@ package com.joven.inventory.controller;
 
 import com.joven.inventory.common.ApiResponse;
 import com.joven.inventory.dto.response.AuditTrailResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.AuditTrailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -38,6 +40,7 @@ public class AuditTrailController {
      * @return the API response containing a page of audit trail records
      */
     @GetMapping
+    @RequiresPermission(Permission.VIEW_AUDIT_TRAIL)
     public ResponseEntity<ApiResponse<Page<AuditTrailResponse>>> getAll(
             @RequestParam(required = false) String entityName,
             @RequestParam(required = false) String performedBy,
@@ -68,6 +71,7 @@ public class AuditTrailController {
      * @return the API response containing a page of audit trail records for the entity
      */
     @GetMapping("/entity/{name}/{id}")
+    @RequiresPermission(Permission.VIEW_AUDIT_TRAIL)
     public ResponseEntity<ApiResponse<Page<AuditTrailResponse>>> getByEntity(
             @PathVariable String name,
             @PathVariable Long id,

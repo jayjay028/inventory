@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory + POS System — Technical Documentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #1a2332;
+            --navy-light: #243447;
+            --accent: #3b82f6;
+            --accent-light: #60a5fa;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --bg: #ffffff;
+            --bg-alt: #f8fafc;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text);
+            line-height: 1.7;
+            background: var(--bg);
+        }
+        header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+            color: #fff;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        header h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        header .subtitle { font-size: 1.1rem; font-weight: 300; opacity: 0.9; }
+        header .meta {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        header .meta span { display: inline-flex; align-items: center; gap: 0.3rem; }
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+        nav.toc {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 3rem;
+        }
+        nav.toc h2 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--navy); }
+        nav.toc ol { padding-left: 1.2rem; }
+        nav.toc li { margin-bottom: 0.4rem; }
+        nav.toc a { color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+        nav.toc a:hover { text-decoration: underline; }
+        section { margin-bottom: 3rem; page-break-inside: avoid; }
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--navy);
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        h3 { font-size: 1.15rem; font-weight: 600; color: var(--navy-light); margin: 1.5rem 0 0.75rem; }
+        h4 { font-size: 1rem; font-weight: 600; margin: 1rem 0 0.5rem; }
+        p { margin-bottom: 1rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+        li { margin-bottom: 0.3rem; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.88rem;
+        }
+        th, td { padding: 0.6rem 0.8rem; text-align: left; border: 1px solid var(--border); }
+        th { background: var(--navy); color: #fff; font-weight: 500; }
+        tr:nth-child(even) { background: var(--bg-alt); }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            background: #f1f5f9;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            color: var(--navy);
+        }
+        pre {
+            background: var(--code-bg);
+            color: #e2e8f0;
+            padding: 1.2rem 1.5rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+        pre code { background: none; padding: 0; color: inherit; }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .badge-get { background: #dbeafe; color: #1d4ed8; }
+        .badge-post { background: #d1fae5; color: #065f46; }
+        .badge-put { background: #fef3c7; color: #92400e; }
+        .badge-delete { background: #fee2e2; color: #991b1b; }
+        .note {
+            background: #eff6ff;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.9rem;
+        }
+        .warning {
+            background: #fffbeb;
+            border-left: 4px solid var(--warning);
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.9rem;
+        }
+        .danger {
+            background: #fef2f2;
+            border-left: 4px solid var(--danger);
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.9rem;
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            border-top: 1px solid var(--border);
+        }
+        @media print {
+            header { padding: 1.5rem; }
+            .container { max-width: 100%; padding: 1rem; }
+            pre { white-space: pre-wrap; word-wrap: break-word; }
+            section { page-break-inside: avoid; }
+            h2 { page-break-after: avoid; }
+            nav.toc { page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Inventory + POS System</h1>
+    <div class="subtitle">Technical Documentation</div>
+    <div class="meta">
+        <span><strong>Version:</strong> 1.1</span>
+        <span><strong>Author:</strong> Joven Q. Divinagracia Jr.</span>
+        <span><strong>Date:</strong> August 2026</span>
+        <span><strong>Stack:</strong> Java 25 · Spring Boot 4.1.0 · Vue 3 · MySQL 8</span>
+    </div>
+</header>
+
+<div class="container">
+
+<!-- Table of Contents -->
+<nav class="toc">
+    <h2>Table of Contents</h2>
+    <ol>
+        <li><a href="#overview">System Overview</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#structure">Project Structure</a></li>
+        <li><a href="#database">Database Schema</a></li>
+        <li><a href="#api">API Documentation</a></li>
+        <li><a href="#security">Security</a></li>
+        <li><a href="#deployment">Deployment Guide</a></li>
+        <li><a href="#development">Development Setup</a></li>
+        <li><a href="#testing">Testing</a></li>
+        <li><a href="#reports">Reports</a></li>
+        <li><a href="#configuration">Configuration Reference</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+        <li><a href="#changelog">Changelog</a></li>
+    </ol>
+</nav>
+
+<!-- 1. System Overview -->
+<section id="overview">
+    <h2>1. System Overview</h2>
+    <h3>Purpose and Scope</h3>
+    <p>The Inventory + POS System is a comprehensive enterprise-grade application designed for small and medium enterprises (SMEs) in the Philippines. It provides end-to-end inventory management, point-of-sale operations, financial reporting, and compliance with Philippine regulatory requirements.</p>
+    <p>The system covers the complete business cycle from procurement (stock-in) through sales (POS) to reporting and auditing, all within a single integrated platform.</p>
+
+    <h3>Target Users</h3>
+    <ul>
+        <li>Small and medium retail businesses in the Philippines</li>
+        <li>Convenience stores, sari-sari stores, and mini-marts</li>
+        <li>Hardware stores and supply shops</li>
+        <li>Food and beverage retail outlets</li>
+        <li>Any Philippine SME requiring inventory tracking and POS capabilities</li>
+    </ul>
+
+    <h3>Key Features</h3>
+    <ul>
+        <li><strong>Inventory Management</strong> — Item catalog, categories, stock-in/out/adjust, stock level monitoring, reorder alerts</li>
+        <li><strong>Point of Sale</strong> — Fast item lookup, barcode support, multiple payment methods, receipt generation, shift management</li>
+        <li><strong>Customer &amp; Supplier Management</strong> — Contact database, transaction history, balance tracking</li>
+        <li><strong>Financial Reporting</strong> — Sales reports, inventory valuation, profit analysis, daily/weekly/monthly summaries</li>
+        <li><strong>User Management</strong> — Role-based access, 25 granular permissions, audit trail</li>
+        <li><strong>JasperReports Integration</strong> — 19 professional PDF report templates</li>
+        <li><strong>Philippine Compliance</strong> — BIR-compliant VAT computation, official receipt numbering, senior/PWD discounts</li>
+    </ul>
+
+    <h3>Philippine Compliance</h3>
+    <table>
+        <tr><th>Requirement</th><th>Implementation</th></tr>
+        <tr><td>BIR VAT (12%)</td><td>Configurable tax rate with VAT-inclusive/exclusive options</td></tr>
+        <tr><td>Official Receipt (OR)</td><td>Sequential OR numbering with configurable prefix</td></tr>
+        <tr><td>Sales Invoice (SI)</td><td>SI generation for vatable sales</td></tr>
+        <tr><td>Delivery Receipt (DR)</td><td>DR for stock-in transactions from suppliers</td></tr>
+        <tr><td>Senior Citizen Discount (20%)</td><td>Automatic 20% discount with VAT exemption for SC transactions</td></tr>
+        <tr><td>PWD Discount (20%)</td><td>Automatic 20% discount with VAT exemption for PWD transactions</td></tr>
+    </table>
+</section>
+
+<!-- 2. Architecture -->
+<section id="architecture">
+    <h2>2. Architecture</h2>
+    <h3>Three-Tier Architecture</h3>
+    <table>
+        <tr><th>Tier</th><th>Technology</th><th>Responsibility</th></tr>
+        <tr><td>Presentation</td><td>Vue 3 + Vite</td><td>User interface, routing, state management, API communication</td></tr>
+        <tr><td>Business Logic</td><td>Spring Boot 4.1.0</td><td>REST API, business rules, validation, security, transactions</td></tr>
+        <tr><td>Data</td><td>MySQL 8 + Hibernate/JPA</td><td>Persistence, constraints, indexing, referential integrity</td></tr>
+    </table>
+
+    <h3>Component Diagram</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    PRESENTATION TIER                         │
+│  ┌─────────┐  ┌──────────┐  ┌────────┐  ┌──────────────┐  │
+│  │  Views  │  │Components│  │ Stores │  │  API Client  │  │
+│  └─────────┘  └──────────┘  └────────┘  └──────┬───────┘  │
+└─────────────────────────────────────────────────┼───────────┘
+                                                  │ HTTP/JSON
+┌─────────────────────────────────────────────────┼───────────┐
+│                  BUSINESS LOGIC TIER             │           │
+│  ┌────────────┐  ┌──────────┐  ┌───────────────▼────────┐  │
+│  │ Security   │  │  AOP     │  │     Controllers        │  │
+│  │ (JWT+BCrypt│  │(Perms)   │  └───────────┬────────────┘  │
+│  └────────────┘  └──────────┘              │               │
+│                    ┌───────────────────────▼─────────────┐  │
+│                    │          Services                    │  │
+│                    │  (Business Logic + Transactions)     │  │
+│                    └───────────────────────┬─────────────┘  │
+│                    ┌───────────────────────▼─────────────┐  │
+│                    │        Repositories (JPA)            │  │
+│                    └───────────────────────┬─────────────┘  │
+└────────────────────────────────────────────┼────────────────┘
+                                             │ JDBC
+┌────────────────────────────────────────────┼────────────────┐
+│                      DATA TIER             │                 │
+│                    ┌───────────────────────▼─────────────┐  │
+│                    │         MySQL 8.0                    │  │
+│                    │   (InnoDB, utf8mb4, Foreign Keys)    │  │
+│                    └────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+
+    <h3>Technology Stack</h3>
+    <table>
+        <tr><th>Layer</th><th>Technology</th><th>Version</th></tr>
+        <tr><td>Backend Runtime</td><td>Java (OpenJDK)</td><td>25</td></tr>
+        <tr><td>Backend Framework</td><td>Spring Boot</td><td>4.1.0</td></tr>
+        <tr><td>ORM</td><td>Hibernate / Spring Data JPA</td><td>7.x</td></tr>
+        <tr><td>Frontend Framework</td><td>Vue.js</td><td>3.x</td></tr>
+        <tr><td>Frontend Build</td><td>Vite</td><td>5.x</td></tr>
+        <tr><td>State Management</td><td>Pinia</td><td>2.x</td></tr>
+        <tr><td>UI Components</td><td>Custom + Tailwind-inspired</td><td>—</td></tr>
+        <tr><td>Database</td><td>MySQL</td><td>8.0+</td></tr>
+        <tr><td>Reporting</td><td>JasperReports</td><td>7.x</td></tr>
+        <tr><td>Application Server</td><td>Apache Tomcat</td><td>9.0+</td></tr>
+        <tr><td>Build Tool</td><td>Apache Maven</td><td>3.9+</td></tr>
+        <tr><td>Testing</td><td>JUnit 5, Mockito, Playwright</td><td>—</td></tr>
+    </table>
+
+    <h3>Security Architecture</h3>
+    <ul>
+        <li><strong>Authentication:</strong> Stateless JWT (access + refresh token pair)</li>
+        <li><strong>Password Storage:</strong> bcrypt with cost factor 10</li>
+        <li><strong>Authorization:</strong> Bitwise permission model (25 permissions encoded in a single integer)</li>
+        <li><strong>Permission Check:</strong> Custom <code>@RequiresPermission</code> annotation with AOP aspect</li>
+        <li><strong>Token Invalidation:</strong> In-memory deny list cleared on server restart; refresh tokens stored in DB</li>
+    </ul>
+
+    <h3>API Response Format</h3>
+    <p>All API responses use a standardized <code>ApiResponse&lt;T&gt;</code> wrapper:</p>
+<pre><code>{
+  "success": true,
+  "message": "Operation completed successfully",
+  "data": { ... },
+  "timestamp": "2026-08-14T13:30:00",
+  "errors": null
+}</code></pre>
+    <p>Error responses follow the same structure with <code>success: false</code> and an <code>errors</code> array:</p>
+<pre><code>{
+  "success": false,
+  "message": "Validation failed",
+  "data": null,
+  "timestamp": "2026-08-14T13:30:00",
+  "errors": ["Item name is required", "Price must be greater than zero"]
+}</code></pre>
+</section>
+
+<!-- 3. Project Structure -->
+<section id="structure">
+    <h2>3. Project Structure</h2>
+    <h3>Backend Package Layout</h3>
+<pre><code>src/main/java/com/inventory/
+├── config/              # Spring configuration (CORS, Web, Jackson)
+├── security/            # JWT filter, provider, authentication entry point
+├── controller/          # REST controllers (HTTP layer only)
+├── service/             # Service interfaces
+│   └── impl/            # Service implementations (business logic)
+├── repository/          # Spring Data JPA repositories
+├── entity/              # JPA entity classes (database models)
+├── dto/
+│   ├── request/         # Inbound request DTOs with validation
+│   └── response/        # Outbound response DTOs
+├── mapper/              # Entity ↔ DTO conversion logic
+├── enums/               # Enumeration types (Status, TransactionType, etc.)
+├── common/              # Shared utilities (ApiResponse, PageResponse)
+├── exception/           # Custom exceptions + global handler
+└── audit/               # Audit trail interceptor and entities</code></pre>
+
+    <h3>Frontend Directory Layout</h3>
+<pre><code>frontend/src/
+├── views/               # Page-level components (routed views)
+├── components/          # Reusable UI components
+├── stores/              # Pinia state management stores
+├── api/                 # Axios API client and endpoint modules
+├── router/              # Vue Router configuration and guards
+├── utils/               # Utility functions (formatting, validation)
+└── assets/              # Static assets (images, icons, styles)</code></pre>
+
+    <h3>Key Files</h3>
+    <table>
+        <tr><th>File</th><th>Purpose</th></tr>
+        <tr><td><code>pom.xml</code></td><td>Maven build configuration, dependencies, WAR packaging</td></tr>
+        <tr><td><code>application.yml</code></td><td>Primary application configuration</td></tr>
+        <tr><td><code>application-dev.yml</code></td><td>Development profile overrides</td></tr>
+        <tr><td><code>SecurityConfig.java</code></td><td>Spring Security filter chain and CORS config</td></tr>
+        <tr><td><code>JwtTokenProvider.java</code></td><td>JWT generation, validation, and parsing</td></tr>
+        <tr><td><code>GlobalExceptionHandler.java</code></td><td>Centralized error handling for all controllers</td></tr>
+        <tr><td><code>DataSeeder.java</code></td><td>Initial admin user and default settings creation</td></tr>
+        <tr><td><code>frontend/vite.config.js</code></td><td>Vite build config with API proxy</td></tr>
+        <tr><td><code>frontend/src/router/index.js</code></td><td>Route definitions with permission guards</td></tr>
+        <tr><td><code>frontend/src/stores/auth.js</code></td><td>Authentication state, token management</td></tr>
+    </table>
+</section>
+
+<!-- 4. Database Schema -->
+<section id="database">
+    <h2>4. Database Schema</h2>
+    <h3>Table Overview</h3>
+    <table>
+        <tr><th>Table</th><th>Purpose</th><th>Key Fields</th></tr>
+        <tr><td><code>users</code></td><td>System users and authentication</td><td>id, username, password_hash, full_name, permissions, active</td></tr>
+        <tr><td><code>categories</code></td><td>Item classification</td><td>id, name, description, active</td></tr>
+        <tr><td><code>items</code></td><td>Product/item catalog</td><td>id, name, sku, barcode, category_id, cost_price, selling_price, stock_quantity, reorder_level</td></tr>
+        <tr><td><code>customers</code></td><td>Customer records</td><td>id, name, contact_number, email, address, is_senior, is_pwd</td></tr>
+        <tr><td><code>suppliers</code></td><td>Supplier/vendor records</td><td>id, name, contact_person, contact_number, email, address</td></tr>
+        <tr><td><code>stock_transactions</code></td><td>Stock movement header</td><td>id, transaction_number, type (IN/OUT/ADJUST), supplier_id, status, remarks, created_by</td></tr>
+        <tr><td><code>stock_transaction_addons</code></td><td>Stock movement line items</td><td>id, stock_transaction_id, item_id, quantity, unit_cost</td></tr>
+        <tr><td><code>sales</code></td><td>POS sale header</td><td>id, sale_number, customer_id, subtotal, tax_amount, discount_amount, total, status, shift_id</td></tr>
+        <tr><td><code>sale_items</code></td><td>POS sale line items</td><td>id, sale_id, item_id, quantity, unit_price, discount, line_total</td></tr>
+        <tr><td><code>sale_payments</code></td><td>Payment records per sale</td><td>id, sale_id, payment_method, amount, reference_number</td></tr>
+        <tr><td><code>shifts</code></td><td>Cashier shift management</td><td>id, user_id, start_time, end_time, opening_amount, closing_amount, status</td></tr>
+        <tr><td><code>app_settings</code></td><td>Application configuration</td><td>id, setting_key, setting_value, description</td></tr>
+        <tr><td><code>audit_trail</code></td><td>User action audit log</td><td>id, user_id, action, entity_type, entity_id, old_value, new_value, ip_address, timestamp</td></tr>
+    </table>
+
+    <h3>Key Relationships</h3>
+    <ul>
+        <li><code>items.category_id</code> → <code>categories.id</code> (Many-to-One)</li>
+        <li><code>stock_transactions.supplier_id</code> → <code>suppliers.id</code> (Many-to-One)</li>
+        <li><code>stock_transactions.created_by</code> → <code>users.id</code> (Many-to-One)</li>
+        <li><code>stock_transaction_addons.stock_transaction_id</code> → <code>stock_transactions.id</code> (Many-to-One)</li>
+        <li><code>stock_transaction_addons.item_id</code> → <code>items.id</code> (Many-to-One)</li>
+        <li><code>sales.customer_id</code> → <code>customers.id</code> (Many-to-One, nullable)</li>
+        <li><code>sales.shift_id</code> → <code>shifts.id</code> (Many-to-One)</li>
+        <li><code>sale_items.sale_id</code> → <code>sales.id</code> (Many-to-One)</li>
+        <li><code>sale_items.item_id</code> → <code>items.id</code> (Many-to-One)</li>
+        <li><code>sale_payments.sale_id</code> → <code>sales.id</code> (Many-to-One)</li>
+        <li><code>shifts.user_id</code> → <code>users.id</code> (Many-to-One)</li>
+        <li><code>audit_trail.user_id</code> → <code>users.id</code> (Many-to-One)</li>
+    </ul>
+
+    <h3>Indexing Strategy</h3>
+    <table>
+        <tr><th>Table</th><th>Index</th><th>Columns</th><th>Reason</th></tr>
+        <tr><td>items</td><td>idx_items_sku</td><td>sku</td><td>Unique lookups by SKU</td></tr>
+        <tr><td>items</td><td>idx_items_barcode</td><td>barcode</td><td>POS barcode scanning</td></tr>
+        <tr><td>items</td><td>idx_items_category</td><td>category_id</td><td>Category filtering</td></tr>
+        <tr><td>items</td><td>idx_items_name</td><td>name</td><td>Search by name</td></tr>
+        <tr><td>sales</td><td>idx_sales_date</td><td>created_at</td><td>Date-range report queries</td></tr>
+        <tr><td>sales</td><td>idx_sales_number</td><td>sale_number</td><td>Unique sale number lookup</td></tr>
+        <tr><td>sales</td><td>idx_sales_shift</td><td>shift_id</td><td>Shift-based reporting</td></tr>
+        <tr><td>stock_transactions</td><td>idx_stock_tx_number</td><td>transaction_number</td><td>Unique transaction lookup</td></tr>
+        <tr><td>stock_transactions</td><td>idx_stock_tx_date</td><td>created_at</td><td>Date-range queries</td></tr>
+        <tr><td>audit_trail</td><td>idx_audit_user</td><td>user_id</td><td>User activity queries</td></tr>
+        <tr><td>audit_trail</td><td>idx_audit_timestamp</td><td>timestamp</td><td>Chronological queries</td></tr>
+    </table>
+
+    <h3>Data Type Conventions</h3>
+    <table>
+        <tr><th>Java Type</th><th>MySQL Type</th><th>Usage</th></tr>
+        <tr><td><code>BigDecimal</code></td><td><code>DECIMAL(15,2)</code></td><td>All monetary values (prices, totals, tax amounts)</td></tr>
+        <tr><td><code>LocalDateTime</code></td><td><code>DATETIME</code></td><td>All timestamps (created_at, updated_at)</td></tr>
+        <tr><td><code>Long</code></td><td><code>BIGINT</code></td><td>Primary keys and foreign keys</td></tr>
+        <tr><td><code>Integer</code></td><td><code>INT</code></td><td>Quantities, permission bitmasks</td></tr>
+        <tr><td><code>String</code></td><td><code>VARCHAR(n)</code></td><td>Names, descriptions, codes</td></tr>
+        <tr><td><code>Boolean</code></td><td><code>TINYINT(1)</code></td><td>Flags (active, enabled)</td></tr>
+    </table>
+</section>
+
+<!-- 5. API Documentation -->
+<section id="api">
+    <h2>5. API Documentation</h2>
+    <p>Base URL: <code>/api</code> — All endpoints are prefixed with this path.</p>
+
+    <h3>Authentication Endpoints</h3>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Description</th><th>Auth</th></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/auth/login</code></td><td>Authenticate user, returns JWT tokens</td><td>No</td></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/auth/refresh</code></td><td>Refresh access token using refresh token</td><td>No</td></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/auth/logout</code></td><td>Invalidate current tokens</td><td>Yes</td></tr>
+        <tr><td><span class="badge badge-get">GET</span></td><td><code>/api/auth/me</code></td><td>Get current authenticated user profile</td><td>Yes</td></tr>
+    </table>
+
+    <h4>Login Request/Response Example</h4>
+<pre><code>// POST /api/auth/login
+// Request:
+{ "username": "admin", "password": "admin" }
+
+// Response (200 OK):
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIs...",
+    "tokenType": "Bearer",
+    "expiresIn": 1800000,
+    "user": {
+      "id": 1,
+      "username": "admin",
+      "fullName": "System Administrator",
+      "permissions": 33554431
+    }
+  }
+}</code></pre>
+
+    <h3>CRUD Endpoints (Categories, Items, Customers, Suppliers)</h3>
+    <p>All CRUD modules follow the same RESTful pattern:</p>
+    <table>
+        <tr><th>Method</th><th>Pattern</th><th>Description</th></tr>
+        <tr><td><span class="badge badge-get">GET</span></td><td><code>/api/{resource}</code></td><td>List all (paginated: ?page=0&amp;size=20&amp;search=)</td></tr>
+        <tr><td><span class="badge badge-get">GET</span></td><td><code>/api/{resource}/{id}</code></td><td>Get single record by ID</td></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/{resource}</code></td><td>Create new record</td></tr>
+        <tr><td><span class="badge badge-put">PUT</span></td><td><code>/api/{resource}/{id}</code></td><td>Update existing record</td></tr>
+        <tr><td><span class="badge badge-delete">DELETE</span></td><td><code>/api/{resource}/{id}</code></td><td>Soft-delete or deactivate record</td></tr>
+    </table>
+    <p>Resources: <code>/api/categories</code>, <code>/api/items</code>, <code>/api/customers</code>, <code>/api/suppliers</code></p>
+
+    <h3>Stock Management Endpoints</h3>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/stock/in</code></td><td>Record stock receipt from supplier</td></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/stock/out</code></td><td>Record stock issuance or disposal</td></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/stock/adjust</code></td><td>Adjust stock for discrepancy or count</td></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/stock/transactions/{id}/approve</code></td><td>Approve a pending stock transaction</td></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/stock/transactions/{id}/cancel</code></td><td>Cancel a pending stock transaction</td></tr>
+    </table>
+
+    <h3>POS Endpoints</h3>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+        <tr><td><span class="badge badge-get">GET</span></td><td><code>/api/pos/items</code></td><td>Get items available for POS (active + in stock)</td></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/pos/sales</code></td><td>Create new sale transaction</td></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/pos/sales/{id}/payment</code></td><td>Record payment for a sale</td></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/pos/sales/{id}/void</code></td><td>Void a completed sale (reverses stock)</td></tr>
+    </table>
+
+    <h3>Report Endpoints</h3>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+        <tr><td><span class="badge badge-get">GET</span></td><td><code>/api/reports/{type}?startDate=&amp;endDate=</code></td><td>Generate PDF report by type</td></tr>
+    </table>
+    <p>Report types: <code>sales-summary</code>, <code>sales-detail</code>, <code>inventory-valuation</code>, <code>stock-movement</code>, <code>low-stock</code>, <code>daily-sales</code>, and more.</p>
+
+    <h3>Authentication Header</h3>
+    <p>All authenticated endpoints require the <code>Authorization</code> header:</p>
+<pre><code>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</code></pre>
+
+    <h3>Error Response Format</h3>
+<pre><code>// 400 Bad Request (Validation Error)
+{
+  "success": false,
+  "message": "Validation failed",
+  "data": null,
+  "timestamp": "2026-08-14T13:30:00",
+  "errors": ["Item name is required", "Selling price must be positive"]
+}
+
+// 401 Unauthorized
+{
+  "success": false,
+  "message": "Invalid or expired token",
+  "data": null,
+  "timestamp": "2026-08-14T13:30:00",
+  "errors": null
+}
+
+// 403 Forbidden
+{
+  "success": false,
+  "message": "You do not have permission to perform this action",
+  "data": null,
+  "timestamp": "2026-08-14T13:30:00",
+  "errors": null
+}
+
+// 404 Not Found
+{
+  "success": false,
+  "message": "Item with id 99 not found",
+  "data": null,
+  "timestamp": "2026-08-14T13:30:00",
+  "errors": null
+}</code></pre>
+</section>
+
+<!-- 6. Security -->
+<section id="security">
+    <h2>6. Security</h2>
+    <h3>Authentication Flow</h3>
+    <ol>
+        <li>User submits username and password to <code>POST /api/auth/login</code></li>
+        <li>Server validates credentials against bcrypt hash in database</li>
+        <li>Server generates JWT access token (30 min) and refresh token (7 days)</li>
+        <li>Client stores tokens (access in memory, refresh in httpOnly cookie or secure storage)</li>
+        <li>Client includes access token in <code>Authorization: Bearer</code> header on subsequent requests</li>
+        <li>When access token expires, client calls <code>POST /api/auth/refresh</code> with refresh token</li>
+        <li>On logout, tokens are added to deny list and refresh token deleted from DB</li>
+    </ol>
+
+    <h3>Token Lifecycle</h3>
+    <table>
+        <tr><th>Token Type</th><th>Expiry</th><th>Storage</th><th>Purpose</th></tr>
+        <tr><td>Access Token</td><td>30 minutes</td><td>Client memory / localStorage</td><td>API authentication</td></tr>
+        <tr><td>Refresh Token</td><td>7 days</td><td>Secure storage</td><td>Obtain new access token</td></tr>
+    </table>
+
+    <h3>Token Deny List</h3>
+    <p>On logout, the current access token's JTI (JWT ID) is added to an in-memory deny list. The deny list is checked on every request by the JWT authentication filter. Entries are auto-expired based on the token's original expiry time.</p>
+
+    <h3>Permission Model</h3>
+    <p>The system uses a bitwise permission model where each user's permissions are stored as a single integer. Each bit position (0–24) represents a specific permission. This allows efficient storage and fast permission checks using bitwise AND operations.</p>
+
+    <h4>Permission Check: <code>@RequiresPermission</code></h4>
+<pre><code>@RequiresPermission(Permission.MANAGE_ITEMS)
+@PostMapping("/items")
+public ApiResponse&lt;ItemResponse&gt; createItem(@RequestBody ItemRequest request) {
+    // Only accessible if user's permission bitmask has bit 4 set
+}</code></pre>
+
+    <h3>Complete Permission List (25 Permissions)</h3>
+    <table>
+        <tr><th>Bit</th><th>Permission</th><th>Description</th></tr>
+        <tr><td>0</td><td>VIEW_DASHBOARD</td><td>Access dashboard and summary statistics</td></tr>
+        <tr><td>1</td><td>VIEW_CATEGORIES</td><td>View category list</td></tr>
+        <tr><td>2</td><td>MANAGE_CATEGORIES</td><td>Create, edit, delete categories</td></tr>
+        <tr><td>3</td><td>VIEW_ITEMS</td><td>View item catalog</td></tr>
+        <tr><td>4</td><td>MANAGE_ITEMS</td><td>Create, edit, delete items</td></tr>
+        <tr><td>5</td><td>VIEW_CUSTOMERS</td><td>View customer list</td></tr>
+        <tr><td>6</td><td>MANAGE_CUSTOMERS</td><td>Create, edit, delete customers</td></tr>
+        <tr><td>7</td><td>VIEW_SUPPLIERS</td><td>View supplier list</td></tr>
+        <tr><td>8</td><td>MANAGE_SUPPLIERS</td><td>Create, edit, delete suppliers</td></tr>
+        <tr><td>9</td><td>VIEW_STOCK</td><td>View stock levels and transactions</td></tr>
+        <tr><td>10</td><td>MANAGE_STOCK_IN</td><td>Create stock-in transactions</td></tr>
+        <tr><td>11</td><td>MANAGE_STOCK_OUT</td><td>Create stock-out transactions</td></tr>
+        <tr><td>12</td><td>MANAGE_STOCK_ADJUST</td><td>Create stock adjustments</td></tr>
+        <tr><td>13</td><td>APPROVE_STOCK</td><td>Approve pending stock transactions</td></tr>
+        <tr><td>14</td><td>ACCESS_POS</td><td>Access Point of Sale module</td></tr>
+        <tr><td>15</td><td>VOID_SALES</td><td>Void completed sales</td></tr>
+        <tr><td>16</td><td>VIEW_SALES</td><td>View sales history</td></tr>
+        <tr><td>17</td><td>MANAGE_SHIFTS</td><td>Open and close cashier shifts</td></tr>
+        <tr><td>18</td><td>VIEW_REPORTS</td><td>Access reporting module</td></tr>
+        <tr><td>19</td><td>EXPORT_REPORTS</td><td>Export/download report PDFs</td></tr>
+        <tr><td>20</td><td>VIEW_USERS</td><td>View user list</td></tr>
+        <tr><td>21</td><td>MANAGE_USERS</td><td>Create, edit, deactivate users</td></tr>
+        <tr><td>22</td><td>VIEW_SETTINGS</td><td>View application settings</td></tr>
+        <tr><td>23</td><td>MANAGE_SETTINGS</td><td>Modify application settings</td></tr>
+        <tr><td>24</td><td>VIEW_AUDIT_TRAIL</td><td>View audit log</td></tr>
+    </table>
+
+    <h3>Role Presets</h3>
+    <table>
+        <tr><th>Role</th><th>Bitmask</th><th>Permissions Summary</th></tr>
+        <tr><td>Admin</td><td>33554431 (all bits)</td><td>All 25 permissions</td></tr>
+        <tr><td>Manager</td><td>Custom</td><td>All except MANAGE_USERS and MANAGE_SETTINGS</td></tr>
+        <tr><td>Cashier</td><td>Custom</td><td>VIEW_DASHBOARD, ACCESS_POS, MANAGE_SHIFTS, VIEW_SALES, VIEW_ITEMS</td></tr>
+        <tr><td>Inventory Clerk</td><td>Custom</td><td>VIEW_DASHBOARD, VIEW/MANAGE items, stock, categories, suppliers</td></tr>
+        <tr><td>Viewer</td><td>Custom</td><td>All VIEW_* permissions only (read-only access)</td></tr>
+    </table>
+
+    <h3>Guards</h3>
+    <ul>
+        <li><strong>Backend (Controller):</strong> <code>@RequiresPermission</code> annotation checked by AOP aspect before method execution. Returns 403 if check fails.</li>
+        <li><strong>Frontend (Router):</strong> Vue Router <code>beforeEach</code> guard checks user permissions from auth store against route <code>meta.permission</code> requirement. Redirects to unauthorized page if insufficient.</li>
+    </ul>
+</section>
+
+<!-- 7. Deployment Guide -->
+<section id="deployment">
+    <h2>7. Deployment Guide</h2>
+    <h3>Prerequisites</h3>
+    <table>
+        <tr><th>Software</th><th>Minimum Version</th><th>Purpose</th></tr>
+        <tr><td>JDK (OpenJDK)</td><td>25+</td><td>Java runtime and compilation</td></tr>
+        <tr><td>Node.js</td><td>18+</td><td>Frontend build toolchain</td></tr>
+        <tr><td>npm</td><td>9+</td><td>Package management for frontend</td></tr>
+        <tr><td>MySQL Server</td><td>8.0+</td><td>Relational database</td></tr>
+        <tr><td>Apache Tomcat</td><td>9.0+</td><td>WAR deployment server</td></tr>
+        <tr><td>Apache Maven</td><td>3.9+</td><td>Backend build tool</td></tr>
+    </table>
+
+    <h3>Database Setup</h3>
+<pre><code>-- Execute as MySQL root user
+CREATE DATABASE inventory_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'inventory_user'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON inventory_db.* TO 'inventory_user'@'localhost';
+FLUSH PRIVILEGES;</code></pre>
+    <div class="note">
+        <strong>Note:</strong> Spring Boot auto-creates all tables via Hibernate <code>ddl-auto=update</code> on first startup. A default admin user (<code>admin/admin</code>) is seeded automatically on first run via <code>DataSeeder.java</code>.
+    </div>
+
+    <h3>Build Steps</h3>
+<pre><code># 1. Clone the repository
+git clone &lt;repo-url&gt;
+cd inventory
+
+# 2. Build frontend (output goes to src/main/resources/static/)
+cd frontend
+npm install
+npm run build
+cd ..
+
+# 3. Build WAR file (includes frontend static files)
+mvn clean package -DskipTests
+
+# Output: target/inventory-1.0.0-SNAPSHOT.war</code></pre>
+
+    <h3>Application Properties</h3>
+    <p>File: <code>src/main/resources/application.yml</code></p>
+    <table>
+        <tr><th>Property</th><th>Value</th><th>Notes</th></tr>
+        <tr><td><code>spring.datasource.url</code></td><td>jdbc:mysql://localhost:3306/inventory_db</td><td>Database connection URL</td></tr>
+        <tr><td><code>spring.datasource.username</code></td><td>inventory_user</td><td>Database username</td></tr>
+        <tr><td><code>spring.datasource.password</code></td><td>(configured)</td><td>Database password</td></tr>
+        <tr><td><code>app.jwt.secret</code></td><td>(256+ bit key)</td><td>HMAC-SHA256 signing key</td></tr>
+        <tr><td><code>app.jwt.access-token-expiry</code></td><td>1800000</td><td>30 minutes in milliseconds</td></tr>
+        <tr><td><code>app.jwt.refresh-token-expiry</code></td><td>604800000</td><td>7 days in milliseconds</td></tr>
+        <tr><td><code>app.jwt.issuer</code></td><td>inventory-system</td><td>JWT issuer claim</td></tr>
+        <tr><td><code>spring.jpa.hibernate.ddl-auto</code></td><td>update</td><td>Use <code>validate</code> in production</td></tr>
+    </table>
+
+    <h3>Tomcat 9 Deployment</h3>
+<pre><code># 1. Copy WAR to Tomcat webapps directory
+cp target/inventory-1.0.0-SNAPSHOT.war TOMCAT_HOME/webapps/inventory.war
+
+# 2. Start Tomcat
+# Linux/Mac:
+TOMCAT_HOME/bin/startup.sh
+# Windows:
+TOMCAT_HOME\bin\startup.bat
+
+# 3. Access the application
+# URL: http://localhost:8080/inventory
+# Default login: admin / admin</code></pre>
+
+    <h3>Production Checklist</h3>
+    <div class="danger">
+        <strong>Critical:</strong> Complete ALL items below before exposing the system to production traffic.
+    </div>
+    <ul>
+        <li>✅ Change default admin password immediately after first login</li>
+        <li>✅ Set strong JWT secret (minimum 256 bits / 32 characters)</li>
+        <li>✅ Set <code>spring.jpa.hibernate.ddl-auto=validate</code></li>
+        <li>✅ Enable HTTPS (configure SSL connector in Tomcat <code>server.xml</code>)</li>
+        <li>✅ Set <code>spring.jpa.show-sql=false</code></li>
+        <li>✅ Configure dedicated MySQL user (not root)</li>
+        <li>✅ Set up MySQL backups (daily <code>mysqldump</code> with rotation)</li>
+        <li>✅ Configure log rotation (logback or OS-level)</li>
+        <li>✅ Set Java heap: <code>JAVA_OPTS="-Xms512m -Xmx1024m"</code></li>
+        <li>✅ Remove or disable <code>/api/auth</code> rate limiting bypass if present</li>
+        <li>✅ Review and restrict CORS origins to actual frontend domain</li>
+    </ul>
+
+    <h3>Environment Variables (Recommended for Production)</h3>
+<pre><code># Set these in your environment or Tomcat setenv.sh / setenv.bat
+export DB_URL=jdbc:mysql://localhost:3306/inventory_db
+export DB_USERNAME=inventory_user
+export DB_PASSWORD=your_secure_password
+export JWT_SECRET=your-256-bit-secret-key-here-minimum-32-chars</code></pre>
+    <p>Reference these in <code>application.yml</code> using <code>${DB_URL}</code>, <code>${DB_USERNAME}</code>, etc.</p>
+</section>
+
+<!-- 8. Development Setup -->
+<section id="development">
+    <h2>8. Development Setup</h2>
+    <h3>Prerequisites</h3>
+    <ul>
+        <li>JDK 25 (OpenJDK or equivalent)</li>
+        <li>Node.js 18+ with npm</li>
+        <li>MySQL 8.0+ (local or Docker)</li>
+        <li>Maven 3.9+</li>
+        <li>IDE: IntelliJ IDEA (recommended) or VS Code with Java extensions</li>
+    </ul>
+
+    <h3>Initial Setup</h3>
+<pre><code># 1. Clone the repository
+git clone &lt;repo-url&gt;
+cd inventory
+
+# 2. Configure database (create application-dev.yml or modify application.yml)
+# Set MySQL connection to localhost:3308 (or your local port)
+
+# 3. Start backend (port 8080)
+mvn spring-boot:run
+
+# 4. Start frontend dev server (port 5173, proxies /api → localhost:8080)
+cd frontend
+npm install
+npm run dev</code></pre>
+
+    <h3>Development Configuration</h3>
+    <p>File: <code>src/main/resources/application-dev.yml</code></p>
+<pre><code>spring:
+  datasource:
+    url: jdbc:mysql://localhost:3308/inventory_db
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true</code></pre>
+
+    <h3>Hot Reload</h3>
+    <ul>
+        <li><strong>Frontend:</strong> Vite dev server provides instant HMR (Hot Module Replacement) at <code>http://localhost:5173</code></li>
+        <li><strong>Backend:</strong> Spring Boot DevTools enables automatic restart on class changes</li>
+        <li><strong>API Proxy:</strong> Vite <code>proxy</code> config forwards <code>/api/*</code> requests to <code>http://localhost:8080</code></li>
+    </ul>
+
+    <h3>Running Tests</h3>
+    <table>
+        <tr><th>Command</th><th>What It Runs</th><th>Count</th></tr>
+        <tr><td><code>mvn test</code></td><td>Unit + Integration tests</td><td>85 tests (53 unit + 32 integration)</td></tr>
+        <tr><td><code>npm run test:e2e</code></td><td>Playwright E2E tests (headless)</td><td>21 tests</td></tr>
+        <tr><td><code>npm run test:e2e:headed</code></td><td>Playwright E2E tests (with browser)</td><td>21 tests</td></tr>
+        <tr><td><code>npx playwright test --headed</code></td><td>Alternative E2E invocation</td><td>21 tests</td></tr>
+    </table>
+</section>
+
+<!-- 9. Testing -->
+<section id="testing">
+    <h2>9. Testing</h2>
+    <h3>Test Architecture</h3>
+    <table>
+        <tr><th>Level</th><th>Framework</th><th>Count</th><th>Location</th></tr>
+        <tr><td>Unit Tests</td><td>JUnit 5 + Mockito</td><td>53 tests / 7 files</td><td><code>src/test/java/**/service/</code></td></tr>
+        <tr><td>Integration Tests</td><td>Spring MockMvc</td><td>32 tests / 5 files</td><td><code>src/test/java/**/controller/</code></td></tr>
+        <tr><td>E2E Tests</td><td>Playwright</td><td>21 tests</td><td><code>frontend/e2e/</code></td></tr>
+    </table>
+
+    <h3>Unit Tests (Service Layer)</h3>
+    <p>Each service implementation has a corresponding test file that mocks repository dependencies and validates business logic in isolation.</p>
+    <ul>
+        <li><code>CategoryServiceTest</code> — CRUD operations, duplicate name validation</li>
+        <li><code>ItemServiceTest</code> — Item creation, price validation, stock calculations</li>
+        <li><code>CustomerServiceTest</code> — Customer management, senior/PWD flag handling</li>
+        <li><code>SupplierServiceTest</code> — Supplier CRUD</li>
+        <li><code>StockServiceTest</code> — Stock in/out/adjust, approval flow, quantity validation</li>
+        <li><code>SaleServiceTest</code> — Sale creation, payment processing, void logic</li>
+        <li><code>AuthServiceTest</code> — Login, token generation, refresh flow</li>
+    </ul>
+
+    <h3>Integration Tests (Controller Layer)</h3>
+    <p>Tests the full HTTP request/response cycle with Spring's <code>MockMvc</code>, including serialization, validation, and security filters.</p>
+    <ul>
+        <li><code>AuthControllerTest</code> — Login, logout, refresh, unauthorized access</li>
+        <li><code>CategoryControllerTest</code> — CRUD API, pagination, validation errors</li>
+        <li><code>ItemControllerTest</code> — Item API, search, category filtering</li>
+        <li><code>StockControllerTest</code> — Stock transaction APIs, approval workflow</li>
+        <li><code>PosControllerTest</code> — POS sale creation, payment, void</li>
+    </ul>
+
+    <h3>E2E Tests (Playwright)</h3>
+    <p>Browser-based tests that validate the full user workflow from frontend through API to database.</p>
+    <ul>
+        <li><strong>Login Flow (4 tests)</strong> — Valid login, invalid credentials, session persistence, logout</li>
+        <li><strong>Categories CRUD (5 tests)</strong> — Create, read, update, delete, validation</li>
+        <li><strong>Customers CRUD (5 tests)</strong> — Create, read, update, delete, senior/PWD flags</li>
+        <li><strong>POS Operations (7 tests)</strong> — Add items, apply discount, payment, receipt, void</li>
+    </ul>
+
+    <h3>Postman Collection</h3>
+    <p>Location: <code>postman/Inventory-POS-API.postman_collection.json</code></p>
+    <p>Includes pre-configured requests for all API endpoints with environment variables for <code>baseUrl</code>, <code>token</code>, and reusable IDs. Can be run via Newman for CI regression testing.</p>
+<pre><code># Run Postman collection with Newman
+npx newman run postman/Inventory-POS-API.postman_collection.json \
+  -e postman/local-env.json \
+  --reporters cli,htmlextra</code></pre>
+</section>
+
+<!-- 10. Reports -->
+<section id="reports">
+    <h2>10. Reports</h2>
+    <h3>Report Engine</h3>
+    <p>The system uses <strong>JasperReports 7</strong> for all PDF report generation. Report templates (<code>.jrxml</code>) are compiled at runtime on first access and cached for subsequent requests. Output is streamed as PDF directly to the browser.</p>
+
+    <h3>Report Templates</h3>
+    <p>Location: <code>src/main/resources/reports/</code> — 19 template files total.</p>
+
+    <h4>Inventory Reports (7)</h4>
+    <table>
+        <tr><th>Report</th><th>Description</th></tr>
+        <tr><td>inventory-valuation</td><td>Current stock value at cost and selling price</td></tr>
+        <tr><td>stock-movement</td><td>All stock transactions within date range</td></tr>
+        <tr><td>low-stock</td><td>Items below reorder level</td></tr>
+        <tr><td>stock-in-summary</td><td>Summary of stock receipts by supplier</td></tr>
+        <tr><td>stock-out-summary</td><td>Summary of stock issuances</td></tr>
+        <tr><td>item-list</td><td>Complete item catalog with current stock</td></tr>
+        <tr><td>category-summary</td><td>Item count and value by category</td></tr>
+    </table>
+
+    <h4>Financial Reports (5)</h4>
+    <table>
+        <tr><th>Report</th><th>Description</th></tr>
+        <tr><td>sales-summary</td><td>Total sales, tax, and discount by date range</td></tr>
+        <tr><td>sales-detail</td><td>Line-item detail of each sale</td></tr>
+        <tr><td>daily-sales</td><td>Day-by-day sales totals</td></tr>
+        <tr><td>profit-analysis</td><td>Gross profit by item (selling price − cost)</td></tr>
+        <tr><td>payment-summary</td><td>Sales by payment method</td></tr>
+    </table>
+
+    <h4>POS Reports (7)</h4>
+    <table>
+        <tr><th>Report</th><th>Description</th></tr>
+        <tr><td>shift-report</td><td>Sales and payments within a cashier shift</td></tr>
+        <tr><td>receipt</td><td>Individual sale receipt (thermal format)</td></tr>
+        <tr><td>void-report</td><td>Voided sales with reasons</td></tr>
+        <tr><td>cashier-performance</td><td>Sales totals by cashier</td></tr>
+        <tr><td>top-selling-items</td><td>Best sellers by quantity and revenue</td></tr>
+        <tr><td>customer-purchases</td><td>Purchase history by customer</td></tr>
+        <tr><td>discount-report</td><td>Discounts applied (senior, PWD, manual)</td></tr>
+    </table>
+
+    <h3>Custom Reports</h3>
+    <ol>
+        <li>Design template in JasperSoft Studio (free IDE)</li>
+        <li>Save <code>.jrxml</code> file to <code>src/main/resources/reports/</code></li>
+        <li>Register the report type in the <code>ReportService</code> enum</li>
+        <li>Rebuild and deploy — report compiles on first access</li>
+    </ol>
+</section>
+
+<!-- 11. Configuration Reference -->
+<section id="configuration">
+    <h2>11. Configuration Reference</h2>
+    <p>Runtime settings are stored in the <code>app_settings</code> table and can be modified from the Settings page in the UI. Changes take effect immediately without restart.</p>
+
+    <h3>Tax Settings</h3>
+    <table>
+        <tr><th>Key</th><th>Default</th><th>Description</th></tr>
+        <tr><td><code>tax_enabled</code></td><td>true</td><td>Enable/disable tax calculation</td></tr>
+        <tr><td><code>tax_rate</code></td><td>12.00</td><td>Tax rate percentage (BIR VAT = 12%)</td></tr>
+        <tr><td><code>tax_label</code></td><td>VAT</td><td>Tax label displayed on receipts</td></tr>
+        <tr><td><code>tax_inclusive</code></td><td>true</td><td>Whether selling prices include tax</td></tr>
+    </table>
+
+    <h3>POS Settings</h3>
+    <table>
+        <tr><th>Key</th><th>Default</th><th>Description</th></tr>
+        <tr><td><code>receipt_header</code></td><td>(Business name)</td><td>Text printed at top of receipt</td></tr>
+        <tr><td><code>receipt_footer</code></td><td>Thank you!</td><td>Text printed at bottom of receipt</td></tr>
+        <tr><td><code>auto_print</code></td><td>false</td><td>Auto-print receipt after payment</td></tr>
+        <tr><td><code>require_shift</code></td><td>true</td><td>Require open shift before POS access</td></tr>
+    </table>
+
+    <h3>Numbering Settings</h3>
+    <table>
+        <tr><th>Key</th><th>Default</th><th>Description</th></tr>
+        <tr><td><code>sale_prefix</code></td><td>SL</td><td>Prefix for sale transaction numbers</td></tr>
+        <tr><td><code>sale_next_number</code></td><td>1</td><td>Next sequential number for sales</td></tr>
+        <tr><td><code>stock_in_prefix</code></td><td>SI</td><td>Prefix for stock-in transaction numbers</td></tr>
+        <tr><td><code>stock_in_next_number</code></td><td>1</td><td>Next sequential number for stock-in</td></tr>
+        <tr><td><code>stock_out_prefix</code></td><td>SO</td><td>Prefix for stock-out numbers</td></tr>
+        <tr><td><code>stock_out_next_number</code></td><td>1</td><td>Next sequential number for stock-out</td></tr>
+        <tr><td><code>adjust_prefix</code></td><td>ADJ</td><td>Prefix for adjustment numbers</td></tr>
+        <tr><td><code>adjust_next_number</code></td><td>1</td><td>Next sequential number for adjustments</td></tr>
+    </table>
+
+    <h3>Discount Settings</h3>
+    <table>
+        <tr><th>Key</th><th>Default</th><th>Description</th></tr>
+        <tr><td><code>discount_enabled</code></td><td>true</td><td>Enable/disable manual discount</td></tr>
+        <tr><td><code>max_discount_percent</code></td><td>50.00</td><td>Maximum allowable discount percentage</td></tr>
+        <tr><td><code>senior_discount_rate</code></td><td>20.00</td><td>Senior citizen discount rate (Philippine law)</td></tr>
+        <tr><td><code>pwd_discount_rate</code></td><td>20.00</td><td>PWD discount rate (Philippine law)</td></tr>
+    </table>
+</section>
+
+<!-- 12. Troubleshooting -->
+<section id="troubleshooting">
+    <h2>12. Troubleshooting</h2>
+
+    <h3>Port 8080 Already in Use</h3>
+    <p><strong>Symptom:</strong> Tomcat fails to start with "Address already in use: bind"</p>
+    <p><strong>Solution:</strong></p>
+<pre><code># Find the process using port 8080
+# Windows:
+netstat -ano | findstr :8080
+taskkill /PID &lt;pid&gt; /F
+
+# Linux:
+lsof -i :8080
+kill -9 &lt;pid&gt;
+
+# Or change Tomcat port in server.xml</code></pre>
+
+    <h3>MySQL Connection Refused</h3>
+    <p><strong>Symptom:</strong> <code>Communications link failure</code> or <code>Connection refused</code></p>
+    <p><strong>Solutions:</strong></p>
+    <ul>
+        <li>Verify MySQL service is running: <code>systemctl status mysql</code> or check Windows Services</li>
+        <li>Confirm port matches configuration (default 3306, dev might use 3308)</li>
+        <li>Check <code>application.yml</code> datasource URL, username, and password</li>
+        <li>Verify MySQL user has GRANT on the database: <code>SHOW GRANTS FOR 'inventory_user'@'localhost';</code></li>
+        <li>Check if MySQL is bound to localhost only (<code>bind-address</code> in <code>my.cnf</code>)</li>
+    </ul>
+
+    <h3>JWT Token Expired Errors (401)</h3>
+    <p><strong>Symptom:</strong> API returns 401 with "Token expired" after working previously</p>
+    <p><strong>Solutions:</strong></p>
+    <ul>
+        <li>Access tokens expire after 30 minutes — client should auto-refresh using refresh token</li>
+        <li>If refresh token also expired (7 days), user must re-login</li>
+        <li>Check server clock synchronization (JWT validation is time-sensitive)</li>
+        <li>Verify the JWT secret hasn't changed between deployments (invalidates all tokens)</li>
+    </ul>
+
+    <h3>Permission Denied (403 Forbidden)</h3>
+    <p><strong>Symptom:</strong> User gets 403 error on certain actions</p>
+    <p><strong>Solutions:</strong></p>
+    <ul>
+        <li>Check user's permission bitmask includes the required permission bit</li>
+        <li>Admin users should have permission value <code>33554431</code> (all 25 bits set)</li>
+        <li>Update permissions via Admin → Users → Edit User → Permissions</li>
+        <li>User must re-login after permission changes for new token to reflect updated permissions</li>
+    </ul>
+
+    <h3>Frontend Shows Blank Page</h3>
+    <p><strong>Symptom:</strong> White/blank page when accessing the application URL</p>
+    <p><strong>Solutions:</strong></p>
+    <ul>
+        <li>Check browser console for JavaScript errors (F12 → Console)</li>
+        <li>Verify frontend was built: <code>npm run build</code> in <code>frontend/</code></li>
+        <li>Confirm static files exist in <code>src/main/resources/static/</code> after build</li>
+        <li>Check that the WAR was rebuilt after frontend changes: <code>mvn clean package</code></li>
+        <li>Clear browser cache (Ctrl+Shift+R)</li>
+        <li>Verify context path matches (e.g., <code>/inventory</code> if deployed as <code>inventory.war</code>)</li>
+    </ul>
+
+    <h3>Reports Not Generating (Jasper Compilation Error)</h3>
+    <p><strong>Symptom:</strong> 500 error when generating reports, or "net.sf.jasperreports.engine.JRException"</p>
+    <p><strong>Solutions:</strong></p>
+    <ul>
+        <li>Verify <code>.jrxml</code> files exist in <code>src/main/resources/reports/</code></li>
+        <li>Check JasperReports dependency version in <code>pom.xml</code></li>
+        <li>Ensure template was designed for JasperReports 7 (incompatible with older versions)</li>
+        <li>Check logs for specific compilation error — often a typo in field names or expressions</li>
+        <li>Test template independently in JasperSoft Studio before deployment</li>
+    </ul>
+
+    <h3>WAR Deployment Fails</h3>
+    <p><strong>Symptom:</strong> Application fails to start in Tomcat, 404 on all paths</p>
+    <p><strong>Solutions:</strong></p>
+    <ul>
+        <li>Check <code>TOMCAT_HOME/logs/catalina.out</code> for startup errors</li>
+        <li>Verify Java version: Tomcat 9 supports up to Java 25 (check compatibility)</li>
+        <li>Ensure <code>JAVA_HOME</code> points to JDK 25</li>
+        <li>Check WAR file isn't corrupted: rebuild with <code>mvn clean package</code></li>
+        <li>Verify no duplicate context paths in <code>TOMCAT_HOME/conf/server.xml</code></li>
+    </ul>
+
+    <h3>Out of Memory on Tomcat</h3>
+    <p><strong>Symptom:</strong> <code>java.lang.OutOfMemoryError: Java heap space</code></p>
+    <p><strong>Solutions:</strong></p>
+<pre><code># Set memory in TOMCAT_HOME/bin/setenv.sh (Linux) or setenv.bat (Windows)
+# Linux:
+export JAVA_OPTS="-Xms512m -Xmx1024m -XX:+UseG1GC"
+
+# Windows (setenv.bat):
+set JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC</code></pre>
+    <ul>
+        <li>Monitor heap usage with <code>jstat</code> or VisualVM</li>
+        <li>Check for large report generations that load too many records — use pagination</li>
+        <li>Consider increasing to <code>-Xmx2048m</code> for production with heavy report usage</li>
+    </ul>
+</section>
+
+<!-- 13. Changelog -->
+<section id="changelog">
+    <h2>13. Changelog</h2>
+
+    <h3>Version 1.1 — August 14, 2026</h3>
+    <p><strong>UI Overhaul &amp; Quality Improvements</strong></p>
+    <ul>
+        <li>Complete UI redesign with modern dark navy theme and Inter font</li>
+        <li>Right sidebar layout for improved navigation and context</li>
+        <li>Security hardening: token deny list, permission validation fixes</li>
+        <li>Improved form validation and error messaging across all modules</li>
+        <li>Enhanced POS interface with faster item lookup and keyboard shortcuts</li>
+        <li>Report template refinements for print consistency</li>
+        <li>Bug fixes: stock quantity calculation edge cases, shift closing totals</li>
+        <li>Performance optimization: added database indexes, query optimization</li>
+        <li>Accessibility improvements: ARIA labels, keyboard navigation, focus indicators</li>
+    </ul>
+
+    <h3>Version 1.0 — August 13, 2026</h3>
+    <p><strong>Initial Release</strong></p>
+    <ul>
+        <li>Complete inventory management system (categories, items, stock in/out/adjust)</li>
+        <li>Point of Sale with multi-payment support and receipt generation</li>
+        <li>Customer and supplier management</li>
+        <li>User management with 25 bitwise permissions</li>
+        <li>JWT stateless authentication with refresh tokens</li>
+        <li>19 JasperReports PDF templates</li>
+        <li>Cashier shift management</li>
+        <li>Application settings (tax, numbering, discounts, POS config)</li>
+        <li>Full audit trail logging</li>
+        <li>Philippine BIR compliance (VAT, OR/SI/DR numbering, SC/PWD discounts)</li>
+        <li>Responsive Vue 3 frontend with Pinia state management</li>
+        <li>85 automated tests (unit + integration) and 21 E2E tests</li>
+        <li>WAR deployment package for Tomcat 9</li>
+    </ul>
+</section>
+
+</div>
+
+<footer>
+    <p>Inventory + POS System v1.1 — Technical Documentation</p>
+    <p>&copy; 2026 Joven Q. Divinagracia Jr. All rights reserved.</p>
+    <p>Generated: August 14, 2026</p>
+</footer>
+
+</body>
+</html>

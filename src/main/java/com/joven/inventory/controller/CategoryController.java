@@ -4,6 +4,8 @@ import com.joven.inventory.common.ApiResponse;
 import com.joven.inventory.common.PageResponse;
 import com.joven.inventory.dto.request.CategoryRequest;
 import com.joven.inventory.dto.response.CategoryResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +51,7 @@ public class CategoryController {
      * @return the API response containing a paginated list of categories
      */
     @GetMapping
+    @RequiresPermission(Permission.VIEW_CATEGORIES)
     public ResponseEntity<ApiResponse<PageResponse<CategoryResponse>>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -72,6 +75,7 @@ public class CategoryController {
      * @return the API response containing a list of active categories
      */
     @GetMapping("/active")
+    @RequiresPermission(Permission.VIEW_CATEGORIES)
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getAllActive() {
         List<CategoryResponse> response = categoryService.getAllActive();
         return ResponseEntity.ok(ApiResponse.success("Active categories retrieved successfully", response));
@@ -84,6 +88,7 @@ public class CategoryController {
      * @return the API response containing the category details
      */
     @GetMapping("/{id}")
+    @RequiresPermission(Permission.VIEW_CATEGORIES)
     public ResponseEntity<ApiResponse<CategoryResponse>> getById(@PathVariable Long id) {
         CategoryResponse response = categoryService.getById(id);
         return ResponseEntity.ok(ApiResponse.success("Category retrieved successfully", response));
@@ -96,6 +101,7 @@ public class CategoryController {
      * @return the API response containing the created category
      */
     @PostMapping
+    @RequiresPermission(Permission.MANAGE_CATEGORIES)
     public ResponseEntity<ApiResponse<CategoryResponse>> create(@Valid @RequestBody CategoryRequest request) {
         CategoryResponse response = categoryService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -110,6 +116,7 @@ public class CategoryController {
      * @return the API response containing the updated category
      */
     @PutMapping("/{id}")
+    @RequiresPermission(Permission.MANAGE_CATEGORIES)
     public ResponseEntity<ApiResponse<CategoryResponse>> update(
             @PathVariable Long id,
             @Valid @RequestBody CategoryRequest request) {
@@ -125,6 +132,7 @@ public class CategoryController {
      * @return the API response containing the updated category
      */
     @PatchMapping("/{id}/status")
+    @RequiresPermission(Permission.MANAGE_CATEGORIES)
     public ResponseEntity<ApiResponse<CategoryResponse>> updateStatus(
             @PathVariable Long id,
             @RequestParam boolean active) {

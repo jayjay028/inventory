@@ -154,6 +154,31 @@ public class AppSettingServiceImpl implements AppSettingService {
      */
     @Override
     @Transactional
+    public int getAndIncrementIntValue(String key, int defaultStart) {
+        Optional<AppSetting> settingOpt = appSettingRepository.findBySettingKeyForUpdate(key);
+        if (settingOpt.isPresent()) {
+            AppSetting setting = settingOpt.get();
+            int currentValue = Integer.parseInt(setting.getSettingValue());
+            setting.setSettingValue(String.valueOf(currentValue + 1));
+            appSettingRepository.save(setting);
+            return currentValue;
+        } else {
+            // Create the setting with defaultStart + 1
+            AppSetting newSetting = new AppSetting();
+            newSetting.setSettingKey(key);
+            newSetting.setSettingValue(String.valueOf(defaultStart + 1));
+            newSetting.setCreatedBy("system");
+            newSetting.setActive(true);
+            appSettingRepository.save(newSetting);
+            return defaultStart;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
     public void updateAll(Map<String, String> settings) {
         String currentUser = getCurrentUsername();
         updateValues(settings, currentUser);

@@ -8,7 +8,8 @@ export const useAppStore = defineStore('app', {
       show: false,
       message: '',
       type: 'success'
-    }
+    },
+    _toastTimeoutId: null
   }),
 
   actions: {
@@ -17,14 +18,25 @@ export const useAppStore = defineStore('app', {
     },
 
     showToast(message, type = 'success', duration = 3000) {
+      // Clear any existing timeout to prevent premature hiding
+      if (this._toastTimeoutId) {
+        clearTimeout(this._toastTimeoutId)
+        this._toastTimeoutId = null
+      }
+
       this.toast = { show: true, message, type }
 
-      setTimeout(() => {
+      this._toastTimeoutId = setTimeout(() => {
         this.hideToast()
+        this._toastTimeoutId = null
       }, duration)
     },
 
     hideToast() {
+      if (this._toastTimeoutId) {
+        clearTimeout(this._toastTimeoutId)
+        this._toastTimeoutId = null
+      }
       this.toast = { show: false, message: '', type: 'success' }
     },
 

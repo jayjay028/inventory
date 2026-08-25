@@ -4,6 +4,8 @@ import com.joven.inventory.common.ApiResponse;
 import com.joven.inventory.common.PageResponse;
 import com.joven.inventory.dto.request.SupplierRequest;
 import com.joven.inventory.dto.response.SupplierResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.SupplierService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,7 @@ public class SupplierController {
      * @return the API response containing a page of suppliers
      */
     @GetMapping
+    @RequiresPermission(Permission.VIEW_SUPPLIERS)
     public ResponseEntity<ApiResponse<PageResponse<SupplierResponse>>> getAll(
             @PageableDefault(size = 20) Pageable pageable) {
         PageResponse<SupplierResponse> response = supplierService.getAll(pageable);
@@ -54,6 +57,7 @@ public class SupplierController {
      * @return the API response containing the supplier data
      */
     @GetMapping("/{id}")
+    @RequiresPermission(Permission.VIEW_SUPPLIERS)
     public ResponseEntity<ApiResponse<SupplierResponse>> getById(@PathVariable Long id) {
         SupplierResponse response = supplierService.getById(id);
         return ResponseEntity.ok(ApiResponse.success("Supplier retrieved successfully", response));
@@ -67,6 +71,7 @@ public class SupplierController {
      * @return the API response containing a page of matching suppliers
      */
     @GetMapping("/search")
+    @RequiresPermission(Permission.VIEW_SUPPLIERS)
     public ResponseEntity<ApiResponse<PageResponse<SupplierResponse>>> search(
             @RequestParam String q,
             @PageableDefault(size = 20) Pageable pageable) {
@@ -81,6 +86,7 @@ public class SupplierController {
      * @return the API response containing the created supplier
      */
     @PostMapping
+    @RequiresPermission(Permission.MANAGE_SUPPLIERS)
     public ResponseEntity<ApiResponse<SupplierResponse>> create(@Valid @RequestBody SupplierRequest request) {
         SupplierResponse response = supplierService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -95,6 +101,7 @@ public class SupplierController {
      * @return the API response containing the updated supplier
      */
     @PutMapping("/{id}")
+    @RequiresPermission(Permission.MANAGE_SUPPLIERS)
     public ResponseEntity<ApiResponse<SupplierResponse>> update(
             @PathVariable Long id,
             @Valid @RequestBody SupplierRequest request) {
@@ -110,6 +117,7 @@ public class SupplierController {
      * @return the API response containing the updated supplier
      */
     @PatchMapping("/{id}/status")
+    @RequiresPermission(Permission.MANAGE_SUPPLIERS)
     public ResponseEntity<ApiResponse<SupplierResponse>> updateStatus(
             @PathVariable Long id,
             @RequestParam boolean active) {

@@ -4,6 +4,8 @@ import com.joven.inventory.common.ApiResponse;
 import com.joven.inventory.common.PageResponse;
 import com.joven.inventory.dto.request.AddonMasterRequest;
 import com.joven.inventory.dto.response.AddonMasterResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.AddonMasterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +45,7 @@ public class AddonMasterController {
      * @return the API response containing a page of add-on master records
      */
     @GetMapping
+    @RequiresPermission(Permission.MANAGE_ADDONS)
     public ResponseEntity<ApiResponse<PageResponse<AddonMasterResponse>>> getAll(Pageable pageable) {
         Page<AddonMasterResponse> page = addonMasterService.getAll(pageable);
         return ResponseEntity.ok(ApiResponse.success("Add-ons retrieved successfully", PageResponse.of(page)));
@@ -54,6 +57,7 @@ public class AddonMasterController {
      * @return the API response containing a list of active add-on master records
      */
     @GetMapping("/active")
+    @RequiresPermission(Permission.MANAGE_ADDONS)
     public ResponseEntity<ApiResponse<List<AddonMasterResponse>>> getAllActive() {
         List<AddonMasterResponse> addons = addonMasterService.getAllActive();
         return ResponseEntity.ok(ApiResponse.success("Active add-ons retrieved successfully", addons));
@@ -66,6 +70,7 @@ public class AddonMasterController {
      * @return the API response containing the add-on master record
      */
     @GetMapping("/{id}")
+    @RequiresPermission(Permission.MANAGE_ADDONS)
     public ResponseEntity<ApiResponse<AddonMasterResponse>> getById(@PathVariable Long id) {
         AddonMasterResponse addon = addonMasterService.getById(id);
         return ResponseEntity.ok(ApiResponse.success("Add-on retrieved successfully", addon));
@@ -78,6 +83,7 @@ public class AddonMasterController {
      * @return the API response containing the created add-on master record
      */
     @PostMapping
+    @RequiresPermission(Permission.MANAGE_ADDONS)
     public ResponseEntity<ApiResponse<AddonMasterResponse>> create(@Valid @RequestBody AddonMasterRequest request) {
         AddonMasterResponse addon = addonMasterService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -92,6 +98,7 @@ public class AddonMasterController {
      * @return the API response containing the updated add-on master record
      */
     @PutMapping("/{id}")
+    @RequiresPermission(Permission.MANAGE_ADDONS)
     public ResponseEntity<ApiResponse<AddonMasterResponse>> update(@PathVariable Long id,
                                                                    @Valid @RequestBody AddonMasterRequest request) {
         AddonMasterResponse addon = addonMasterService.update(id, request);
@@ -106,6 +113,7 @@ public class AddonMasterController {
      * @return the API response containing the updated add-on master record
      */
     @PatchMapping("/{id}/status")
+    @RequiresPermission(Permission.MANAGE_ADDONS)
     public ResponseEntity<ApiResponse<AddonMasterResponse>> updateStatus(@PathVariable Long id,
                                                                          @RequestParam boolean active) {
         AddonMasterResponse addon = addonMasterService.updateStatus(id, active);

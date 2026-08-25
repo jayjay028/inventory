@@ -131,7 +131,7 @@
 </template>
 
 <script setup>
-import { ref, computed, useSlots } from 'vue'
+import { ref, computed, useSlots, useAttrs } from 'vue'
 
 const props = defineProps({
   columns: {
@@ -170,12 +170,13 @@ const props = defineProps({
 
 const emit = defineEmits(['page-change', 'sort-change', 'search', 'row-click'])
 const slots = useSlots()
+const attrs = useAttrs()
 
 const searchQuery = ref('')
 const sortKey = ref('')
 const sortOrder = ref('')
 
-const hasRowClick = computed(() => !!slots['row-click'] || true)
+const hasRowClick = computed(() => !!attrs.onRowClick)
 
 const visiblePages = computed(() => {
   const pages = []

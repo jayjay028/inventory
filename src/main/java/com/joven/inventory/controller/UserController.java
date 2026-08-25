@@ -5,6 +5,8 @@ import com.joven.inventory.common.PageResponse;
 import com.joven.inventory.dto.request.PasswordResetRequest;
 import com.joven.inventory.dto.request.UserRequest;
 import com.joven.inventory.dto.response.UserResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +44,7 @@ public class UserController {
      * @return the API response containing a page of users
      */
     @GetMapping
+    @RequiresPermission(Permission.MANAGE_USERS)
     public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> getAll(Pageable pageable) {
         Page<UserResponse> page = userService.getAll(pageable);
         return ResponseEntity.ok(ApiResponse.success("Users retrieved successfully", PageResponse.of(page)));
@@ -54,6 +57,7 @@ public class UserController {
      * @return the API response containing the user
      */
     @GetMapping("/{id}")
+    @RequiresPermission(Permission.MANAGE_USERS)
     public ResponseEntity<ApiResponse<UserResponse>> getById(@PathVariable Long id) {
         UserResponse user = userService.getById(id);
         return ResponseEntity.ok(ApiResponse.success("User retrieved successfully", user));
@@ -66,6 +70,7 @@ public class UserController {
      * @return the API response containing the created user
      */
     @PostMapping
+    @RequiresPermission(Permission.MANAGE_USERS)
     public ResponseEntity<ApiResponse<UserResponse>> create(@Valid @RequestBody UserRequest request) {
         UserResponse user = userService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -80,6 +85,7 @@ public class UserController {
      * @return the API response containing the updated user
      */
     @PutMapping("/{id}")
+    @RequiresPermission(Permission.MANAGE_USERS)
     public ResponseEntity<ApiResponse<UserResponse>> update(@PathVariable Long id,
                                                             @Valid @RequestBody UserRequest request) {
         UserResponse user = userService.update(id, request);
@@ -94,6 +100,7 @@ public class UserController {
      * @return the API response containing the updated user
      */
     @PatchMapping("/{id}/status")
+    @RequiresPermission(Permission.MANAGE_USERS)
     public ResponseEntity<ApiResponse<UserResponse>> updateStatus(@PathVariable Long id,
                                                                   @RequestParam boolean active) {
         UserResponse user = userService.updateStatus(id, active);
@@ -108,6 +115,7 @@ public class UserController {
      * @return the API response containing the updated user
      */
     @PatchMapping("/{id}/password")
+    @RequiresPermission(Permission.MANAGE_USERS)
     public ResponseEntity<ApiResponse<UserResponse>> resetPassword(@PathVariable Long id,
                                                                    @Valid @RequestBody PasswordResetRequest request) {
         UserResponse user = userService.resetPassword(id, request);

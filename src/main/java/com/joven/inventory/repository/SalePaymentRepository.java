@@ -28,6 +28,14 @@ public interface SalePaymentRepository extends JpaRepository<SalePayment, Long> 
     List<SalePayment> findBySaleId(Long saleId);
 
     /**
+     * Finds all payments for a collection of sale IDs in a single batch query.
+     *
+     * @param saleIds the collection of sale IDs
+     * @return a list of sale payments
+     */
+    List<SalePayment> findBySaleIdIn(List<Long> saleIds);
+
+    /**
      * Deletes all payments for a given sale.
      *
      * @param saleId the sale ID

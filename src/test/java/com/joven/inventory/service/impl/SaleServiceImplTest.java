@@ -12,6 +12,7 @@ import com.joven.inventory.entity.Sale;
 import com.joven.inventory.entity.SaleItem;
 import com.joven.inventory.entity.SalePayment;
 import com.joven.inventory.entity.Shift;
+import com.joven.inventory.entity.Stock;
 import com.joven.inventory.enums.DiscountType;
 import com.joven.inventory.enums.PaymentMethod;
 import com.joven.inventory.enums.SaleStatus;
@@ -288,9 +289,11 @@ class SaleServiceImplTest {
         Sale sale = createTestSale(1L, "RCT-202608-00001", SaleStatus.OPEN, new BigDecimal("1000.00"));
         Item item = createTestItem(1L, "ITM-001", "Test Item", new BigDecimal("500.00"), true);
         SaleItem saleItem = createTestSaleItem(1L, sale, item, 2, new BigDecimal("500.00"));
+        Stock stock = createTestStock(1L, item, 100);
 
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
         when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of(saleItem));
+        when(stockRepository.findByItemId(1L)).thenReturn(Optional.of(stock));
         when(saleAddonRepository.findBySaleId(1L)).thenReturn(Collections.emptyList());
         when(salePaymentRepository.save(any(SalePayment.class))).thenAnswer(invocation -> {
             SalePayment payment = invocation.getArgument(0);
@@ -344,9 +347,11 @@ class SaleServiceImplTest {
         Sale sale = createTestSale(1L, "RCT-202608-00001", SaleStatus.OPEN, new BigDecimal("1000.00"));
         Item item = createTestItem(1L, "ITM-001", "Test Item", new BigDecimal("500.00"), true);
         SaleItem saleItem = createTestSaleItem(1L, sale, item, 2, new BigDecimal("500.00"));
+        Stock stock = createTestStock(1L, item, 100);
 
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
         when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of(saleItem));
+        when(stockRepository.findByItemId(1L)).thenReturn(Optional.of(stock));
         when(saleAddonRepository.findBySaleId(1L)).thenReturn(Collections.emptyList());
         when(salePaymentRepository.save(any(SalePayment.class))).thenAnswer(invocation -> {
             SalePayment payment = invocation.getArgument(0);
@@ -570,5 +575,14 @@ class SaleServiceImplTest {
         shift.setOpeningAmount(new BigDecimal("5000.00"));
         shift.setOpenedAt(LocalDateTime.now());
         return shift;
+    }
+
+    private Stock createTestStock(Long id, Item item, int quantityOnHand) {
+        Stock stock = new Stock();
+        stock.setId(id);
+        stock.setItem(item);
+        stock.setQuantityOnHand(quantityOnHand);
+        stock.setLastUpdated(LocalDateTime.now());
+        return stock;
     }
 }

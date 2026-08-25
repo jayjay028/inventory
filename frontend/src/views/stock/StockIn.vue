@@ -173,7 +173,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import stockApi from '@/api/stock'
 import itemsApi from '@/api/items'
@@ -239,6 +239,10 @@ onMounted(async () => {
   }
 
   document.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 
 function handleClickOutside(e) {

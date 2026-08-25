@@ -91,6 +91,17 @@ public interface AppSettingService {
     Map<String, String> getAll();
 
     /**
+     * Atomically retrieves the current integer value for a setting and increments it.
+     * Uses a pessimistic lock to prevent race conditions under concurrent access.
+     * If the setting does not exist, it is created with defaultStart + 1 and defaultStart is returned.
+     *
+     * @param key          the setting key
+     * @param defaultStart the starting value to use if the setting does not exist
+     * @return the current value before incrementing
+     */
+    int getAndIncrementIntValue(String key, int defaultStart);
+
+    /**
      * Updates multiple settings at once (without requiring updatedBy parameter).
      * Uses the current authenticated user from the security context.
      *

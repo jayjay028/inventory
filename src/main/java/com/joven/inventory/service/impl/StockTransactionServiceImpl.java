@@ -298,6 +298,16 @@ public class StockTransactionServiceImpl implements StockTransactionService {
         Long itemId = transaction.getItem().getId();
         int quantity = transaction.getQuantity();
 
+        // Re-validate stock sufficiency at approval time for STOCK_OUT
+        if (transaction.getTransactionType() == TransactionType.OUT) {
+            Stock stock = stockRepository.findByItemId(itemId)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Stock not found for item ID: " + itemId));
+            if (stock.getQuantityOnHand() < quantity) {
+                throw new InsufficientStockException(itemId, stock.getQuantityOnHand(), quantity);
+            }
+        }
+
         switch (transaction.getTransactionType()) {
             case IN -> stockService.addStock(itemId, quantity);
             case OUT -> stockService.deductStock(itemId, quantity);

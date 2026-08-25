@@ -4,6 +4,7 @@ import com.joven.inventory.common.ApiResponse;
 import com.joven.inventory.dto.request.LoginRequest;
 import com.joven.inventory.dto.request.RefreshTokenRequest;
 import com.joven.inventory.dto.response.LoginResponse;
+import com.joven.inventory.security.TokenDenyList;
 import com.joven.inventory.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +13,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Instant;
 
 /**
  * REST controller for authentication operations.
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final TokenDenyList tokenDenyList;
 
     /**
      * Authenticates a user with username and password credentials.
@@ -53,14 +58,19 @@ public class AuthController {
     }
 
     /**
-     * Logs out the current user.
-     * Since the system uses stateless JWT authentication, this endpoint
-     * simply acknowledges the logout request. Token invalidation is handled client-side.
+     * Logs out the current user by adding the token to the deny list.
+     * The token will be rejected on subsequent requests until it naturally expires.
      *
+     * @param authHeader the Authorization header containing the Bearer token
      * @return the API response confirming logout
      */
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout() {
+    public ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            // Deny for remaining token lifetime (max 30 min)
+            tokenDenyList.denyToken(token, Instant.now().plusSeconds(1800));
+        }
         return ResponseEntity.ok(ApiResponse.success("Logout successful", null));
     }
 

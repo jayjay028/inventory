@@ -10,6 +10,8 @@ import com.joven.inventory.dto.response.ItemResponse;
 import com.joven.inventory.dto.response.ReceiptResponse;
 import com.joven.inventory.dto.response.SaleDetailResponse;
 import com.joven.inventory.dto.response.SaleResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.ItemService;
 import com.joven.inventory.service.SaleService;
 import jakarta.validation.Valid;
@@ -56,6 +58,7 @@ public class PosController {
      * @return the API response containing the created sale detail
      */
     @PostMapping("/sales")
+    @RequiresPermission(Permission.USE_POS)
     public ResponseEntity<ApiResponse<SaleDetailResponse>> createSale(
             @Valid @RequestBody CreateSaleRequest request) {
         SaleDetailResponse response = saleService.createSale(request);
@@ -70,6 +73,7 @@ public class PosController {
      * @return the API response containing a page of sales
      */
     @GetMapping("/sales")
+    @RequiresPermission(Permission.USE_POS)
     public ResponseEntity<ApiResponse<PageResponse<SaleResponse>>> getAll(
             @PageableDefault(size = 20) Pageable pageable) {
         PageResponse<SaleResponse> response = saleService.getAll(pageable);
@@ -83,6 +87,7 @@ public class PosController {
      * @return the API response containing the sale detail
      */
     @GetMapping("/sales/{id}")
+    @RequiresPermission(Permission.USE_POS)
     public ResponseEntity<ApiResponse<SaleDetailResponse>> getById(@PathVariable Long id) {
         SaleDetailResponse response = saleService.getById(id);
         return ResponseEntity.ok(ApiResponse.success("Sale retrieved successfully", response));
@@ -97,6 +102,7 @@ public class PosController {
      * @return the API response containing the updated sale detail
      */
     @PutMapping("/sales/{id}/items")
+    @RequiresPermission(Permission.USE_POS)
     public ResponseEntity<ApiResponse<SaleDetailResponse>> updateItems(
             @PathVariable Long id,
             @Valid @RequestBody List<SaleItemRequest> items) {
@@ -113,6 +119,7 @@ public class PosController {
      * @return the API response containing the paid sale detail
      */
     @PostMapping("/sales/{id}/pay")
+    @RequiresPermission(Permission.USE_POS)
     public ResponseEntity<ApiResponse<SaleDetailResponse>> processPayment(
             @PathVariable Long id,
             @Valid @RequestBody ProcessPaymentRequest request) {
@@ -127,6 +134,7 @@ public class PosController {
      * @return the API response containing the closed sale detail
      */
     @PatchMapping("/sales/{id}/close")
+    @RequiresPermission(Permission.USE_POS)
     public ResponseEntity<ApiResponse<SaleDetailResponse>> closeSale(@PathVariable Long id) {
         SaleDetailResponse response = saleService.closeSale(id);
         return ResponseEntity.ok(ApiResponse.success("Sale closed successfully", response));
@@ -141,6 +149,7 @@ public class PosController {
      * @return the API response containing the voided sale detail
      */
     @PostMapping("/sales/{id}/void")
+    @RequiresPermission(Permission.VOID_SALES)
     public ResponseEntity<ApiResponse<SaleDetailResponse>> voidSale(
             @PathVariable Long id,
             @Valid @RequestBody VoidSaleRequest request) {
@@ -156,6 +165,7 @@ public class PosController {
      * @return the API response containing the receipt data
      */
     @GetMapping("/sales/{id}/receipt")
+    @RequiresPermission(Permission.USE_POS)
     public ResponseEntity<ApiResponse<ReceiptResponse>> getReceipt(@PathVariable Long id) {
         ReceiptResponse response = saleService.getReceipt(id);
         return ResponseEntity.ok(ApiResponse.success("Receipt generated successfully", response));
@@ -169,6 +179,7 @@ public class PosController {
      * @return the API response containing a page of today's sales
      */
     @GetMapping("/sales/today")
+    @RequiresPermission(Permission.USE_POS)
     public ResponseEntity<ApiResponse<PageResponse<SaleResponse>>> getTodaySales(
             @PageableDefault(size = 20) Pageable pageable) {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
@@ -183,6 +194,7 @@ public class PosController {
      * @return the API response containing the list of open sales
      */
     @GetMapping("/sales/open")
+    @RequiresPermission(Permission.USE_POS)
     public ResponseEntity<ApiResponse<List<SaleResponse>>> getOpenSales() {
         List<SaleResponse> response = saleService.getOpenSales();
         return ResponseEntity.ok(ApiResponse.success("Open sales retrieved", response));
@@ -197,6 +209,7 @@ public class PosController {
      * @return the API response containing a page of matching items
      */
     @GetMapping("/items/search")
+    @RequiresPermission(Permission.USE_POS)
     public ResponseEntity<ApiResponse<PageResponse<ItemResponse>>> searchItems(
             @RequestParam String q,
             @PageableDefault(size = 20) Pageable pageable) {

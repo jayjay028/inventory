@@ -6,6 +6,8 @@ import com.joven.inventory.dto.request.CloseShiftRequest;
 import com.joven.inventory.dto.request.OpenShiftRequest;
 import com.joven.inventory.dto.response.ShiftResponse;
 import com.joven.inventory.dto.response.ShiftSummaryResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.ShiftService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +44,7 @@ public class ShiftController {
      * @return the API response containing the opened shift
      */
     @PostMapping("/open")
+    @RequiresPermission(Permission.MANAGE_SHIFTS)
     public ResponseEntity<ApiResponse<ShiftResponse>> openShift(
             @Valid @RequestBody OpenShiftRequest request) {
         ShiftResponse response = shiftService.openShift(request);
@@ -59,6 +62,7 @@ public class ShiftController {
      * @return the API response containing the shift summary with sales breakdown
      */
     @PostMapping("/{id}/close")
+    @RequiresPermission(Permission.MANAGE_SHIFTS)
     public ResponseEntity<ApiResponse<ShiftSummaryResponse>> closeShift(
             @PathVariable Long id,
             @Valid @RequestBody CloseShiftRequest request) {
@@ -72,6 +76,7 @@ public class ShiftController {
      * @return the API response containing the current open shift
      */
     @GetMapping("/current")
+    @RequiresPermission(Permission.MANAGE_SHIFTS)
     public ResponseEntity<ApiResponse<ShiftResponse>> getCurrentShift() {
         ShiftResponse response = shiftService.getCurrentShift();
         return ResponseEntity.ok(ApiResponse.success("Current shift retrieved", response));
@@ -84,6 +89,7 @@ public class ShiftController {
      * @return the API response containing a page of shifts
      */
     @GetMapping
+    @RequiresPermission(Permission.MANAGE_SHIFTS)
     public ResponseEntity<ApiResponse<PageResponse<ShiftResponse>>> getAll(
             @PageableDefault(size = 20) Pageable pageable) {
         PageResponse<ShiftResponse> response = shiftService.getAll(pageable);
@@ -97,6 +103,7 @@ public class ShiftController {
      * @return the API response containing the shift data
      */
     @GetMapping("/{id}")
+    @RequiresPermission(Permission.MANAGE_SHIFTS)
     public ResponseEntity<ApiResponse<ShiftResponse>> getById(@PathVariable Long id) {
         ShiftResponse response = shiftService.getById(id);
         return ResponseEntity.ok(ApiResponse.success("Shift retrieved successfully", response));

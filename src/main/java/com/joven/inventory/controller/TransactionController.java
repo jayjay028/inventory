@@ -3,6 +3,8 @@ package com.joven.inventory.controller;
 import com.joven.inventory.common.ApiResponse;
 import com.joven.inventory.common.PageResponse;
 import com.joven.inventory.dto.response.StockTransactionResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.StockTransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +36,7 @@ public class TransactionController {
      * @return the API response containing a page of stock transactions
      */
     @GetMapping
+    @RequiresPermission(Permission.VIEW_TRANSACTIONS)
     public ResponseEntity<ApiResponse<PageResponse<StockTransactionResponse>>> getAll(
             @PageableDefault(size = 20) Pageable pageable) {
         PageResponse<StockTransactionResponse> response = stockTransactionService.getAll(pageable);
@@ -47,6 +50,7 @@ public class TransactionController {
      * @return the API response containing the stock transaction with add-ons
      */
     @GetMapping("/{id}")
+    @RequiresPermission(Permission.VIEW_TRANSACTIONS)
     public ResponseEntity<ApiResponse<StockTransactionResponse>> getById(@PathVariable Long id) {
         StockTransactionResponse response = stockTransactionService.getById(id);
         return ResponseEntity.ok(ApiResponse.success("Transaction retrieved successfully", response));
@@ -60,6 +64,7 @@ public class TransactionController {
      * @return the API response containing a page of pending stock transactions
      */
     @GetMapping("/pending")
+    @RequiresPermission(Permission.VIEW_TRANSACTIONS)
     public ResponseEntity<ApiResponse<PageResponse<StockTransactionResponse>>> getPending(
             @PageableDefault(size = 20) Pageable pageable) {
         PageResponse<StockTransactionResponse> response = stockTransactionService.getPending(pageable);

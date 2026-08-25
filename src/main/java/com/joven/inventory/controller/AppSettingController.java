@@ -1,6 +1,8 @@
 package com.joven.inventory.controller;
 
 import com.joven.inventory.common.ApiResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.AppSettingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,7 @@ public class AppSettingController {
      * @return the API response containing all settings
      */
     @GetMapping
+    @RequiresPermission(Permission.MANAGE_SETTINGS)
     public ResponseEntity<ApiResponse<Map<String, String>>> getAll() {
         Map<String, String> settings = appSettingService.getAll();
         return ResponseEntity.ok(ApiResponse.success("Settings retrieved successfully", settings));
@@ -45,6 +48,7 @@ public class AppSettingController {
      * @return the API response containing the setting value
      */
     @GetMapping("/{key}")
+    @RequiresPermission(Permission.MANAGE_SETTINGS)
     public ResponseEntity<ApiResponse<String>> getByKey(@PathVariable String key) {
         String value = appSettingService.getValue(key)
                 .orElse(null);
@@ -59,6 +63,7 @@ public class AppSettingController {
      * @return the API response confirming the update
      */
     @PutMapping
+    @RequiresPermission(Permission.MANAGE_SETTINGS)
     public ResponseEntity<ApiResponse<Void>> updateAll(
             @RequestBody Map<String, String> settings,
             Authentication authentication) {
@@ -75,6 +80,7 @@ public class AppSettingController {
      * @return the API response confirming the update
      */
     @PutMapping("/{key}")
+    @RequiresPermission(Permission.MANAGE_SETTINGS)
     public ResponseEntity<ApiResponse<Void>> updateByKey(
             @PathVariable String key,
             @RequestBody Map<String, String> body,

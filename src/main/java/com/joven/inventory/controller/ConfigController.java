@@ -1,6 +1,8 @@
 package com.joven.inventory.controller;
 
 import com.joven.inventory.common.ApiResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,7 @@ public class ConfigController {
      * @throws IOException if the configuration file cannot be read
      */
     @GetMapping("/navigation")
+    @RequiresPermission(Permission.MANAGE_SETTINGS)
     public ResponseEntity<ApiResponse<Object>> getNavigation() throws IOException {
         Object config = loadYaml("config/navigation.yml");
         return ResponseEntity.ok(ApiResponse.success("Navigation config retrieved", config));
@@ -48,6 +51,7 @@ public class ConfigController {
      * @throws IOException if the configuration file cannot be read
      */
     @GetMapping("/forms/{formName}")
+    @RequiresPermission(Permission.MANAGE_SETTINGS)
     public ResponseEntity<ApiResponse<Object>> getFormConfig(@PathVariable String formName) throws IOException {
         Object config = loadYaml("config/forms/" + formName + ".yml");
         return ResponseEntity.ok(ApiResponse.success("Form config retrieved", config));
@@ -61,6 +65,7 @@ public class ConfigController {
      * @throws IOException if the configuration file cannot be read
      */
     @GetMapping("/permissions")
+    @RequiresPermission(Permission.MANAGE_SETTINGS)
     public ResponseEntity<ApiResponse<Object>> getPermissions() throws IOException {
         Object config = loadYaml("config/permissions.yml");
         return ResponseEntity.ok(ApiResponse.success("Permissions config retrieved", config));

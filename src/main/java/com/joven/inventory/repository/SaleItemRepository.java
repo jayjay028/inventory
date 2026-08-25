@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -33,6 +34,15 @@ public interface SaleItemRepository extends JpaRepository<SaleItem, Long> {
      * @param saleId the sale ID
      */
     void deleteBySaleId(Long saleId);
+
+    /**
+     * Counts the number of items per sale for a collection of sale IDs in a single batch query.
+     *
+     * @param saleIds the collection of sale IDs
+     * @return a list of Object arrays containing [saleId, itemCount]
+     */
+    @Query("SELECT si.sale.id, COUNT(si) FROM SaleItem si WHERE si.sale.id IN :saleIds GROUP BY si.sale.id")
+    List<Object[]> countItemsBySaleIds(@Param("saleIds") Collection<Long> saleIds);
 
     /**
      * Finds the top selling items within a date range, returning item ID, item name,

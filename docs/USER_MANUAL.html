@@ -4,36 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory + POS System - User Manual</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
+            --primary: #1e40af;
+            --primary-light: #eff6ff;
             --secondary: #64748b;
-            --success: #16a34a;
+            --success: #059669;
             --warning: #d97706;
             --danger: #dc2626;
-            --bg: #f8fafc;
+            --bg: #f9fafb;
             --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+            --text: #111827;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --navy: #0f172a;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             line-height: 1.7;
             color: var(--text);
             background: var(--bg);
+            font-size: 14px;
         }
-        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        .container { max-width: 920px; margin: 0 auto; padding: 2rem; }
         header {
-            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            background: var(--navy);
             color: white;
             padding: 3rem 2rem;
             text-align: center;
         }
-        header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-        header p { opacity: 0.9; font-size: 1.1rem; }
+        header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header p { opacity: 0.8; font-size: 1rem; }
+        header .version { margin-top: 0.75rem; opacity: 0.6; font-size: 0.85rem; }
         nav.toc {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -41,10 +45,10 @@
             padding: 1.5rem 2rem;
             margin: 2rem 0;
         }
-        nav.toc h2 { margin-bottom: 1rem; color: var(--primary); }
+        nav.toc h2 { margin-bottom: 1rem; color: var(--primary); font-size: 1.1rem; }
         nav.toc ul { list-style: none; }
-        nav.toc li { margin: 0.4rem 0; }
-        nav.toc a { color: var(--primary); text-decoration: none; }
+        nav.toc li { margin: 0.35rem 0; }
+        nav.toc a { color: var(--primary); text-decoration: none; font-size: 0.9rem; }
         nav.toc a:hover { text-decoration: underline; }
         nav.toc ul ul { padding-left: 1.5rem; }
         section {
@@ -54,24 +58,24 @@
             padding: 2rem;
             margin: 2rem 0;
         }
-        h2 { color: var(--primary); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
-        h3 { color: var(--text); margin: 1.5rem 0 0.5rem; }
-        h4 { color: var(--secondary); margin: 1rem 0 0.5rem; }
+        h2 { color: var(--primary); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); font-size: 1.25rem; }
+        h3 { color: var(--text); margin: 1.5rem 0 0.5rem; font-size: 1rem; }
+        h4 { color: var(--secondary); margin: 1rem 0 0.5rem; font-size: 0.9rem; }
         p { margin: 0.5rem 0; }
         ul, ol { margin: 0.5rem 0 1rem 1.5rem; }
         li { margin: 0.3rem 0; }
         code {
-            background: #f1f5f9;
+            background: #f3f4f6;
             padding: 0.15rem 0.4rem;
             border-radius: 4px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--danger);
         }
         .badge {
             display: inline-block;
             padding: 0.2rem 0.6rem;
             border-radius: 12px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             color: white;
         }
@@ -83,49 +87,28 @@
             width: 100%;
             border-collapse: collapse;
             margin: 1rem 0;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         th, td {
             padding: 0.6rem 0.8rem;
             text-align: left;
             border: 1px solid var(--border);
         }
-        th { background: #f1f5f9; font-weight: 600; }
-        tr:nth-child(even) { background: #f8fafc; }
+        th { background: #f9fafb; font-weight: 600; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; }
+        tr:nth-child(even) { background: #f9fafb; }
         .tip, .warning, .info {
             padding: 1rem 1.2rem;
             border-radius: 6px;
             margin: 1rem 0;
             border-left: 4px solid;
+            font-size: 0.9rem;
         }
-        .tip { background: #f0fdf4; border-color: var(--success); }
+        .tip { background: #ecfdf5; border-color: var(--success); }
         .warning { background: #fffbeb; border-color: var(--warning); }
-        .info { background: #eff6ff; border-color: var(--primary); }
+        .info { background: var(--primary-light); border-color: var(--primary); }
         .tip::before { content: "💡 Tip: "; font-weight: 600; }
         .warning::before { content: "⚠️ Warning: "; font-weight: 600; }
         .info::before { content: "ℹ️ Note: "; font-weight: 600; }
-        .shortcut {
-            display: inline-block;
-            background: #e2e8f0;
-            padding: 0.1rem 0.5rem;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.85rem;
-            border: 1px solid #cbd5e1;
-        }
-        .step-number {
-            display: inline-block;
-            width: 28px;
-            height: 28px;
-            line-height: 28px;
-            text-align: center;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            font-weight: 600;
-            font-size: 0.85rem;
-            margin-right: 0.5rem;
-        }
         .workflow {
             display: flex;
             align-items: center;
@@ -135,26 +118,38 @@
         }
         .workflow-step {
             padding: 0.4rem 0.8rem;
-            background: #e0e7ff;
+            background: var(--primary-light);
+            border: 1px solid #bfdbfe;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 500;
+            color: var(--primary);
         }
         .workflow-arrow { color: var(--secondary); font-weight: bold; }
+        .screenshot-hint {
+            background: #f3f4f6;
+            border: 1px dashed #d1d5db;
+            border-radius: 6px;
+            padding: 1rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin: 1rem 0;
+        }
         footer {
             text-align: center;
             padding: 2rem;
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         @media print {
-            header { background: var(--primary) !important; -webkit-print-color-adjust: exact; }
+            header { background: var(--navy) !important; -webkit-print-color-adjust: exact; }
             section { break-inside: avoid; }
         }
         @media (max-width: 768px) {
             .container { padding: 1rem; }
-            header h1 { font-size: 1.8rem; }
-            table { font-size: 0.8rem; }
+            header h1 { font-size: 1.6rem; }
+            table { font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -162,8 +157,8 @@
 
 <header>
     <h1>📦 Inventory + POS System</h1>
-    <p>User Manual v1.0 — August 2026</p>
-    <p style="margin-top: 0.5rem; opacity: 0.8;">Developed by Joven Q. Divinagracia Jr.</p>
+    <p>User Manual</p>
+    <div class="version">Version 1.1 — August 2026 | Developed by Joven Q. Divinagracia Jr.</div>
 </header>
 
 <div class="container">
@@ -171,7 +166,13 @@
 <nav class="toc">
     <h2>Table of Contents</h2>
     <ul>
-        <li><a href="#getting-started">1. Getting Started</a></li>
+        <li><a href="#getting-started">1. Getting Started</a>
+            <ul>
+                <li><a href="#login">1.1 Logging In</a></li>
+                <li><a href="#navigation">1.2 Navigation & Layout</a></li>
+                <li><a href="#right-panel">1.3 Quick Access Panel (Right Sidebar)</a></li>
+            </ul>
+        </li>
         <li><a href="#dashboard">2. Dashboard</a></li>
         <li><a href="#categories">3. Categories</a></li>
         <li><a href="#items">4. Items</a></li>
@@ -195,7 +196,16 @@
             </ul>
         </li>
         <li><a href="#reports">9. Reports</a></li>
-        <li><a href="#settings">10. Settings</a></li>
+        <li><a href="#settings">10. Settings</a>
+            <ul>
+                <li><a href="#settings-company">10.1 Company Info</a></li>
+                <li><a href="#settings-tax">10.2 Tax Settings</a></li>
+                <li><a href="#settings-numbering">10.3 Document Numbering</a></li>
+                <li><a href="#settings-pos">10.4 POS Settings</a></li>
+                <li><a href="#settings-discount">10.5 Discount Settings</a></li>
+                <li><a href="#settings-access">10.6 User Access Rights</a></li>
+            </ul>
+        </li>
         <li><a href="#users">11. User Management</a></li>
         <li><a href="#audit">12. Audit Trail</a></li>
         <li><a href="#roles">13. Roles & Permissions</a></li>
@@ -207,7 +217,7 @@
 <section id="getting-started">
     <h2>1. Getting Started</h2>
 
-    <h3>Logging In</h3>
+    <h3 id="login">1.1 Logging In</h3>
     <ol>
         <li>Open your browser and navigate to the system URL</li>
         <li>Enter your <strong>Username</strong> and <strong>Password</strong></li>
@@ -216,55 +226,89 @@
 
     <div class="info">Your administrator will provide your login credentials. Change your password after first login.</div>
 
-    <h3>Navigation</h3>
-    <p>The system has a sidebar menu on the left with the following sections:</p>
-    <ul>
-        <li><strong>Dashboard</strong> — Overview of your business</li>
-        <li><strong>POS Terminal</strong> — Point of Sale cashier screen</li>
-        <li><strong>Inventory</strong> — Items, Categories, Stock operations</li>
-        <li><strong>Sales</strong> — Sales history and shift management</li>
-        <li><strong>Contacts</strong> — Customers and Suppliers</li>
-        <li><strong>Reports</strong> — PDF report generation</li>
-        <li><strong>Administration</strong> — Users, Settings, Audit Trail</li>
-    </ul>
-
-    <div class="tip">Menu items are shown based on your permissions. You may not see all sections depending on your role.</div>
-
     <h3>Default Accounts</h3>
     <table>
         <tr><th>Username</th><th>Password</th><th>Role</th></tr>
         <tr><td>admin</td><td>admin</td><td>Administrator (full access)</td></tr>
     </table>
+
+    <h3 id="navigation">1.2 Navigation & Layout</h3>
+    <p>The system uses a <strong>three-panel layout</strong>:</p>
+    <table>
+        <tr><th>Panel</th><th>Position</th><th>Purpose</th></tr>
+        <tr><td><strong>Left Sidebar</strong></td><td>Left (fixed, 250px)</td><td>Main navigation menu with collapsible groups + recent transactions</td></tr>
+        <tr><td><strong>Main Content</strong></td><td>Center</td><td>Active page (forms, tables, dashboard)</td></tr>
+        <tr><td><strong>Quick Access Panel</strong></td><td>Right (slide-in)</td><td>Quick links to Transactions, Reports, Settings, Administration</td></tr>
+    </table>
+
+    <h4>Left Sidebar Menu</h4>
+    <ul>
+        <li><strong>Dashboard</strong> — Business overview and metrics</li>
+        <li><strong>POS Terminal</strong> — Full-screen cashier interface</li>
+        <li><strong>Inventory</strong> — Items, Categories, Stock In/Out/Adjust, Transactions</li>
+        <li><strong>Sales</strong> — Sales History, Shifts</li>
+        <li><strong>Contacts</strong> — Customers, Suppliers</li>
+        <li><strong>Reports</strong> — PDF report generation</li>
+        <li><strong>Administration</strong> — Users, Add-ons, Settings, Audit Trail</li>
+    </ul>
+    <p>At the bottom of the left sidebar, you'll see <strong>Recent Transactions</strong> — the last 8 stock transactions with their status and relative time (e.g., "5m ago").</p>
+
+    <div class="tip">Click the hamburger icon (☰) in the top-left to collapse the left sidebar on smaller screens.</div>
+
+    <h3 id="right-panel">1.3 Quick Access Panel (Right Sidebar)</h3>
+    <p>The <strong>Quick Access Panel</strong> is a slide-in panel on the right side of the screen. Click the tab on the right edge to open it.</p>
+
+    <p>It contains expandable sections:</p>
+    <table>
+        <tr><th>Section</th><th>Contains</th></tr>
+        <tr><td><strong>Transactions</strong></td><td>All Transactions, Stock In, Stock Out, Stock Adjustment, Stock Overview, Sales History, Shifts</td></tr>
+        <tr><td><strong>Reports</strong></td><td>Grouped by: Inventory (Stock Level, Movement, Low Stock, Valuation), Financial (Sales Summary, Gross Profit, VAT Summary), POS (Z-Reading, X-Reading, Cashier Sales)</td></tr>
+        <tr><td><strong>Inventory</strong></td><td>Items, Categories, Suppliers, Customers</td></tr>
+        <tr><td><strong>Settings</strong></td><td>Company Info, Tax Settings, Document Numbering, POS Settings, Discount Settings, <strong>Access Rights</strong></td></tr>
+        <tr><td><strong>Administration</strong></td><td>Users, Add-ons, Audit Trail</td></tr>
+    </table>
+
+    <p><strong>How it works:</strong></p>
+    <ol>
+        <li>Click the arrow tab on the right edge of the screen</li>
+        <li>The panel slides open</li>
+        <li>Click a section heading (e.g., "Transactions") to expand it</li>
+        <li>Click a sub-item to navigate directly to that page</li>
+        <li>Only one section is expanded at a time (accordion behavior)</li>
+    </ol>
+
+    <div class="info">The Quick Access Panel is permission-filtered — you only see sections your role has access to.</div>
 </section>
 
 <!-- 2. Dashboard -->
 <section id="dashboard">
     <h2>2. Dashboard</h2>
-    <p>The dashboard provides a quick overview of your business:</p>
-    <ul>
-        <li><strong>Total Items</strong> — Number of active items in your inventory</li>
-        <li><strong>Stock Value</strong> — Total value of inventory (cost × quantity)</li>
-        <li><strong>Low Stock Alerts</strong> — Items at or below reorder level</li>
-        <li><strong>Today's Sales</strong> — Sales count and revenue for today</li>
-        <li><strong>Pending Approvals</strong> — Stock transactions waiting for approval</li>
-    </ul>
+    <p>The dashboard displays key business metrics at a glance:</p>
+
+    <table>
+        <tr><th>Metric</th><th>Description</th><th>Color Indicator</th></tr>
+        <tr><td>Total Items</td><td>Number of active items in inventory</td><td>Indigo</td></tr>
+        <tr><td>Stock Value</td><td>Total cost value of all stock (cost × qty)</td><td>Emerald</td></tr>
+        <tr><td>Low Stock</td><td>Items at or below reorder level</td><td>Amber</td></tr>
+        <tr><td>Today's Sales</td><td>Total revenue for today</td><td>Teal</td></tr>
+        <tr><td>Pending Approvals</td><td>Transactions awaiting approval</td><td>Rose</td></tr>
+    </table>
 
     <h3>Dashboard Sections</h3>
     <ul>
-        <li><strong>Recent Transactions</strong> — Last 10 stock transactions</li>
-        <li><strong>Low Stock Alerts</strong> — Items that need restocking</li>
-        <li><strong>Top Selling Items</strong> — Best sellers this month</li>
+        <li><strong>Recent Transactions</strong> (left panel) — Last 10 stock transactions with type, document number, status, and date</li>
+        <li><strong>Low Stock Alerts</strong> (right panel) — Items needing restocking with current qty vs. reorder level</li>
     </ul>
 </section>
 
 <!-- 3. Categories -->
 <section id="categories">
     <h2>3. Categories</h2>
-    <p>Categories help organize your items (e.g., Electronics, Food & Beverages, Office Supplies).</p>
+    <p>Categories organize your items (e.g., Electronics, Food & Beverages, Office Supplies).</p>
 
     <h3>Create a Category</h3>
     <ol>
-        <li>Go to <strong>Inventory → Categories</strong></li>
+        <li>Go to <strong>Inventory → Categories</strong> (left sidebar) or <strong>Quick Access → Inventory → Categories</strong></li>
         <li>Click <strong>New Category</strong></li>
         <li>Enter the category <strong>Name</strong> (required) and optional <strong>Description</strong></li>
         <li>Click <strong>Create</strong></li>
@@ -272,8 +316,8 @@
 
     <h3>Edit / Deactivate</h3>
     <ul>
-        <li>Click <strong>Edit</strong> on a category row to modify it</li>
-        <li>Click <strong>Deactivate</strong> to hide it from dropdowns (items remain assigned)</li>
+        <li>Click the pencil icon to edit a category</li>
+        <li>Click the × icon to deactivate (hides from dropdowns, items remain assigned)</li>
     </ul>
 
     <div class="info">Deactivated categories are not deleted — they can be reactivated anytime.</div>
@@ -302,7 +346,8 @@
         <tr><td>Taxable</td><td>No</td><td>Subject to VAT (if tax enabled)</td></tr>
     </table>
 
-    <div class="tip">If item code auto-generation is enabled in Settings, the code will be created automatically.</div>
+    <h3>Filtering & Search</h3>
+    <p>Use the search bar to find items by name or code. Use the category dropdown filter to show items in a specific category.</p>
 </section>
 
 <!-- 5. Customers -->
@@ -312,7 +357,7 @@
 
     <h3>Create a Customer</h3>
     <ol>
-        <li>Go to <strong>Contacts → Customers</strong></li>
+        <li>Go to <strong>Contacts → Customers</strong> or <strong>Quick Access → Inventory → Customers</strong></li>
         <li>Click <strong>New Customer</strong></li>
         <li>Fill in: Name (required), TIN, Address, Contact Person, Contact Number, Email</li>
         <li>Click <strong>Create</strong></li>
@@ -328,7 +373,7 @@
 
     <h3>Create a Supplier</h3>
     <ol>
-        <li>Go to <strong>Contacts → Suppliers</strong></li>
+        <li>Go to <strong>Contacts → Suppliers</strong> or <strong>Quick Access → Inventory → Suppliers</strong></li>
         <li>Click <strong>New Supplier</strong></li>
         <li>Fill in: Name (required), TIN, Address, Contact Person, Contact Number, Email</li>
         <li>Click <strong>Create</strong></li>
@@ -340,7 +385,7 @@
     <h2>7. Stock Operations</h2>
 
     <h3>Stock Overview</h3>
-    <p>Go to <strong>Inventory → Stock Overview</strong> to see current stock levels for all items.</p>
+    <p>Go to <strong>Inventory → Stock Overview</strong> or <strong>Quick Access → Transactions → Stock Overview</strong> to see current stock levels.</p>
     <p>Stock status indicators:</p>
     <ul>
         <li><span class="badge badge-success">NORMAL</span> — Quantity above reorder level</li>
@@ -359,7 +404,7 @@
         <span class="workflow-step">Stock Updated ✓</span>
     </div>
     <ol>
-        <li>Go to <strong>Inventory → Stock In</strong></li>
+        <li>Go to <strong>Inventory → Stock In</strong> or <strong>Quick Access → Transactions → Stock In</strong></li>
         <li>Select the <strong>Item</strong> (current stock shown)</li>
         <li>Enter <strong>Quantity</strong> and <strong>Unit Cost</strong></li>
         <li>Optionally select a <strong>Supplier</strong></li>
@@ -373,7 +418,7 @@
 
     <h3 id="stock-out">7.2 Stock Out (Releasing Goods)</h3>
     <ol>
-        <li>Go to <strong>Inventory → Stock Out</strong></li>
+        <li>Go to <strong>Inventory → Stock Out</strong> or <strong>Quick Access → Transactions → Stock Out</strong></li>
         <li>Select the <strong>Item</strong> (validates sufficient stock)</li>
         <li>Enter <strong>Quantity</strong> and <strong>Unit Price</strong></li>
         <li>Optionally select a <strong>Customer</strong></li>
@@ -404,7 +449,7 @@
 
     <p>To approve or cancel:</p>
     <ol>
-        <li>Go to <strong>Inventory → Transactions</strong></li>
+        <li>Go to <strong>Inventory → Transactions</strong> or <strong>Quick Access → Transactions → All Transactions</strong></li>
         <li>Filter by <strong>Status: CREATED</strong></li>
         <li>Click <strong>Approve</strong> or <strong>Cancel</strong> on the transaction</li>
     </ol>
@@ -415,14 +460,14 @@
 <!-- 8. POS Terminal -->
 <section id="pos">
     <h2>8. POS Terminal</h2>
-    <p>The Point of Sale terminal is a full-screen cashier interface for processing sales.</p>
+    <p>The Point of Sale terminal is a full-screen cashier interface for processing sales. It has a professional layout with product search on the left and the cart on the right.</p>
 
     <h3 id="pos-shift">8.1 Shift Management</h3>
     <p>Before making sales, you must open a shift:</p>
 
     <h4>Opening a Shift</h4>
     <ol>
-        <li>Navigate to <strong>POS Terminal</strong></li>
+        <li>Navigate to <strong>POS Terminal</strong> (left sidebar or Quick Access → Transactions → Sales History)</li>
         <li>If no shift is open, you'll be prompted to open one</li>
         <li>Enter the <strong>Opening Amount</strong> (cash in drawer)</li>
         <li>Click <strong>Open Shift</strong></li>
@@ -430,7 +475,7 @@
 
     <h4>Closing a Shift</h4>
     <ol>
-        <li>Go to <strong>Sales → Shifts</strong> or use the shift close option in POS</li>
+        <li>Go to <strong>Sales → Shifts</strong></li>
         <li>Count your cash and enter the <strong>Closing Amount</strong></li>
         <li>The system calculates <strong>Expected Amount</strong> and shows any <strong>Over/Short</strong></li>
         <li>Add optional <strong>Remarks</strong></li>
@@ -441,11 +486,11 @@
 
     <h3 id="pos-sale">8.2 Creating a Sale</h3>
     <ol>
-        <li>In the POS terminal, search for items using the search bar</li>
-        <li>Click on an item to add it to the cart</li>
-        <li>Adjust quantity using the <strong>+</strong> / <strong>−</strong> buttons</li>
+        <li>In the POS terminal, use the <strong>search bar</strong> (with barcode icon) to find items</li>
+        <li>Click on a product card to add it to the cart</li>
+        <li>Adjust quantity using the <strong>+</strong> / <strong>−</strong> buttons in the cart</li>
         <li>The totals update automatically (Subtotal, Discount, Tax, Total)</li>
-        <li>Apply a transaction-level discount if needed</li>
+        <li>Apply a transaction-level discount if needed (No Discount / % / Fixed)</li>
         <li>Click <strong>Pay</strong> when ready</li>
     </ol>
 
@@ -473,7 +518,7 @@
         <tr><th>Status</th><th>Meaning</th><th>Actions Available</th></tr>
         <tr><td><span class="badge badge-primary">OPEN</span></td><td>Cart in progress</td><td>Add/remove items, Pay</td></tr>
         <tr><td><span class="badge badge-success">PAID</span></td><td>Payment received, stock deducted</td><td>Print receipt, Close, Void</td></tr>
-        <tr><td><span class="badge badge-secondary" style="background:#64748b">CLOSED</span></td><td>Finalized</td><td>Print receipt, Void</td></tr>
+        <tr><td><span class="badge" style="background:#64748b">CLOSED</span></td><td>Finalized</td><td>Print receipt, Void</td></tr>
         <tr><td><span class="badge badge-danger">VOIDED</span></td><td>Cancelled</td><td>View only</td></tr>
     </table>
 
@@ -488,12 +533,7 @@
     <div class="warning">Voiding a PAID or CLOSED sale reverses the stock deduction. A void reason is required and logged in the audit trail.</div>
 
     <h3 id="pos-receipt">8.5 Receipts</h3>
-    <p>Receipts can be viewed and printed for any PAID or CLOSED sale:</p>
-    <ul>
-        <li>After payment, a receipt preview is shown</li>
-        <li>Click <strong>Print</strong> to print via browser dialog</li>
-        <li>Receipts can be reprinted anytime from Sales History</li>
-    </ul>
+    <p>Receipts can be viewed and printed for any PAID or CLOSED sale.</p>
 
     <h4>Receipt Contents (BIR-compliant)</h4>
     <ul>
@@ -516,7 +556,7 @@
 <!-- 9. Reports -->
 <section id="reports">
     <h2>9. Reports</h2>
-    <p>The system generates PDF reports organized in three categories:</p>
+    <p>The system generates PDF reports organized in three categories. Access via <strong>Reports</strong> in the left sidebar or expand <strong>Reports</strong> in the Quick Access panel for direct links.</p>
 
     <h3>Inventory Reports</h3>
     <table>
@@ -554,7 +594,7 @@
 
     <h3>Generating a Report</h3>
     <ol>
-        <li>Go to <strong>Reports</strong></li>
+        <li>Go to <strong>Reports</strong> (left sidebar) or click a specific report in <strong>Quick Access → Reports</strong></li>
         <li>Select the report you want</li>
         <li>Set the <strong>Date Range</strong> and any filters</li>
         <li>Click <strong>Generate</strong></li>
@@ -565,62 +605,93 @@
 <!-- 10. Settings -->
 <section id="settings">
     <h2>10. Settings</h2>
-    <p>Configure system behavior from <strong>Administration → Settings</strong>.</p>
+    <p>Configure system behavior from <strong>Administration → Settings</strong> or via <strong>Quick Access → Settings</strong> (which links directly to each sub-section).</p>
 
-    <h3>Company Information</h3>
+    <p>Settings is organized into 6 tabs:</p>
+
+    <h3 id="settings-company">10.1 Company Info</h3>
     <ul>
-        <li>Business Name, TIN, Address, Contact, Email</li>
-        <li>Appears on receipts and reports</li>
+        <li>Business Name, TIN, Address, Phone, Email</li>
+        <li>Appears on receipts, reports, and documents</li>
     </ul>
 
-    <h3>Tax Settings</h3>
+    <h3 id="settings-tax">10.2 Tax Settings</h3>
     <table>
         <tr><th>Setting</th><th>Description</th></tr>
         <tr><td>Tax Enabled</td><td>Toggle VAT computation on/off globally</td></tr>
-        <tr><td>VAT Registered</td><td>Whether business is VAT-registered</td></tr>
-        <tr><td>Default Tax Rate</td><td>VAT rate (default: 12%)</td></tr>
-        <tr><td>Pricing Method</td><td>VAT-Inclusive or VAT-Exclusive</td></tr>
+        <tr><td>Tax Rate (%)</td><td>VAT rate (default: 12%)</td></tr>
+        <tr><td>Tax Label</td><td>Label shown (e.g., "VAT")</td></tr>
+        <tr><td>Tax Inclusive</td><td>Whether prices already include VAT</td></tr>
     </table>
 
-    <div class="info">When tax is disabled, all tax fields are hidden throughout the system. Enable only if your business is VAT-registered or you want to track tax.</div>
+    <div class="info">When tax is disabled, all tax fields are hidden throughout the system. Enable only if your business is VAT-registered.</div>
 
-    <h3>Document Numbering</h3>
+    <h3 id="settings-numbering">10.3 Document Numbering</h3>
     <p>Configure prefixes and sequential numbers for:</p>
-    <ul>
-        <li>OR (Official Receipt)</li>
-        <li>SI (Sales Invoice)</li>
-        <li>DR (Delivery Receipt)</li>
-        <li>PO (Purchase Order)</li>
-        <li>RR (Receiving Report)</li>
-    </ul>
-    <p>Format: <code>{PREFIX}{YYYYMM}-{NNNNN}</code> — e.g., <code>OR-202608-00001</code></p>
+    <table>
+        <tr><th>Document</th><th>Prefix Example</th><th>Result</th></tr>
+        <tr><td>Sales</td><td>SL-</td><td>SL-00001, SL-00002...</td></tr>
+        <tr><td>Stock In</td><td>SI-</td><td>SI-00001, SI-00002...</td></tr>
+        <tr><td>Stock Out</td><td>SO-</td><td>SO-00001, SO-00002...</td></tr>
+    </table>
 
-    <h3>POS Settings</h3>
+    <h3 id="settings-pos">10.4 POS Settings</h3>
     <ul>
-        <li><strong>Receipt Prefix</strong> — Prefix for sale numbers</li>
-        <li><strong>Printing Enabled</strong> — Enable/disable receipt printing</li>
-        <li><strong>Auto Print</strong> — Auto-print after payment</li>
+        <li><strong>Receipt Header</strong> — Custom text at top of receipts</li>
+        <li><strong>Receipt Footer</strong> — Custom text at bottom of receipts</li>
+        <li><strong>Auto-print Receipt</strong> — Automatically print after payment</li>
+        <li><strong>Require Open Shift</strong> — Must have a shift open to create sales</li>
     </ul>
 
-    <h3>Discount Settings</h3>
+    <h3 id="settings-discount">10.5 Discount Settings</h3>
     <ul>
-        <li><strong>Enable Discounts</strong> — Show/hide discount fields</li>
-        <li><strong>Max Discount % (Admin)</strong> — Maximum discount for admins</li>
-        <li><strong>Max Discount % (Staff)</strong> — Maximum discount for staff</li>
+        <li><strong>Enable Discounts</strong> — Show/hide discount fields globally</li>
+        <li><strong>Max Discount %</strong> — Maximum allowable discount percentage</li>
+        <li><strong>Senior/PWD Rate</strong> — Discount rate for SC/PWD (default: 20%)</li>
     </ul>
+
+    <h3 id="settings-access">10.6 User Access Rights</h3>
+    <p>This tab allows you to configure <strong>default permission presets</strong> for each role. It shows a matrix table:</p>
+
+    <table>
+        <tr><th>Columns</th><th>Description</th></tr>
+        <tr><td>Rows</td><td>25 individual permissions grouped by category (Dashboard, Inventory, POS, Contacts, Administration)</td></tr>
+        <tr><td>Columns</td><td>5 roles: Admin, Manager, Cashier, Inventory Clerk, Viewer</td></tr>
+    </table>
+
+    <p><strong>How to use:</strong></p>
+    <ol>
+        <li>Navigate to <strong>Settings → User Access Rights</strong> tab (or <strong>Quick Access → Settings → Access Rights</strong>)</li>
+        <li>Check/uncheck permissions for each role</li>
+        <li>Use <strong>Select All</strong> buttons to grant all permissions to a role</li>
+        <li>Use <strong>Clear All</strong> to reset</li>
+        <li>Click <strong>Save Settings</strong></li>
+    </ol>
+
+    <div class="info">Changes here set the <strong>default</strong> permissions for newly created users. To change an existing user's permissions, edit them in User Management.</div>
+
+    <h4>Permission Groups</h4>
+    <table>
+        <tr><th>Group</th><th>Permissions</th></tr>
+        <tr><td>Dashboard</td><td>View Dashboard</td></tr>
+        <tr><td>Inventory</td><td>View/Manage Items, Categories, Stock Levels, Stock In/Out/Adjust, View/Approve/Cancel Transactions</td></tr>
+        <tr><td>Point of Sale</td><td>Use POS, Void Sales, Manage Shifts, Reprint Receipts</td></tr>
+        <tr><td>Contacts</td><td>View/Manage Customers, View/Manage Suppliers</td></tr>
+        <tr><td>Administration</td><td>View Reports, View Audit Trail, Manage Users, Manage Settings, Manage Add-ons</td></tr>
+    </table>
 </section>
 
 <!-- 11. User Management -->
 <section id="users">
     <h2>11. User Management</h2>
-    <p>Manage user accounts from <strong>Administration → Users</strong>.</p>
+    <p>Manage user accounts from <strong>Administration → Users</strong> or <strong>Quick Access → Administration → Users</strong>.</p>
 
     <h3>Create a User</h3>
     <ol>
         <li>Click <strong>New User</strong></li>
         <li>Fill in: Username, Password, Full Name, Email</li>
-        <li>Select <strong>Role</strong> (Admin or Staff)</li>
-        <li>Check the desired <strong>Permissions</strong></li>
+        <li>Select <strong>Role</strong></li>
+        <li>Check the desired <strong>Permissions</strong> (checkboxes)</li>
         <li>Click <strong>Create</strong></li>
     </ol>
 
@@ -628,35 +699,43 @@
     <table>
         <tr><th>Role</th><th>Description</th></tr>
         <tr><td>ADMIN</td><td>Full access to all features</td></tr>
+        <tr><td>MANAGER</td><td>All except user management and settings</td></tr>
         <tr><td>CASHIER</td><td>POS terminal, view items and stock</td></tr>
-        <tr><td>STOCK CLERK</td><td>Inventory operations with approval</td></tr>
+        <tr><td>INVENTORY CLERK</td><td>Stock operations, items, suppliers</td></tr>
         <tr><td>VIEWER</td><td>View-only access to all modules</td></tr>
     </table>
 
-    <div class="info">Permissions can be customized per user regardless of role preset.</div>
+    <div class="info">Permissions can be customized per user regardless of role preset. The role sets defaults, but you can check/uncheck individual permissions.</div>
+
+    <h3>Other Actions</h3>
+    <ul>
+        <li><strong>Reset Password</strong> — Reset a user's password</li>
+        <li><strong>Deactivate</strong> — Disable login without deleting the account</li>
+    </ul>
 </section>
 
 <!-- 12. Audit Trail -->
 <section id="audit">
     <h2>12. Audit Trail</h2>
-    <p>Every change in the system is automatically recorded.</p>
+    <p>Every change in the system is automatically recorded. Access from <strong>Administration → Audit Trail</strong> or <strong>Quick Access → Administration → Audit Trail</strong>.</p>
 
-    <p>The audit trail shows:</p>
-    <ul>
-        <li><strong>Timestamp</strong> — When the change happened</li>
-        <li><strong>User</strong> — Who made the change</li>
-        <li><strong>Entity</strong> — What was changed (Item, Category, Sale, etc.)</li>
-        <li><strong>Action</strong> — CREATE, UPDATE, or DELETE</li>
-        <li><strong>Details</strong> — Field-level changes (old value → new value)</li>
-    </ul>
+    <p>Each audit record shows:</p>
+    <table>
+        <tr><th>Field</th><th>Description</th></tr>
+        <tr><td>Timestamp</td><td>When the change happened</td></tr>
+        <tr><td>User</td><td>Who made the change</td></tr>
+        <tr><td>Entity</td><td>What was changed (Item, Category, Sale, etc.)</td></tr>
+        <tr><td>Action</td><td>CREATE, UPDATE, or DELETE</td></tr>
+        <tr><td>Details</td><td>Field-level changes (old value → new value)</td></tr>
+    </table>
 
-    <p>Access from <strong>Administration → Audit Trail</strong>. Filter by entity, user, date range, or action.</p>
+    <p>Use filters to narrow results by entity type, user, date range, or action type.</p>
 </section>
 
 <!-- 13. Roles & Permissions -->
 <section id="roles">
     <h2>13. Roles & Permissions</h2>
-    <p>The system uses a granular permission system with 25 individual permissions:</p>
+    <p>The system uses a bitwise permission system with 25 individual permissions:</p>
 
     <table>
         <tr><th>Permission</th><th>Description</th></tr>
@@ -677,19 +756,28 @@
         <tr><td>VIEW_AUDIT_TRAIL</td><td>View the audit trail</td></tr>
         <tr><td>MANAGE_USERS</td><td>Create/edit user accounts</td></tr>
         <tr><td>MANAGE_SETTINGS</td><td>Modify system settings</td></tr>
+        <tr><td>MANAGE_ADDONS</td><td>Manage add-on configurations</td></tr>
         <tr><td>REPRINT</td><td>Reprint transactions and receipts</td></tr>
     </table>
+
+    <div class="info">Permissions are stored as a single integer using bitwise operations. Each permission is a bit position (0–24). This allows efficient storage and fast permission checking.</div>
 </section>
 
 <!-- 14. FAQ -->
 <section id="faq">
     <h2>14. FAQ & Troubleshooting</h2>
 
+    <h3>Q: Where is the Quick Access panel?</h3>
+    <p>Look for the small arrow tab on the <strong>right edge</strong> of your screen. Click it to slide open the Quick Access panel with shortcuts to Transactions, Reports, Settings, and more.</p>
+
+    <h3>Q: How do I configure user access rights?</h3>
+    <p>Go to <strong>Settings → User Access Rights</strong> tab (the 6th tab). Or use the Quick Access panel → Settings → Access Rights. This shows a matrix of all permissions × roles.</p>
+
     <h3>Q: Why can't I see certain menu items?</h3>
-    <p>Your user account may not have the required permissions. Contact your administrator to grant access.</p>
+    <p>Your user account may not have the required permissions. Both the left sidebar and the Quick Access panel are filtered by your permissions. Contact your administrator to grant access.</p>
 
     <h3>Q: Why is my stock not updating after a stock-in?</h3>
-    <p>Stock transactions require <strong>approval</strong>. Go to Transactions, find the CREATED transaction, and click <strong>Approve</strong>.</p>
+    <p>Stock transactions require <strong>approval</strong>. Go to Transactions (via left sidebar or Quick Access → Transactions → All Transactions), find the CREATED transaction, and click <strong>Approve</strong>.</p>
 
     <h3>Q: Can I edit a completed sale?</h3>
     <p>No. Completed (PAID/CLOSED) sales cannot be edited. You must <strong>Void</strong> the sale and create a new one. This maintains audit integrity.</p>
@@ -713,13 +801,16 @@
     <p>An administrator can reset your password from <strong>Administration → Users → Reset Password</strong>.</p>
 
     <h3>Q: Can I use this on my phone?</h3>
-    <p>Yes. The system is responsive and works on desktop, tablet, and mobile devices. The POS terminal is optimized for touch screens.</p>
+    <p>Yes. The system is responsive and works on desktop, tablet, and mobile devices. The left sidebar collapses on mobile, and the POS terminal adapts to smaller screens.</p>
+
+    <h3>Q: How do I navigate faster between sections?</h3>
+    <p>Use the <strong>Quick Access panel</strong> (right sidebar). It provides direct links to all subsections without navigating through nested menus.</p>
 </section>
 
 </div>
 
 <footer>
-    <p>Inventory + POS System v1.0 — © 2026 Joven Q. Divinagracia Jr.</p>
+    <p>Inventory + POS System v1.1 — © 2026 Joven Q. Divinagracia Jr.</p>
     <p>For technical support, contact the system administrator.</p>
 </footer>
 

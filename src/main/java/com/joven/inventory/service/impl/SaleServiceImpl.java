@@ -18,6 +18,7 @@ import com.joven.inventory.entity.SaleAddon;
 import com.joven.inventory.entity.SaleItem;
 import com.joven.inventory.entity.SalePayment;
 import com.joven.inventory.entity.Shift;
+import com.joven.inventory.entity.Stock;
 import com.joven.inventory.enums.DiscountType;
 import com.joven.inventory.enums.DocumentType;
 import com.joven.inventory.enums.PaymentMethod;
@@ -25,6 +26,7 @@ import com.joven.inventory.enums.SaleStatus;
 import com.joven.inventory.enums.ShiftStatus;
 import com.joven.inventory.enums.TaxType;
 import com.joven.inventory.exception.BusinessRuleException;
+import com.joven.inventory.exception.InsufficientStockException;
 import com.joven.inventory.exception.ResourceNotFoundException;
 import com.joven.inventory.mapper.SaleMapper;
 import com.joven.inventory.repository.CustomerRepository;
@@ -291,8 +293,19 @@ public class SaleServiceImpl implements SaleService {
         // Update status to PAID
         sale.setStatus(SaleStatus.PAID);
 
-        // Deduct stock for each item
+        // Pre-validate stock sufficiency for all items before any deduction
         List<SaleItem> saleItems = saleItemRepository.findBySaleId(saleId);
+        for (SaleItem saleItem : saleItems) {
+            Stock stock = stockRepository.findByItemId(saleItem.getItem().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Stock not found for item: " + saleItem.getItemName()));
+            if (stock.getQuantityOnHand() < saleItem.getQuantity()) {
+                throw new InsufficientStockException(
+                        saleItem.getItem().getId(), stock.getQuantityOnHand(), saleItem.getQuantity());
+            }
+        }
+
+        // Deduct stock for each item
         for (SaleItem saleItem : saleItems) {
             stockService.deductStock(saleItem.getItem().getId(), saleItem.getQuantity());
         }

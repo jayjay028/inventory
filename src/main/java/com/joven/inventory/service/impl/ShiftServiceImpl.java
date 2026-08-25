@@ -134,16 +134,18 @@ public class ShiftServiceImpl implements ShiftService {
         BigDecimal creditSales = BigDecimal.ZERO;
         BigDecimal totalChange = BigDecimal.ZERO;
 
-        for (Long saleId : completedSaleIds) {
-            List<SalePayment> payments = salePaymentRepository.findBySaleId(saleId);
-            for (SalePayment payment : payments) {
-                switch (payment.getPaymentMethod()) {
-                    case CASH -> cashSales = cashSales.add(payment.getAmount());
-                    case GCASH -> gcashSales = gcashSales.add(payment.getAmount());
-                    case BANK_TRANSFER -> bankTransferSales = bankTransferSales.add(payment.getAmount());
-                    case CREDIT -> creditSales = creditSales.add(payment.getAmount());
-                    case MULTIPLE -> { /* MULTIPLE is broken into individual payment records */ }
-                }
+        // Batch query: fetch all payments for completed sales in a single call
+        List<SalePayment> allPayments = completedSaleIds.isEmpty()
+                ? List.of()
+                : salePaymentRepository.findBySaleIdIn(completedSaleIds);
+
+        for (SalePayment payment : allPayments) {
+            switch (payment.getPaymentMethod()) {
+                case CASH -> cashSales = cashSales.add(payment.getAmount());
+                case GCASH -> gcashSales = gcashSales.add(payment.getAmount());
+                case BANK_TRANSFER -> bankTransferSales = bankTransferSales.add(payment.getAmount());
+                case CREDIT -> creditSales = creditSales.add(payment.getAmount());
+                case MULTIPLE -> { /* MULTIPLE is broken into individual payment records */ }
             }
         }
 

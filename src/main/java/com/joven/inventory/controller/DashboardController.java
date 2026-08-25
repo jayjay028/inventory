@@ -2,6 +2,8 @@ package com.joven.inventory.controller;
 
 import com.joven.inventory.common.ApiResponse;
 import com.joven.inventory.dto.response.DashboardResponse;
+import com.joven.inventory.security.Permission;
+import com.joven.inventory.security.RequiresPermission;
 import com.joven.inventory.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,7 @@ public class DashboardController {
      * @return the API response containing dashboard data
      */
     @GetMapping
+    @RequiresPermission(Permission.VIEW_DASHBOARD)
     public ResponseEntity<ApiResponse<DashboardResponse>> getDashboard() {
         DashboardResponse response = dashboardService.getDashboard();
         return ResponseEntity.ok(ApiResponse.success("Dashboard data retrieved successfully", response));
