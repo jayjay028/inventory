@@ -1,6 +1,7 @@
 package com.joven.inventory.service.impl;
 
 import com.joven.inventory.audit.AuditContext;
+import com.joven.inventory.context.StoreContext;
 import com.joven.inventory.dto.request.CreateSaleRequest;
 import com.joven.inventory.dto.request.ProcessPaymentRequest;
 import com.joven.inventory.dto.request.SaleItemRequest;
@@ -13,6 +14,7 @@ import com.joven.inventory.entity.SaleItem;
 import com.joven.inventory.entity.SalePayment;
 import com.joven.inventory.entity.Shift;
 import com.joven.inventory.entity.Stock;
+import com.joven.inventory.entity.Store;
 import com.joven.inventory.enums.DiscountType;
 import com.joven.inventory.enums.PaymentMethod;
 import com.joven.inventory.enums.SaleStatus;
@@ -27,6 +29,7 @@ import com.joven.inventory.repository.SalePaymentRepository;
 import com.joven.inventory.repository.SaleRepository;
 import com.joven.inventory.repository.ShiftRepository;
 import com.joven.inventory.repository.StockRepository;
+import com.joven.inventory.repository.StoreRepository;
 import com.joven.inventory.service.AppSettingService;
 import com.joven.inventory.service.DocumentNumberService;
 import com.joven.inventory.service.StockService;
@@ -63,12 +66,15 @@ import static org.mockito.Mockito.when;
 /**
  * Unit tests for {@link SaleServiceImpl}.
  * Verifies POS sale lifecycle: creation, payment, closing, voiding, and discount calculations.
+ * All operations are scoped to the current store resolved from {@link StoreContext}.
  *
  * @author Joven Q. Divinagracia Jr.
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SaleServiceImpl Unit Tests")
 class SaleServiceImplTest {
+
+    private static final Long STORE_ID = 1L;
 
     @Mock
     private SaleRepository saleRepository;
@@ -106,17 +112,29 @@ class SaleServiceImplTest {
     @Mock
     private ShiftRepository shiftRepository;
 
+    @Mock
+    private StoreRepository storeRepository;
+
     @InjectMocks
     private SaleServiceImpl saleService;
+
+    private Store store;
 
     @BeforeEach
     void setUp() {
         AuditContext.set("testuser", "127.0.0.1");
+        StoreContext.setStoreId(STORE_ID);
+
+        store = createTestStore();
+        // Store resolution happens only in createSale flows; keep lenient so payment/close/void
+        // tests do not trip Mockito strict stubbing.
+        lenient().when(storeRepository.findById(STORE_ID)).thenReturn(Optional.of(store));
     }
 
     @AfterEach
     void tearDown() {
         AuditContext.clear();
+        StoreContext.clear();
     }
 
     // ========================================================================
@@ -130,7 +148,7 @@ class SaleServiceImplTest {
         Shift shift = createTestShift(1L, "testuser", ShiftStatus.OPEN);
         Item item = createTestItem(1L, "ITM-001", "Test Item", new BigDecimal("500.00"), true);
 
-        when(shiftRepository.findByCashierAndStatus("testuser", ShiftStatus.OPEN))
+        when(shiftRepository.findByStoreIdAndCashierAndStatus(STORE_ID, "testuser", ShiftStatus.OPEN))
                 .thenReturn(Optional.of(shift));
         when(appSettingService.getValueOrDefault("pos_receipt_prefix", "POS-"))
                 .thenReturn("RCT-");
@@ -180,14 +198,14 @@ class SaleServiceImplTest {
         assertThat(response.getSaleNo()).startsWith("RCT-");
 
         // Verify stock is NOT deducted on creation (only on payment)
-        verify(stockService, never()).deductStock(anyLong(), anyInt());
+        verify(stockService, never()).deductStock(anyLong(), anyLong(), anyInt());
     }
 
     @Test
     @DisplayName("createSale - given no open shift - throws BusinessRuleException")
     void createSale_givenNoOpenShift_throwsBusinessRuleException() {
         // Arrange
-        when(shiftRepository.findByCashierAndStatus("testuser", ShiftStatus.OPEN))
+        when(shiftRepository.findByStoreIdAndCashierAndStatus(STORE_ID, "testuser", ShiftStatus.OPEN))
                 .thenReturn(Optional.empty());
 
         CreateSaleRequest request = CreateSaleRequest.builder()
@@ -214,7 +232,7 @@ class SaleServiceImplTest {
         Shift shift = createTestShift(1L, "testuser", ShiftStatus.OPEN);
         Item item = createTestItem(1L, "ITM-001", "Test Item", new BigDecimal("500.00"), true);
 
-        when(shiftRepository.findByCashierAndStatus("testuser", ShiftStatus.OPEN))
+        when(shiftRepository.findByStoreIdAndCashierAndStatus(STORE_ID, "testuser", ShiftStatus.OPEN))
                 .thenReturn(Optional.of(shift));
         when(appSettingService.getValueOrDefault("pos_receipt_prefix", "POS-"))
                 .thenReturn("RCT-");
@@ -293,7 +311,7 @@ class SaleServiceImplTest {
 
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
         when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of(saleItem));
-        when(stockRepository.findByItemId(1L)).thenReturn(Optional.of(stock));
+        when(stockRepository.findByItemIdAndStoreId(1L, STORE_ID)).thenReturn(Optional.of(stock));
         when(saleAddonRepository.findBySaleId(1L)).thenReturn(Collections.emptyList());
         when(salePaymentRepository.save(any(SalePayment.class))).thenAnswer(invocation -> {
             SalePayment payment = invocation.getArgument(0);
@@ -317,8 +335,8 @@ class SaleServiceImplTest {
         assertThat(response.getAmountTendered()).isEqualByComparingTo(new BigDecimal("1500.00"));
         assertThat(response.getChangeAmount()).isEqualByComparingTo(new BigDecimal("500.00"));
 
-        // Verify stock deducted for each item
-        verify(stockService, times(1)).deductStock(eq(1L), eq(2));
+        // Verify stock deducted for each item, scoped to the current store
+        verify(stockService, times(1)).deductStock(eq(1L), eq(STORE_ID), eq(2));
     }
 
     @Test
@@ -351,7 +369,7 @@ class SaleServiceImplTest {
 
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
         when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of(saleItem));
-        when(stockRepository.findByItemId(1L)).thenReturn(Optional.of(stock));
+        when(stockRepository.findByItemIdAndStoreId(1L, STORE_ID)).thenReturn(Optional.of(stock));
         when(saleAddonRepository.findBySaleId(1L)).thenReturn(Collections.emptyList());
         when(salePaymentRepository.save(any(SalePayment.class))).thenAnswer(invocation -> {
             SalePayment payment = invocation.getArgument(0);
@@ -459,8 +477,8 @@ class SaleServiceImplTest {
         assertThat(response.getVoidReason()).isEqualTo("Duplicate sale");
         assertThat(response.getVoidedBy()).isEqualTo("testuser");
 
-        // Verify stock reversal (addStock called for each item)
-        verify(stockService, times(1)).addStock(eq(1L), eq(2));
+        // Verify stock reversal (addStock called for each item, scoped to the current store)
+        verify(stockService, times(1)).addStock(eq(1L), eq(STORE_ID), eq(2));
     }
 
     @Test
@@ -487,7 +505,7 @@ class SaleServiceImplTest {
         assertThat(response.getStatus()).isEqualTo(SaleStatus.VOIDED.name());
 
         // Verify stock NOT reversed (was OPEN, no stock was deducted)
-        verify(stockService, never()).addStock(anyLong(), anyInt());
+        verify(stockService, never()).addStock(anyLong(), anyLong(), anyInt());
     }
 
     @Test
@@ -512,10 +530,19 @@ class SaleServiceImplTest {
     // Helper methods
     // ========================================================================
 
+    private Store createTestStore() {
+        Store s = new Store();
+        s.setId(STORE_ID);
+        s.setCode("MAIN");
+        s.setName("Main Store");
+        return s;
+    }
+
     private Sale createTestSale(Long id, String saleNo, SaleStatus status, BigDecimal totalAmount) {
         Sale sale = new Sale();
         sale.setId(id);
         sale.setSaleNo(saleNo);
+        sale.setStore(store);
         sale.setStatus(status);
         sale.setTotalAmount(totalAmount);
         sale.setSubtotal(totalAmount);
@@ -570,6 +597,7 @@ class SaleServiceImplTest {
     private Shift createTestShift(Long id, String cashier, ShiftStatus status) {
         Shift shift = new Shift();
         shift.setId(id);
+        shift.setStore(store);
         shift.setCashier(cashier);
         shift.setStatus(status);
         shift.setOpeningAmount(new BigDecimal("5000.00"));
@@ -581,6 +609,7 @@ class SaleServiceImplTest {
         Stock stock = new Stock();
         stock.setId(id);
         stock.setItem(item);
+        stock.setStore(store);
         stock.setQuantityOnHand(quantityOnHand);
         stock.setLastUpdated(LocalDateTime.now());
         return stock;

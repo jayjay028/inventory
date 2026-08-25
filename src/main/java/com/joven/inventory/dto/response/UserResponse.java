@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Response DTO representing a user. Does not include the password field.
@@ -22,6 +23,8 @@ public class UserResponse {
     private Long accessRights;
     private Boolean active;
     private LocalDateTime lastLogin;
+    /** IDs of stores this user can access. */
+    private List<Long> storeIds;
     private String createdBy;
     private LocalDateTime createdAt;
     private String updatedBy;

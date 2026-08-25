@@ -64,9 +64,11 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useStoreStore } from '@/stores/store'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const storeStore = useStoreStore()
 
 const form = reactive({
   username: '',
@@ -81,7 +83,13 @@ async function handleLogin() {
 
   try {
     await authStore.login(form)
-    router.push('/dashboard')
+    // If the user has access to multiple stores and none is selected yet,
+    // send them to the store selection screen; otherwise go to dashboard.
+    if (storeStore.hasMultipleStores && !storeStore.hasStore) {
+      router.push('/select-store')
+    } else {
+      router.push('/dashboard')
+    }
   } catch (error) {
     const msg = error.response?.data?.message
     errorMessage.value = msg || 'Invalid username or password. Please try again.'

@@ -30,6 +30,16 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
     Page<StockTransaction> findByStatus(TransactionStatus status, Pageable pageable);
 
     /**
+     * Finds stock transactions by store and status with pagination.
+     *
+     * @param storeId the store ID
+     * @param status the transaction status
+     * @param pageable pagination information
+     * @return a page of stock transactions for the store with the given status
+     */
+    Page<StockTransaction> findByStoreIdAndStatus(Long storeId, TransactionStatus status, Pageable pageable);
+
+    /**
      * Finds stock transactions by item ID with pagination.
      *
      * @param itemId the item ID
@@ -48,6 +58,16 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
     Page<StockTransaction> findByTransactionType(TransactionType transactionType, Pageable pageable);
 
     /**
+     * Finds stock transactions by store and transaction type with pagination.
+     *
+     * @param storeId the store ID
+     * @param transactionType the transaction type
+     * @param pageable pagination information
+     * @return a page of stock transactions for the store with the given type
+     */
+    Page<StockTransaction> findByStoreIdAndTransactionType(Long storeId, TransactionType transactionType, Pageable pageable);
+
+    /**
      * Finds stock transactions within a date range with pagination.
      *
      * @param from the start date (inclusive)
@@ -58,6 +78,17 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
     Page<StockTransaction> findByTransactionDateBetween(LocalDateTime from, LocalDateTime to, Pageable pageable);
 
     /**
+     * Finds stock transactions for a store within a date range with pagination.
+     *
+     * @param storeId the store ID
+     * @param from the start date (inclusive)
+     * @param to the end date (inclusive)
+     * @param pageable pagination information
+     * @return a page of stock transactions for the store within the date range
+     */
+    Page<StockTransaction> findByStoreIdAndTransactionDateBetween(Long storeId, LocalDateTime from, LocalDateTime to, Pageable pageable);
+
+    /**
      * Finds stock transactions pending approval (status = CREATED).
      *
      * @param pageable pagination information
@@ -65,6 +96,17 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
      */
     @Query("SELECT st FROM StockTransaction st WHERE st.status = com.joven.inventory.enums.TransactionStatus.CREATED")
     Page<StockTransaction> findPendingApproval(Pageable pageable);
+
+    /**
+     * Finds stock transactions for a store pending approval (status = CREATED).
+     *
+     * @param storeId the store ID
+     * @param pageable pagination information
+     * @return a page of the store's stock transactions pending approval
+     */
+    @Query("SELECT st FROM StockTransaction st WHERE st.store.id = :storeId "
+            + "AND st.status = com.joven.inventory.enums.TransactionStatus.CREATED")
+    Page<StockTransaction> findPendingApproval(@Param("storeId") Long storeId, Pageable pageable);
 
     /**
      * Counts stock transactions by status.

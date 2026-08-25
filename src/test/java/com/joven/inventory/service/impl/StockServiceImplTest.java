@@ -4,10 +4,12 @@ import com.joven.inventory.dto.response.StockResponse;
 import com.joven.inventory.entity.Category;
 import com.joven.inventory.entity.Item;
 import com.joven.inventory.entity.Stock;
+import com.joven.inventory.entity.Store;
 import com.joven.inventory.exception.InsufficientStockException;
 import com.joven.inventory.exception.ResourceNotFoundException;
 import com.joven.inventory.repository.ItemRepository;
 import com.joven.inventory.repository.StockRepository;
+import com.joven.inventory.repository.StoreRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,12 +29,14 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link StockServiceImpl}.
- * Tests stock query, addition, deduction, and set operations with proper validation.
+ * Tests store-scoped stock query, addition, deduction, and set operations with proper validation.
  *
  * @author Joven Q. Divinagracia Jr.
  */
 @ExtendWith(MockitoExtension.class)
 class StockServiceImplTest {
+
+    private static final Long STORE_ID = 1L;
 
     @Mock
     private StockRepository stockRepository;
@@ -40,21 +44,24 @@ class StockServiceImplTest {
     @Mock
     private ItemRepository itemRepository;
 
+    @Mock
+    private StoreRepository storeRepository;
+
     @InjectMocks
     private StockServiceImpl stockService;
 
-    // ======================== getByItemId ========================
+    // ======================== getByItemIdAndStore ========================
 
     @Test
-    @DisplayName("getByItemId - given existing item - returns stock response with correct fields")
-    void getByItemId_givenExistingItem_returnsStockResponse() {
+    @DisplayName("getByItemIdAndStore - given existing item - returns stock response with correct fields")
+    void getByItemIdAndStore_givenExistingItem_returnsStockResponse() {
         // Arrange
         Stock stock = createStock(50);
 
-        when(stockRepository.findByItemId(1L)).thenReturn(Optional.of(stock));
+        when(stockRepository.findByItemIdAndStoreId(1L, STORE_ID)).thenReturn(Optional.of(stock));
 
         // Act
-        StockResponse response = stockService.getByItemId(1L);
+        StockResponse response = stockService.getByItemIdAndStore(1L, STORE_ID);
 
         // Assert
         assertThat(response).isNotNull();
@@ -71,13 +78,13 @@ class StockServiceImplTest {
     }
 
     @Test
-    @DisplayName("getByItemId - given non-existent item - throws ResourceNotFoundException")
-    void getByItemId_givenNonExistentItem_throwsResourceNotFoundException() {
+    @DisplayName("getByItemIdAndStore - given non-existent item - throws ResourceNotFoundException")
+    void getByItemIdAndStore_givenNonExistentItem_throwsResourceNotFoundException() {
         // Arrange
-        when(stockRepository.findByItemId(999L)).thenReturn(Optional.empty());
+        when(stockRepository.findByItemIdAndStoreId(999L, STORE_ID)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> stockService.getByItemId(999L))
+        assertThatThrownBy(() -> stockService.getByItemIdAndStore(999L, STORE_ID))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Stock not found for item ID: 999");
     }
@@ -90,10 +97,10 @@ class StockServiceImplTest {
         // Arrange
         Stock stock = createStock(100);
 
-        when(stockRepository.findByItemId(1L)).thenReturn(Optional.of(stock));
+        when(stockRepository.findByItemIdAndStoreId(1L, STORE_ID)).thenReturn(Optional.of(stock));
 
         // Act
-        stockService.addStock(1L, 50);
+        stockService.addStock(1L, STORE_ID, 50);
 
         // Assert
         assertThat(stock.getQuantityOnHand()).isEqualTo(150);
@@ -108,10 +115,10 @@ class StockServiceImplTest {
         // Arrange
         Stock stock = createStock(100);
 
-        when(stockRepository.findByItemId(1L)).thenReturn(Optional.of(stock));
+        when(stockRepository.findByItemIdAndStoreId(1L, STORE_ID)).thenReturn(Optional.of(stock));
 
         // Act
-        stockService.deductStock(1L, 30);
+        stockService.deductStock(1L, STORE_ID, 30);
 
         // Assert
         assertThat(stock.getQuantityOnHand()).isEqualTo(70);
@@ -124,10 +131,10 @@ class StockServiceImplTest {
         // Arrange
         Stock stock = createStock(10);
 
-        when(stockRepository.findByItemId(1L)).thenReturn(Optional.of(stock));
+        when(stockRepository.findByItemIdAndStoreId(1L, STORE_ID)).thenReturn(Optional.of(stock));
 
         // Act & Assert
-        assertThatThrownBy(() -> stockService.deductStock(1L, 50))
+        assertThatThrownBy(() -> stockService.deductStock(1L, STORE_ID, 50))
                 .isInstanceOf(InsufficientStockException.class)
                 .hasMessageContaining("Insufficient stock for item ID 1");
 
@@ -138,10 +145,10 @@ class StockServiceImplTest {
     @DisplayName("deductStock - given non-existent item - throws ResourceNotFoundException")
     void deductStock_givenNonExistentItem_throwsResourceNotFoundException() {
         // Arrange
-        when(stockRepository.findByItemId(999L)).thenReturn(Optional.empty());
+        when(stockRepository.findByItemIdAndStoreId(999L, STORE_ID)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> stockService.deductStock(999L, 10))
+        assertThatThrownBy(() -> stockService.deductStock(999L, STORE_ID, 10))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Stock not found for item ID: 999");
     }
@@ -154,10 +161,10 @@ class StockServiceImplTest {
         // Arrange
         Stock stock = createStock(100);
 
-        when(stockRepository.findByItemId(1L)).thenReturn(Optional.of(stock));
+        when(stockRepository.findByItemIdAndStoreId(1L, STORE_ID)).thenReturn(Optional.of(stock));
 
         // Act
-        stockService.setStock(1L, 75);
+        stockService.setStock(1L, STORE_ID, 75);
 
         // Assert
         assertThat(stock.getQuantityOnHand()).isEqualTo(75);
@@ -167,7 +174,7 @@ class StockServiceImplTest {
     // ======================== Helper methods ========================
 
     /**
-     * Creates a Stock entity with a fully populated Item and Category for testing.
+     * Creates a Stock entity with a fully populated Item, Category, and Store for testing.
      *
      * @param quantityOnHand the quantity on hand to set
      * @return the configured Stock entity
@@ -190,9 +197,15 @@ class StockServiceImplTest {
         item.setTaxable(true);
         item.setActive(true);
 
+        Store store = new Store();
+        store.setId(STORE_ID);
+        store.setCode("MAIN");
+        store.setName("Main Store");
+
         Stock stock = new Stock();
         stock.setId(1L);
         stock.setItem(item);
+        stock.setStore(store);
         stock.setQuantityOnHand(quantityOnHand);
         stock.setLastUpdated(LocalDateTime.now());
 

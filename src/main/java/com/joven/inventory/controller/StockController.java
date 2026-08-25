@@ -2,6 +2,7 @@ package com.joven.inventory.controller;
 
 import com.joven.inventory.common.ApiResponse;
 import com.joven.inventory.common.PageResponse;
+import com.joven.inventory.context.StoreContext;
 import com.joven.inventory.dto.request.StockAdjustRequest;
 import com.joven.inventory.dto.request.StockInRequest;
 import com.joven.inventory.dto.request.StockOutRequest;
@@ -55,7 +56,8 @@ public class StockController {
     }
 
     /**
-     * Retrieves the stock level for a specific item.
+     * Retrieves the stock level for a specific item within the current store.
+     * The store is resolved from the request context (X-Store-Id header).
      *
      * @param itemId the item ID
      * @return the API response containing the stock data for the item
@@ -63,7 +65,7 @@ public class StockController {
     @GetMapping("/{itemId}")
     @RequiresPermission(Permission.VIEW_STOCK)
     public ResponseEntity<ApiResponse<StockResponse>> getByItemId(@PathVariable Long itemId) {
-        StockResponse response = stockService.getByItemId(itemId);
+        StockResponse response = stockService.getByItemIdAndStore(itemId, StoreContext.getStoreId());
         return ResponseEntity.ok(ApiResponse.success("Stock retrieved successfully", response));
     }
 

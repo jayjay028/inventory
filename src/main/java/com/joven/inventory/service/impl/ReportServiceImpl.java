@@ -1,5 +1,6 @@
 package com.joven.inventory.service.impl;
 
+import com.joven.inventory.context.StoreContext;
 import com.joven.inventory.entity.Item;
 import com.joven.inventory.entity.Sale;
 import com.joven.inventory.entity.SaleItem;
@@ -175,7 +176,8 @@ public class ReportServiceImpl implements ReportService {
                     row.put("category", item.getCategory().getName());
                     row.put("unit", item.getUnit());
                     row.put("reorderLevel", item.getReorderLevel());
-                    int quantityOnHand = stockRepository.findByItemId(item.getId())
+                    int quantityOnHand = stockRepository
+                            .findByItemIdAndStoreId(item.getId(), StoreContext.getStoreId())
                             .map(Stock::getQuantityOnHand)
                             .orElse(0);
                     row.put("quantityOnHand", quantityOnHand);

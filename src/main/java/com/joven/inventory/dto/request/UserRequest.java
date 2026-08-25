@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * Request DTO for creating or updating a user.
  * On update, the password field is nullable — if not provided, the existing password is retained.
@@ -42,4 +44,7 @@ public class UserRequest {
 
     @NotNull(message = "Access rights is required")
     private Long accessRights;
+
+    /** IDs of stores this user is granted access to. */
+    private List<Long> storeIds;
 }

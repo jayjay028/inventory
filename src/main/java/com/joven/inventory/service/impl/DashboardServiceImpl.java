@@ -1,5 +1,6 @@
 package com.joven.inventory.service.impl;
 
+import com.joven.inventory.context.StoreContext;
 import com.joven.inventory.dto.response.DashboardResponse;
 import com.joven.inventory.entity.Item;
 import com.joven.inventory.entity.Sale;
@@ -58,8 +59,9 @@ public class DashboardServiceImpl implements DashboardService {
         // Active categories count
         long totalCategories = categoryRepository.findByActiveTrueOrderByNameAsc().size();
 
-        // Load all stocks with items (JOIN FETCH to avoid N+1)
-        List<Stock> allStocks = stockRepository.findAllWithItem(Pageable.unpaged()).getContent();
+        // Load all stocks with items for the current store (JOIN FETCH to avoid N+1)
+        List<Stock> allStocks = stockRepository
+                .findAllWithItemByStoreId(StoreContext.getStoreId(), Pageable.unpaged()).getContent();
 
         // Total stock value = sum of (quantityOnHand * costPrice)
         BigDecimal totalStockValue = allStocks.stream()

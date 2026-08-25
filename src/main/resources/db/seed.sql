@@ -6,6 +6,12 @@
 USE inventory_db;
 
 -- ============================================================
+-- DEFAULT STORE (Main Store)
+-- ============================================================
+INSERT INTO stores (code, name, address, tin, phone, active, created_by, created_at, updated_at)
+VALUES ('MAIN', 'Main Store', '', '', '', 1, 'system', NOW(), NOW());
+
+-- ============================================================
 -- DEFAULT ADMIN USER
 -- Password: admin123 (BCrypt encoded)
 -- ============================================================
@@ -20,6 +26,13 @@ VALUES (
     1,
     'system'
 );
+
+-- ============================================================
+-- ASSIGN ADMIN TO DEFAULT STORE
+-- ============================================================
+INSERT INTO user_stores (user_id, store_id)
+SELECT u.id, s.id FROM users u, stores s
+WHERE u.username = 'admin' AND s.code = 'MAIN';
 
 -- ============================================================
 -- APP SETTINGS - Company Information

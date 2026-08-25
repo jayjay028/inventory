@@ -1,6 +1,7 @@
 package com.joven.inventory.config;
 
 import com.joven.inventory.audit.AuditInterceptor;
+import com.joven.inventory.context.StoreContextInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -19,6 +20,7 @@ public class CorsConfig implements WebMvcConfigurer {
 
     private final AppProperties appProperties;
     private final AuditInterceptor auditInterceptor;
+    private final StoreContextInterceptor storeContextInterceptor;
 
     /**
      * Configures CORS mappings for all API endpoints based on application properties.
@@ -51,12 +53,15 @@ public class CorsConfig implements WebMvcConfigurer {
 
     /**
      * Registers interceptors for request processing.
-     * Adds the {@link AuditInterceptor} to log API access.
+     * Adds the {@link StoreContextInterceptor} to resolve the current store, and the
+     * {@link AuditInterceptor} to log API access.
      *
      * @param registry the interceptor registry
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(storeContextInterceptor)
+                .addPathPatterns("/api/**");
         registry.addInterceptor(auditInterceptor)
                 .addPathPatterns("/api/**");
     }

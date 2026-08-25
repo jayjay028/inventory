@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Implementation of {@link AuthService} providing authentication operations
@@ -173,6 +174,14 @@ public class AuthServiceImpl implements AuthService {
      * @return the user info DTO
      */
     private LoginResponse.UserInfo buildUserInfo(User user) {
+        List<LoginResponse.StoreInfo> stores = user.getAccessibleStores().stream()
+                .map(store -> LoginResponse.StoreInfo.builder()
+                        .id(store.getId())
+                        .code(store.getCode())
+                        .name(store.getName())
+                        .build())
+                .toList();
+
         return LoginResponse.UserInfo.builder()
                 .id(user.getId())
                 .username(user.getUsername())
@@ -180,6 +189,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.getEmail())
                 .role(user.getRole().name())
                 .accessRights(user.getAccessRights())
+                .stores(stores)
                 .build();
     }
 }

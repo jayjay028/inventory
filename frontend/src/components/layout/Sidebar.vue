@@ -142,6 +142,7 @@ const navigation = [
     icon: 'bi-gear',
     children: [
       { label: 'Users', route: '/users', permission: 19 },
+      { label: 'Stores', route: '/stores', permission: 20 },
       { label: 'Add-ons', route: '/addons', permission: 21 },
       { label: 'Settings', route: '/settings', permission: 20 },
       { label: 'Audit Trail', route: '/audit', permission: 18 }

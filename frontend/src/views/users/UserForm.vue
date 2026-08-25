@@ -70,6 +70,30 @@
             :error="errors.role"
           />
 
+          <!-- Store Access -->
+          <div class="mb-3">
+            <label class="form-label fw-medium">Store Access</label>
+            <div v-if="stores.length === 0" class="text-muted small">No stores available.</div>
+            <div v-else class="row g-2">
+              <div v-for="store in stores" :key="store.id" class="col-md-6 col-lg-4">
+                <div class="form-check">
+                  <input
+                    :id="`store-${store.id}`"
+                    class="form-check-input"
+                    type="checkbox"
+                    :value="store.id"
+                    :checked="form.storeIds.includes(store.id)"
+                    @change="toggleStore(store.id)"
+                  />
+                  <label :for="`store-${store.id}`" class="form-check-label small">
+                    {{ store.name }} <span class="text-muted">({{ store.code }})</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div v-if="errors.storeIds" class="text-danger small mt-1">{{ errors.storeIds }}</div>
+          </div>
+
           <!-- Permissions -->
           <div class="mb-3">
             <label class="form-label fw-medium">Permissions</label>
@@ -114,6 +138,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import usersApi from '@/api/users'
+import storesApi from '@/api/stores'
 import PageHeader from '@/components/common/PageHeader.vue'
 import FormInput from '@/components/common/FormInput.vue'
 import { useAppStore } from '@/stores/app'
@@ -170,28 +195,42 @@ const form = reactive({
   email: '',
   role: '',
   accessRights: 0,
+  storeIds: [],
   active: true
 })
+
+const stores = ref([])
 
 const errors = reactive({
   username: '',
   password: '',
   fullName: '',
   email: '',
-  role: ''
+  role: '',
+  storeIds: ''
 })
 
 onMounted(async () => {
+  // Load available stores for assignment
+  try {
+    const { data } = await storesApi.getActive()
+    stores.value = data.data || data
+  } catch (error) {
+    // Non-critical - store list just won't show
+  }
+
   if (isEdit.value) {
     pageLoading.value = true
     try {
       const { data } = await usersApi.getById(route.params.id)
-      form.username = data.username || ''
-      form.fullName = data.fullName || ''
-      form.email = data.email || ''
-      form.role = data.role || ''
-      form.accessRights = data.accessRights || 0
-      form.active = data.active !== false
+      const payload = data.data || data
+      form.username = payload.username || ''
+      form.fullName = payload.fullName || ''
+      form.email = payload.email || ''
+      form.role = payload.role || ''
+      form.accessRights = payload.accessRights || 0
+      form.storeIds = payload.storeIds || []
+      form.active = payload.active !== false
     } catch (error) {
       appStore.showToast('Failed to load user', 'error')
       router.push('/users')
@@ -209,6 +248,15 @@ function togglePermission(bit) {
   form.accessRights ^= (1 << bit)
 }
 
+function toggleStore(storeId) {
+  const idx = form.storeIds.indexOf(storeId)
+  if (idx === -1) {
+    form.storeIds.push(storeId)
+  } else {
+    form.storeIds.splice(idx, 1)
+  }
+}
+
 function validate() {
   let valid = true
   Object.keys(errors).forEach(k => (errors[k] = ''))
@@ -217,6 +265,7 @@ function validate() {
   if (!isEdit.value && !form.password) { errors.password = 'Password is required'; valid = false }
   if (!form.fullName.trim()) { errors.fullName = 'Full name is required'; valid = false }
   if (!form.role) { errors.role = 'Role is required'; valid = false }
+  if (form.storeIds.length === 0) { errors.storeIds = 'Assign at least one store'; valid = false }
 
   if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
     errors.email = 'Invalid email format'
@@ -237,6 +286,7 @@ async function handleSubmit() {
       email: form.email || null,
       role: form.role,
       accessRights: form.accessRights,
+      storeIds: form.storeIds,
       active: form.active
     }
 

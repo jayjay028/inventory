@@ -2,6 +2,7 @@ package com.joven.inventory.service.impl;
 
 import com.joven.inventory.audit.AuditContext;
 import com.joven.inventory.common.PageResponse;
+import com.joven.inventory.context.StoreContext;
 import com.joven.inventory.dto.request.CloseShiftRequest;
 import com.joven.inventory.dto.request.OpenShiftRequest;
 import com.joven.inventory.dto.response.ShiftResponse;
@@ -9,6 +10,7 @@ import com.joven.inventory.dto.response.ShiftSummaryResponse;
 import com.joven.inventory.entity.Sale;
 import com.joven.inventory.entity.SalePayment;
 import com.joven.inventory.entity.Shift;
+import com.joven.inventory.entity.Store;
 import com.joven.inventory.enums.PaymentMethod;
 import com.joven.inventory.enums.SaleStatus;
 import com.joven.inventory.enums.ShiftStatus;
@@ -18,6 +20,7 @@ import com.joven.inventory.mapper.ShiftMapper;
 import com.joven.inventory.repository.SalePaymentRepository;
 import com.joven.inventory.repository.SaleRepository;
 import com.joven.inventory.repository.ShiftRepository;
+import com.joven.inventory.repository.StoreRepository;
 import com.joven.inventory.service.ShiftService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +51,7 @@ public class ShiftServiceImpl implements ShiftService {
     private final ShiftRepository shiftRepository;
     private final SaleRepository saleRepository;
     private final SalePaymentRepository salePaymentRepository;
+    private final StoreRepository storeRepository;
 
     /**
      * {@inheritDoc}
@@ -57,8 +61,13 @@ public class ShiftServiceImpl implements ShiftService {
     public ShiftResponse openShift(OpenShiftRequest request) {
         String currentUser = AuditContext.getCurrentUser();
 
-        // Check if user already has an open shift
-        shiftRepository.findByCashierAndStatus(currentUser, ShiftStatus.OPEN)
+        // Resolve the current store from the request context
+        Store store = storeRepository.findById(StoreContext.getStoreId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Store not found with id: " + StoreContext.getStoreId()));
+
+        // Check if user already has an open shift in this store
+        shiftRepository.findByStoreIdAndCashierAndStatus(store.getId(), currentUser, ShiftStatus.OPEN)
                 .ifPresent(existing -> {
                     throw new BusinessRuleException(
                             "User '" + currentUser + "' already has an open shift (ID: " + existing.getId() + "). "
@@ -66,6 +75,7 @@ public class ShiftServiceImpl implements ShiftService {
                 });
 
         Shift shift = new Shift();
+        shift.setStore(store);
         shift.setCashier(currentUser);
         shift.setOpeningAmount(request.getOpeningAmount());
         shift.setStatus(ShiftStatus.OPEN);
@@ -196,7 +206,8 @@ public class ShiftServiceImpl implements ShiftService {
     @Override
     public ShiftResponse getCurrentShift() {
         String currentUser = AuditContext.getCurrentUser();
-        Shift shift = shiftRepository.findCurrentOpenShift(currentUser)
+        Long storeId = StoreContext.getStoreId();
+        Shift shift = shiftRepository.findCurrentOpenShift(storeId, currentUser)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No open shift found for user '" + currentUser + "'."));
         return ShiftMapper.toResponse(shift);

@@ -145,6 +145,9 @@
               <li v-if="authStore.hasPermission(PERMISSIONS.MANAGE_USERS)">
                 <router-link to="/users" @click="handleNav">Users</router-link>
               </li>
+              <li v-if="authStore.hasPermission(PERMISSIONS.MANAGE_SETTINGS)">
+                <router-link to="/stores" @click="handleNav">Stores</router-link>
+              </li>
               <li v-if="authStore.hasPermission(PERMISSIONS.MANAGE_ADDONS)">
                 <router-link to="/addons" @click="handleNav">Add-ons</router-link>
               </li>

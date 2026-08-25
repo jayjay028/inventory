@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore, PERMISSIONS } from '@/stores/auth'
+import { useStoreStore } from '@/stores/store'
 
 const routes = [
   {
@@ -215,6 +216,34 @@ const routes = [
     meta: { layout: 'app', requiresAuth: true, permission: PERMISSIONS.VIEW_AUDIT_TRAIL }
   },
 
+  // Store selection (no layout, requires auth but no permission)
+  {
+    path: '/select-store',
+    name: 'SelectStore',
+    component: () => import('@/views/SelectStore.vue'),
+    meta: { layout: 'blank', requiresAuth: true }
+  },
+
+  // Stores management (admin)
+  {
+    path: '/stores',
+    name: 'StoreList',
+    component: () => import('@/views/stores/StoreList.vue'),
+    meta: { layout: 'app', requiresAuth: true, permission: PERMISSIONS.MANAGE_SETTINGS }
+  },
+  {
+    path: '/stores/new',
+    name: 'StoreCreate',
+    component: () => import('@/views/stores/StoreForm.vue'),
+    meta: { layout: 'app', requiresAuth: true, permission: PERMISSIONS.MANAGE_SETTINGS }
+  },
+  {
+    path: '/stores/:id/edit',
+    name: 'StoreEdit',
+    component: () => import('@/views/stores/StoreForm.vue'),
+    meta: { layout: 'app', requiresAuth: true, permission: PERMISSIONS.MANAGE_SETTINGS }
+  },
+
   // Catch-all 404
   { path: '/:pathMatch(.*)*', redirect: '/dashboard' }
 ]
@@ -258,6 +287,29 @@ router.beforeEach(async (to, from, next) => {
     // Check if user has the required permission bit
     if (!authStore.hasPermission(to.meta.permission)) {
       next('/dashboard')
+      return
+    }
+  }
+
+  // Store-selection guard: authenticated users must have a store selected
+  // before accessing app pages (except the select-store page itself).
+  if (requiresAuth && authStore.isAuthenticated && to.path !== '/select-store') {
+    const storeStore = useStoreStore()
+
+    // Ensure stores are loaded (page reload case)
+    if (storeStore.accessibleStores.length === 0 && authStore.user?.stores == null) {
+      try {
+        await authStore.fetchUser()
+      } catch {
+        authStore.logout()
+        next('/login')
+        return
+      }
+    }
+
+    // If no store selected and the user has multiple, force selection
+    if (!storeStore.hasStore && storeStore.hasMultipleStores) {
+      next('/select-store')
       return
     }
   }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.joven.inventory.common.PageResponse;
+import com.joven.inventory.context.StoreContext;
 import com.joven.inventory.dto.request.StockAdjustRequest;
 import com.joven.inventory.dto.request.StockInRequest;
 import com.joven.inventory.dto.request.StockOutRequest;
@@ -13,6 +14,7 @@ import com.joven.inventory.exception.BusinessRuleException;
 import com.joven.inventory.exception.GlobalExceptionHandler;
 import com.joven.inventory.service.StockService;
 import com.joven.inventory.service.StockTransactionService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,6 +58,7 @@ class StockControllerTest {
 
     @BeforeEach
     void setUp() {
+        StoreContext.setStoreId(1L);
         mockMvc = MockMvcBuilders.standaloneSetup(stockController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .setCustomArgumentResolvers(new org.springframework.data.web.PageableHandlerMethodArgumentResolver())
@@ -63,6 +66,11 @@ class StockControllerTest {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
+
+    @AfterEach
+    void tearDown() {
+        StoreContext.clear();
     }
 
     @Test
@@ -83,7 +91,7 @@ class StockControllerTest {
     @DisplayName("GET /api/stock/1 - returns 200")
     void getStockByItemId_returns200() throws Exception {
         StockResponse s = StockResponse.builder().id(1L).itemId(1L).quantityOnHand(50).build();
-        when(stockService.getByItemId(1L)).thenReturn(s);
+        when(stockService.getByItemIdAndStore(1L, 1L)).thenReturn(s);
 
         mockMvc.perform(get("/api/stock/1"))
                 .andExpect(status().isOk())

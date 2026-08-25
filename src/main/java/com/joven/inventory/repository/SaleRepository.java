@@ -39,6 +39,16 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     Page<Sale> findByStatus(SaleStatus status, Pageable pageable);
 
     /**
+     * Finds sales by store and status with pagination.
+     *
+     * @param storeId the store ID
+     * @param status the sale status
+     * @param pageable pagination information
+     * @return a page of sales for the store with the given status
+     */
+    Page<Sale> findByStoreIdAndStatus(Long storeId, SaleStatus status, Pageable pageable);
+
+    /**
      * Finds sales by the cashier who created them, with pagination.
      *
      * @param createdBy the username of the cashier
@@ -58,6 +68,17 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     Page<Sale> findBySaleDateBetween(LocalDateTime from, LocalDateTime to, Pageable pageable);
 
     /**
+     * Finds sales for a store within a date range with pagination.
+     *
+     * @param storeId the store ID
+     * @param from the start date (inclusive)
+     * @param to the end date (inclusive)
+     * @param pageable pagination information
+     * @return a page of sales for the store within the date range
+     */
+    Page<Sale> findByStoreIdAndSaleDateBetween(Long storeId, LocalDateTime from, LocalDateTime to, Pageable pageable);
+
+    /**
      * Finds all sales for a specific shift.
      *
      * @param shiftId the shift ID
@@ -74,6 +95,19 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
      */
     @Query("SELECT s FROM Sale s WHERE s.saleDate BETWEEN :startOfDay AND :endOfDay")
     List<Sale> findTodaySales(@Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
+
+    /**
+     * Finds all sales for a store for today within the specified day boundaries.
+     *
+     * @param storeId the store ID
+     * @param startOfDay the start of the day
+     * @param endOfDay the end of the day
+     * @return a list of the store's sales for today
+     */
+    @Query("SELECT s FROM Sale s WHERE s.store.id = :storeId AND s.saleDate BETWEEN :startOfDay AND :endOfDay")
+    List<Sale> findTodaySales(@Param("storeId") Long storeId,
+                              @Param("startOfDay") LocalDateTime startOfDay,
+                              @Param("endOfDay") LocalDateTime endOfDay);
 
     /**
      * Counts sales by status within a date range.

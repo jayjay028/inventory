@@ -3,6 +3,8 @@ package com.joven.inventory.dto.response;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * Response DTO returned after successful authentication.
  * Contains JWT tokens and basic user information.
@@ -31,5 +33,18 @@ public class LoginResponse {
         private String email;
         private String role;
         private Long accessRights;
+        /** Stores this user is granted access to. */
+        private List<StoreInfo> stores;
+    }
+
+    /**
+     * Nested DTO containing minimal store information for the store selector.
+     */
+    @Data
+    @Builder
+    public static class StoreInfo {
+        private Long id;
+        private String code;
+        private String name;
     }
 }

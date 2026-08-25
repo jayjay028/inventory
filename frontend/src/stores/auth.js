@@ -62,6 +62,11 @@ export const useAuthStore = defineStore('auth', {
         this.setTokens(accessToken, refreshToken)
         this.user = user
 
+        // Populate accessible stores from login response
+        const { useStoreStore } = await import('@/stores/store')
+        const storeStore = useStoreStore()
+        storeStore.setAccessibleStores(user.stores || [])
+
         return response
       } finally {
         this.loading = false
@@ -74,6 +79,12 @@ export const useAuthStore = defineStore('auth', {
       this.refreshToken = null
       localStorage.removeItem('accessToken')
       localStorage.removeItem('refreshToken')
+
+      // Clear store selection on logout
+      import('@/stores/store').then(({ useStoreStore }) => {
+        useStoreStore().clearStore()
+      })
+
       router.push('/login')
     },
 
@@ -96,6 +107,10 @@ export const useAuthStore = defineStore('auth', {
       try {
         const response = await authApi.me()
         this.user = response.data.data
+
+        // Repopulate accessible stores on page reload
+        const { useStoreStore } = await import('@/stores/store')
+        useStoreStore().setAccessibleStores(this.user.stores || [])
 
         return response
       } finally {

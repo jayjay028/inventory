@@ -3,6 +3,7 @@ package com.joven.inventory.service.impl;
 import com.joven.inventory.audit.AuditContext;
 import com.joven.inventory.common.Constants;
 import com.joven.inventory.common.PageResponse;
+import com.joven.inventory.context.StoreContext;
 import com.joven.inventory.dto.request.CreateSaleRequest;
 import com.joven.inventory.dto.request.ProcessPaymentRequest;
 import com.joven.inventory.dto.request.SaleItemRequest;
@@ -19,6 +20,7 @@ import com.joven.inventory.entity.SaleItem;
 import com.joven.inventory.entity.SalePayment;
 import com.joven.inventory.entity.Shift;
 import com.joven.inventory.entity.Stock;
+import com.joven.inventory.entity.Store;
 import com.joven.inventory.enums.DiscountType;
 import com.joven.inventory.enums.DocumentType;
 import com.joven.inventory.enums.PaymentMethod;
@@ -37,6 +39,7 @@ import com.joven.inventory.repository.SalePaymentRepository;
 import com.joven.inventory.repository.SaleRepository;
 import com.joven.inventory.repository.ShiftRepository;
 import com.joven.inventory.repository.StockRepository;
+import com.joven.inventory.repository.StoreRepository;
 import com.joven.inventory.service.AppSettingService;
 import com.joven.inventory.service.DocumentNumberService;
 import com.joven.inventory.service.SaleService;
@@ -88,6 +91,7 @@ public class SaleServiceImpl implements SaleService {
     private final DocumentNumberService documentNumberService;
     private final AppSettingService appSettingService;
     private final ShiftRepository shiftRepository;
+    private final StoreRepository storeRepository;
 
     /**
      * {@inheritDoc}
@@ -97,8 +101,13 @@ public class SaleServiceImpl implements SaleService {
     public SaleDetailResponse createSale(CreateSaleRequest request) {
         String currentUser = AuditContext.getCurrentUser();
 
-        // Validate open shift
-        Shift shift = shiftRepository.findByCashierAndStatus(currentUser, ShiftStatus.OPEN)
+        // Resolve the current store from the request context
+        Store store = storeRepository.findById(StoreContext.getStoreId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Store not found with id: " + StoreContext.getStoreId()));
+
+        // Validate open shift scoped to the current store
+        Shift shift = shiftRepository.findByStoreIdAndCashierAndStatus(store.getId(), currentUser, ShiftStatus.OPEN)
                 .orElseThrow(() -> new BusinessRuleException(
                         "No open shift found for user '" + currentUser + "'. Please open a shift before creating a sale."));
 
@@ -116,6 +125,7 @@ public class SaleServiceImpl implements SaleService {
         // Create sale
         Sale sale = new Sale();
         sale.setSaleNo(saleNo);
+        sale.setStore(store);
         sale.setCustomer(customer);
         sale.setShift(shift);
         sale.setStatus(SaleStatus.OPEN);
@@ -294,9 +304,10 @@ public class SaleServiceImpl implements SaleService {
         sale.setStatus(SaleStatus.PAID);
 
         // Pre-validate stock sufficiency for all items before any deduction
+        Long storeId = sale.getStore().getId();
         List<SaleItem> saleItems = saleItemRepository.findBySaleId(saleId);
         for (SaleItem saleItem : saleItems) {
-            Stock stock = stockRepository.findByItemId(saleItem.getItem().getId())
+            Stock stock = stockRepository.findByItemIdAndStoreId(saleItem.getItem().getId(), storeId)
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Stock not found for item: " + saleItem.getItemName()));
             if (stock.getQuantityOnHand() < saleItem.getQuantity()) {
@@ -307,7 +318,7 @@ public class SaleServiceImpl implements SaleService {
 
         // Deduct stock for each item
         for (SaleItem saleItem : saleItems) {
-            stockService.deductStock(saleItem.getItem().getId(), saleItem.getQuantity());
+            stockService.deductStock(saleItem.getItem().getId(), storeId, saleItem.getQuantity());
         }
 
         sale = saleRepository.save(sale);
@@ -364,8 +375,9 @@ public class SaleServiceImpl implements SaleService {
         // Reverse stock if was PAID or CLOSED
         List<SaleItem> saleItems = saleItemRepository.findBySaleId(saleId);
         if (previousStatus == SaleStatus.PAID || previousStatus == SaleStatus.CLOSED) {
+            Long storeId = sale.getStore().getId();
             for (SaleItem saleItem : saleItems) {
-                stockService.addStock(saleItem.getItem().getId(), saleItem.getQuantity());
+                stockService.addStock(saleItem.getItem().getId(), storeId, saleItem.getQuantity());
             }
             log.info("Reversed stock for voided sale '{}' ({} items)", sale.getSaleNo(), saleItems.size());
         }

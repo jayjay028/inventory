@@ -1,6 +1,7 @@
 package com.joven.inventory.service.impl;
 
 import com.joven.inventory.audit.AuditContext;
+import com.joven.inventory.context.StoreContext;
 import com.joven.inventory.dto.request.StockAdjustRequest;
 import com.joven.inventory.dto.request.StockInRequest;
 import com.joven.inventory.dto.request.StockOutRequest;
@@ -9,6 +10,7 @@ import com.joven.inventory.entity.Category;
 import com.joven.inventory.entity.Item;
 import com.joven.inventory.entity.Stock;
 import com.joven.inventory.entity.StockTransaction;
+import com.joven.inventory.entity.Store;
 import com.joven.inventory.enums.DiscountType;
 import com.joven.inventory.enums.DocumentType;
 import com.joven.inventory.enums.TransactionStatus;
@@ -19,6 +21,7 @@ import com.joven.inventory.repository.CustomerRepository;
 import com.joven.inventory.repository.ItemRepository;
 import com.joven.inventory.repository.StockRepository;
 import com.joven.inventory.repository.StockTransactionRepository;
+import com.joven.inventory.repository.StoreRepository;
 import com.joven.inventory.repository.SupplierRepository;
 import com.joven.inventory.repository.TransactionAddonRepository;
 import com.joven.inventory.service.AppSettingService;
@@ -50,12 +53,15 @@ import static org.mockito.Mockito.when;
 /**
  * Unit tests for {@link StockTransactionServiceImpl}.
  * Tests creation, approval, and cancellation of stock transactions with proper
- * business rule validation and stock impact verification.
+ * business rule validation and stock impact verification. All operations are
+ * scoped to the current store resolved from {@link StoreContext}.
  *
  * @author Joven Q. Divinagracia Jr.
  */
 @ExtendWith(MockitoExtension.class)
 class StockTransactionServiceImplTest {
+
+    private static final Long STORE_ID = 1L;
 
     @Mock
     private StockTransactionRepository stockTransactionRepository;
@@ -71,6 +77,9 @@ class StockTransactionServiceImplTest {
 
     @Mock
     private SupplierRepository supplierRepository;
+
+    @Mock
+    private StoreRepository storeRepository;
 
     @Mock
     private StockRepository stockRepository;
@@ -90,14 +99,23 @@ class StockTransactionServiceImplTest {
     @InjectMocks
     private StockTransactionServiceImpl stockTransactionService;
 
+    private Store store;
+
     @BeforeEach
     void setUp() {
         AuditContext.set("testuser", "127.0.0.1");
+        StoreContext.setStoreId(STORE_ID);
+
+        store = createStore();
+        // Store resolution happens in create flows; keep lenient so validation-failure and
+        // approve/cancel tests do not trip Mockito strict stubbing.
+        lenient().when(storeRepository.findById(STORE_ID)).thenReturn(Optional.of(store));
     }
 
     @AfterEach
     void tearDown() {
         AuditContext.clear();
+        StoreContext.clear();
     }
 
     // ======================== createStockIn ========================
@@ -136,7 +154,7 @@ class StockTransactionServiceImplTest {
         assertThat(response.getItemId()).isEqualTo(1L);
 
         // Stock should NOT be affected until approved
-        verify(stockService, never()).addStock(any(), any(Integer.class));
+        verify(stockService, never()).addStock(any(), any(), any(Integer.class));
     }
 
     @Test
@@ -181,7 +199,7 @@ class StockTransactionServiceImplTest {
                 .build();
 
         when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
-        when(stockRepository.findByItemId(1L)).thenReturn(Optional.of(stock));
+        when(stockRepository.findByItemIdAndStoreId(1L, STORE_ID)).thenReturn(Optional.of(stock));
         when(stockTransactionRepository.save(any(StockTransaction.class)))
                 .thenAnswer(invocation -> {
                     StockTransaction saved = invocation.getArgument(0);
@@ -216,7 +234,7 @@ class StockTransactionServiceImplTest {
                 .build();
 
         when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
-        when(stockRepository.findByItemId(1L)).thenReturn(Optional.of(stock));
+        when(stockRepository.findByItemIdAndStoreId(1L, STORE_ID)).thenReturn(Optional.of(stock));
 
         // Act & Assert
         assertThatThrownBy(() -> stockTransactionService.createStockOut(request))
@@ -279,7 +297,7 @@ class StockTransactionServiceImplTest {
         // Assert
         assertThat(response.getStatus()).isEqualTo("APPROVED");
         assertThat(response.getApprovedBy()).isEqualTo("testuser");
-        verify(stockService).addStock(1L, 10);
+        verify(stockService).addStock(1L, STORE_ID, 10);
     }
 
     @Test
@@ -290,7 +308,7 @@ class StockTransactionServiceImplTest {
         Stock stock = createStock(transaction.getItem(), 100);
 
         when(stockTransactionRepository.findById(1L)).thenReturn(Optional.of(transaction));
-        when(stockRepository.findByItemId(1L)).thenReturn(Optional.of(stock));
+        when(stockRepository.findByItemIdAndStoreId(1L, STORE_ID)).thenReturn(Optional.of(stock));
         when(stockTransactionRepository.save(any(StockTransaction.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
         lenient().when(transactionAddonRepository.findByTransactionId(1L))
@@ -301,7 +319,7 @@ class StockTransactionServiceImplTest {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo("APPROVED");
-        verify(stockService).deductStock(1L, 5);
+        verify(stockService).deductStock(1L, STORE_ID, 5);
     }
 
     @Test
@@ -337,9 +355,9 @@ class StockTransactionServiceImplTest {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo("CANCELLED");
-        verify(stockService, never()).addStock(any(), any(Integer.class));
-        verify(stockService, never()).deductStock(any(), any(Integer.class));
-        verify(stockService, never()).setStock(any(), any(Integer.class));
+        verify(stockService, never()).addStock(any(), any(), any(Integer.class));
+        verify(stockService, never()).deductStock(any(), any(), any(Integer.class));
+        verify(stockService, never()).setStock(any(), any(), any(Integer.class));
     }
 
     @Test
@@ -357,6 +375,17 @@ class StockTransactionServiceImplTest {
     }
 
     // ======================== Helper methods ========================
+
+    /**
+     * Creates a test Store entity for the current store context.
+     */
+    private Store createStore() {
+        Store s = new Store();
+        s.setId(STORE_ID);
+        s.setCode("MAIN");
+        s.setName("Main Store");
+        return s;
+    }
 
     /**
      * Creates a test Item entity with all required fields for mapper usage.
@@ -383,12 +412,13 @@ class StockTransactionServiceImplTest {
     }
 
     /**
-     * Creates a Stock entity associated with the given item.
+     * Creates a Stock entity associated with the given item and the current store.
      */
     private Stock createStock(Item item, int quantityOnHand) {
         Stock stock = new Stock();
         stock.setId(1L);
         stock.setItem(item);
+        stock.setStore(store);
         stock.setQuantityOnHand(quantityOnHand);
         stock.setLastUpdated(LocalDateTime.now());
         return stock;
@@ -396,7 +426,7 @@ class StockTransactionServiceImplTest {
 
     /**
      * Creates a StockTransaction entity with the given type, status, and quantity.
-     * The transaction is associated with the default test item.
+     * The transaction is associated with the default test item and current store.
      */
     private StockTransaction createTransaction(TransactionType type, TransactionStatus status, int quantity) {
         Item item = createItem();
@@ -404,6 +434,7 @@ class StockTransactionServiceImplTest {
         StockTransaction transaction = new StockTransaction();
         transaction.setId(1L);
         transaction.setItem(item);
+        transaction.setStore(store);
         transaction.setTransactionType(type);
         transaction.setStatus(status);
         transaction.setQuantity(quantity);

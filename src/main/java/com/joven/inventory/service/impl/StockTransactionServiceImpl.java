@@ -2,6 +2,7 @@ package com.joven.inventory.service.impl;
 
 import com.joven.inventory.audit.AuditContext;
 import com.joven.inventory.common.PageResponse;
+import com.joven.inventory.context.StoreContext;
 import com.joven.inventory.dto.request.StockAdjustRequest;
 import com.joven.inventory.dto.request.StockInRequest;
 import com.joven.inventory.dto.request.StockOutRequest;
@@ -10,6 +11,7 @@ import com.joven.inventory.entity.Customer;
 import com.joven.inventory.entity.Item;
 import com.joven.inventory.entity.Stock;
 import com.joven.inventory.entity.StockTransaction;
+import com.joven.inventory.entity.Store;
 import com.joven.inventory.entity.Supplier;
 import com.joven.inventory.entity.TransactionAddon;
 import com.joven.inventory.enums.DiscountType;
@@ -25,6 +27,7 @@ import com.joven.inventory.repository.CustomerRepository;
 import com.joven.inventory.repository.ItemRepository;
 import com.joven.inventory.repository.StockRepository;
 import com.joven.inventory.repository.StockTransactionRepository;
+import com.joven.inventory.repository.StoreRepository;
 import com.joven.inventory.repository.SupplierRepository;
 import com.joven.inventory.repository.TransactionAddonRepository;
 import com.joven.inventory.service.AppSettingService;
@@ -67,6 +70,7 @@ public class StockTransactionServiceImpl implements StockTransactionService {
     private final ItemRepository itemRepository;
     private final CustomerRepository customerRepository;
     private final SupplierRepository supplierRepository;
+    private final StoreRepository storeRepository;
     private final StockRepository stockRepository;
     private final StockService stockService;
     private final TaxService taxService;
@@ -90,6 +94,7 @@ public class StockTransactionServiceImpl implements StockTransactionService {
 
         StockTransaction transaction = new StockTransaction();
         transaction.setItem(item);
+        transaction.setStore(resolveCurrentStore());
         transaction.setTransactionType(TransactionType.IN);
         transaction.setStatus(TransactionStatus.CREATED);
         transaction.setQuantity(request.getQuantity());
@@ -169,9 +174,10 @@ public class StockTransactionServiceImpl implements StockTransactionService {
         }
 
         // Validate sufficient stock (validation only — actual deduction on approval)
-        Stock stock = stockRepository.findByItemId(request.getItemId())
+        Long storeId = StoreContext.getStoreId();
+        Stock stock = stockRepository.findByItemIdAndStoreId(request.getItemId(), storeId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Stock not found for item ID: " + request.getItemId()));
+                        "Stock not found for item ID: " + request.getItemId() + " in store ID: " + storeId));
         if (stock.getQuantityOnHand() < request.getQuantity()) {
             throw new InsufficientStockException(
                     request.getItemId(), stock.getQuantityOnHand(), request.getQuantity());
@@ -179,6 +185,7 @@ public class StockTransactionServiceImpl implements StockTransactionService {
 
         StockTransaction transaction = new StockTransaction();
         transaction.setItem(item);
+        transaction.setStore(resolveCurrentStore());
         transaction.setTransactionType(TransactionType.OUT);
         transaction.setStatus(TransactionStatus.CREATED);
         transaction.setQuantity(request.getQuantity());
@@ -256,6 +263,7 @@ public class StockTransactionServiceImpl implements StockTransactionService {
 
         StockTransaction transaction = new StockTransaction();
         transaction.setItem(item);
+        transaction.setStore(resolveCurrentStore());
         transaction.setTransactionType(TransactionType.ADJUSTMENT);
         transaction.setStatus(TransactionStatus.CREATED);
         transaction.setQuantity(request.getQuantity());
@@ -296,30 +304,31 @@ public class StockTransactionServiceImpl implements StockTransactionService {
 
         // Update stock based on transaction type
         Long itemId = transaction.getItem().getId();
+        Long storeId = transaction.getStore().getId();
         int quantity = transaction.getQuantity();
 
         // Re-validate stock sufficiency at approval time for STOCK_OUT
         if (transaction.getTransactionType() == TransactionType.OUT) {
-            Stock stock = stockRepository.findByItemId(itemId)
+            Stock stock = stockRepository.findByItemIdAndStoreId(itemId, storeId)
                     .orElseThrow(() -> new ResourceNotFoundException(
-                            "Stock not found for item ID: " + itemId));
+                            "Stock not found for item ID: " + itemId + " in store ID: " + storeId));
             if (stock.getQuantityOnHand() < quantity) {
                 throw new InsufficientStockException(itemId, stock.getQuantityOnHand(), quantity);
             }
         }
 
         switch (transaction.getTransactionType()) {
-            case IN -> stockService.addStock(itemId, quantity);
-            case OUT -> stockService.deductStock(itemId, quantity);
-            case ADJUSTMENT -> stockService.setStock(itemId, quantity);
+            case IN -> stockService.addStock(itemId, storeId, quantity);
+            case OUT -> stockService.deductStock(itemId, storeId, quantity);
+            case ADJUSTMENT -> stockService.setStock(itemId, storeId, quantity);
         }
 
         transaction = stockTransactionRepository.save(transaction);
 
         List<TransactionAddon> addons = transactionAddonRepository.findByTransactionId(id);
 
-        log.info("Approved stock transaction ID {} (type={}, item={}, quantity={})",
-                id, transaction.getTransactionType(), itemId, quantity);
+        log.info("Approved stock transaction ID {} (type={}, item={}, store={}, quantity={})",
+                id, transaction.getTransactionType(), itemId, storeId, quantity);
 
         return StockTransactionMapper.toResponse(transaction, addons);
     }
@@ -390,6 +399,18 @@ public class StockTransactionServiceImpl implements StockTransactionService {
     }
 
     // --- Private helper methods ---
+
+    /**
+     * Resolves the {@link Store} for the current request from {@link StoreContext}.
+     *
+     * @return the current store entity
+     * @throws ResourceNotFoundException if no store is found for the current store ID
+     */
+    private Store resolveCurrentStore() {
+        Long storeId = StoreContext.getStoreId();
+        return storeRepository.findById(storeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Store not found with id: " + storeId));
+    }
 
     /**
      * Finds an item by ID and validates it is active.

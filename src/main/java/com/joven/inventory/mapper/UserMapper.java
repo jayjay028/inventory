@@ -31,6 +31,7 @@ public final class UserMapper {
                 .accessRights(user.getAccessRights())
                 .active(user.getActive())
                 .lastLogin(user.getLastLogin())
+                .storeIds(user.getAccessibleStores().stream().map(store -> store.getId()).toList())
                 .createdBy(user.getCreatedBy())
                 .createdAt(user.getCreatedAt())
                 .updatedBy(user.getUpdatedBy())

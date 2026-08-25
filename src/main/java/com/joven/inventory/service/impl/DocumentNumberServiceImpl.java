@@ -2,6 +2,7 @@ package com.joven.inventory.service.impl;
 
 import com.joven.inventory.audit.AuditContext;
 import com.joven.inventory.common.Constants;
+import com.joven.inventory.context.StoreContext;
 import com.joven.inventory.enums.DocumentType;
 import com.joven.inventory.service.AppSettingService;
 import com.joven.inventory.service.DocumentNumberService;
@@ -66,22 +67,41 @@ public class DocumentNumberServiceImpl implements DocumentNumberService {
     }
 
     /**
-     * Returns the app_setting key for the document prefix.
+     * Returns the app_setting key for the document prefix, scoped to the current store.
+     * When a store is present in {@link StoreContext}, the key is prefixed with the store ID
+     * to give each store its own sequence; otherwise the non-prefixed key is used.
      *
      * @param documentType the document type
-     * @return the prefix setting key (e.g., "or_prefix")
+     * @return the prefix setting key (e.g., "store_1_or_prefix" or "or_prefix")
      */
     private String getPrefixKey(DocumentType documentType) {
-        return documentType.name().toLowerCase() + "_prefix";
+        return scopedKey(documentType.name().toLowerCase() + "_prefix");
     }
 
     /**
-     * Returns the app_setting key for the next sequence number.
+     * Returns the app_setting key for the next sequence number, scoped to the current store.
+     * When a store is present in {@link StoreContext}, the key is prefixed with the store ID
+     * to give each store its own sequence; otherwise the non-prefixed key is used.
      *
      * @param documentType the document type
-     * @return the next number setting key (e.g., "or_next_number")
+     * @return the next number setting key (e.g., "store_1_or_next_number" or "or_next_number")
      */
     private String getNextNumberKey(DocumentType documentType) {
-        return documentType.name().toLowerCase() + "_next_number";
+        return scopedKey(documentType.name().toLowerCase() + "_next_number");
+    }
+
+    /**
+     * Prefixes the given base key with the current store when one is set in
+     * {@link StoreContext}. Falls back to the base key when no store is present.
+     *
+     * @param baseKey the unscoped setting key
+     * @return the store-scoped key, or the base key when no store is set
+     */
+    private String scopedKey(String baseKey) {
+        Long storeId = StoreContext.getStoreId();
+        if (storeId == null) {
+            return baseKey;
+        }
+        return "store_" + storeId + "_" + baseKey;
     }
 }
