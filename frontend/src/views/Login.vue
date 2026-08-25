@@ -84,11 +84,11 @@ async function handleLogin() {
   try {
     await authStore.login(form)
     // If the user has access to multiple stores and none is selected yet,
-    // send them to the store selection screen; otherwise go to dashboard.
+    // send them to the store selection screen; otherwise go to their landing page.
     if (storeStore.hasMultipleStores && !storeStore.hasStore) {
       router.push('/select-store')
     } else {
-      router.push('/dashboard')
+      router.push(authStore.landingPath)
     }
   } catch (error) {
     const msg = error.response?.data?.message

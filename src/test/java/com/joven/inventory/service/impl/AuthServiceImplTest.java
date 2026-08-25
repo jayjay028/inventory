@@ -8,6 +8,7 @@ import com.joven.inventory.enums.UserRole;
 import com.joven.inventory.exception.ResourceNotFoundException;
 import com.joven.inventory.exception.UnauthorizedException;
 import com.joven.inventory.repository.UserRepository;
+import com.joven.inventory.repository.StoreRepository;
 import com.joven.inventory.security.CustomUserDetails;
 import com.joven.inventory.security.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,12 +54,17 @@ class AuthServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private StoreRepository storeRepository;
+
     @InjectMocks
     private AuthServiceImpl authService;
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(authService, "accessTokenExpiry", 1800000L);
+        // Test user has ID 1 (super admin) -> buildUserInfo loads all active stores
+        lenient().when(storeRepository.findByActiveTrue()).thenReturn(java.util.List.of());
     }
 
     // --- Helper Methods ---
@@ -134,6 +141,71 @@ class AuthServiceImplTest {
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(userRepository).findByUsername("admin");
         verify(userRepository).save(user);
+    }
+
+    @Test
+    @DisplayName("login - given super admin (id=1) - returns all active stores and DASHBOARD landing")
+    void login_givenSuperAdmin_returnsAllStoresAndDashboardLanding() {
+        // Arrange
+        User user = createTestUser(); // id = 1 (super admin), accessRights 255 includes VIEW_DASHBOARD
+        CustomUserDetails userDetails = CustomUserDetails.fromUser(user);
+        LoginRequest request = createLoginRequest();
+
+        com.joven.inventory.entity.Store storeA = new com.joven.inventory.entity.Store();
+        storeA.setId(1L);
+        storeA.setCode("MAIN");
+        storeA.setName("Main Store");
+        com.joven.inventory.entity.Store storeB = new com.joven.inventory.entity.Store();
+        storeB.setId(2L);
+        storeB.setCode("BR2");
+        storeB.setName("Branch 2");
+
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+        when(jwtTokenProvider.generateAccessToken(userDetails)).thenReturn("token");
+        when(jwtTokenProvider.generateRefreshToken(userDetails)).thenReturn("refresh");
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        // Super admin loads ALL active stores, not just assigned ones
+        when(storeRepository.findByActiveTrue()).thenReturn(java.util.List.of(storeA, storeB));
+
+        // Act
+        LoginResponse response = authService.login(request);
+
+        // Assert
+        assertThat(response.getUser().getStores()).hasSize(2);
+        assertThat(response.getUser().getStores())
+                .extracting(LoginResponse.StoreInfo::getCode)
+                .containsExactlyInAnyOrder("MAIN", "BR2");
+        assertThat(response.getUser().getLandingPage()).isEqualTo("DASHBOARD");
+    }
+
+    @Test
+    @DisplayName("login - given POS-only user - returns POS landing page")
+    void login_givenPosOnlyUser_returnsPosLanding() {
+        // Arrange: user with USE_POS (bit 14) but NOT VIEW_DASHBOARD (bit 0)
+        User user = createTestUser();
+        user.setId(5L); // non-super-admin
+        user.setAccessRights(1L << 14); // USE_POS only
+        CustomUserDetails userDetails = CustomUserDetails.fromUser(user);
+        LoginRequest request = createLoginRequest();
+
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+        when(jwtTokenProvider.generateAccessToken(userDetails)).thenReturn("token");
+        when(jwtTokenProvider.generateRefreshToken(userDetails)).thenReturn("refresh");
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        // Act
+        LoginResponse response = authService.login(request);
+
+        // Assert
+        assertThat(response.getUser().getLandingPage()).isEqualTo("POS");
     }
 
     @Test

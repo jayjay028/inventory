@@ -62,9 +62,10 @@ public class ShiftServiceImpl implements ShiftService {
         String currentUser = AuditContext.getCurrentUser();
 
         // Resolve the current store from the request context
-        Store store = storeRepository.findById(StoreContext.getStoreId())
+        Long currentStoreId = StoreContext.requireStoreId();
+        Store store = storeRepository.findById(currentStoreId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Store not found with id: " + StoreContext.getStoreId()));
+                        "Store not found with id: " + currentStoreId));
 
         // Check if user already has an open shift in this store
         shiftRepository.findByStoreIdAndCashierAndStatus(store.getId(), currentUser, ShiftStatus.OPEN)

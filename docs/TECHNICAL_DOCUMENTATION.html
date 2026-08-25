@@ -160,7 +160,7 @@
     <h1>Inventory + POS System</h1>
     <div class="subtitle">Technical Documentation</div>
     <div class="meta">
-        <span><strong>Version:</strong> 1.1</span>
+        <span><strong>Version:</strong> 1.2</span>
         <span><strong>Author:</strong> Joven Q. Divinagracia Jr.</span>
         <span><strong>Date:</strong> August 2026</span>
         <span><strong>Stack:</strong> Java 25 · Spring Boot 4.1.0 · Vue 3 · MySQL 8</span>
@@ -207,6 +207,7 @@
 
     <h3>Key Features</h3>
     <ul>
+        <li><strong>Multi-Store Support</strong> — Per-store stock, sales, and shifts; per-user store access with backend enforcement; per-store document numbering; shared global master data</li>
         <li><strong>Inventory Management</strong> — Item catalog, categories, stock-in/out/adjust, stock level monitoring, reorder alerts</li>
         <li><strong>Point of Sale</strong> — Fast item lookup, barcode support, multiple payment methods, receipt generation, shift management</li>
         <li><strong>Customer &amp; Supplier Management</strong> — Contact database, transaction history, balance tracking</li>
@@ -296,6 +297,32 @@
         <li><strong>Token Invalidation:</strong> In-memory deny list cleared on server restart; refresh tokens stored in DB</li>
     </ul>
 
+    <h3>Multi-Store Architecture</h3>
+    <p>The system supports multiple physical stores/branches operating against a single deployment. Transactional data (stock, sales, shifts, stock movements) is scoped per store via a <code>store_id</code> foreign key, while master data (items, categories, customers, suppliers) remains <strong>global and shared</strong> across all stores.</p>
+
+    <h4>Store Context Mechanism</h4>
+    <ul>
+        <li>Terminals send an <code>X-Store-Id</code> HTTP header on every request identifying the active store.</li>
+        <li><code>StoreContextInterceptor</code> reads the header, validates the authenticated user's access to that store, and sets a thread-local <code>StoreContext</code> for the duration of the request.</li>
+        <li>Store-scoped services call <code>StoreContext.requireStoreId()</code> to obtain the active store; this throws <strong>400 Bad Request</strong> when no store has been selected.</li>
+        <li>The thread-local <code>StoreContext</code> is cleared after each request to prevent leakage across pooled request threads.</li>
+    </ul>
+
+    <h4>Store Access Enforcement</h4>
+    <ul>
+        <li>Store access is <strong>enforced on the backend</strong>, not merely hidden in the UI. If a user requests a store they are not assigned to (via <code>X-Store-Id</code>), <code>StoreContextInterceptor</code> returns <strong>403 Forbidden</strong>.</li>
+        <li>Access is checked against the <code>user_stores</code> relationship via <code>StoreRepository.userHasStoreAccess(userId, storeId)</code>.</li>
+        <li>The <strong>Super Administrator (user ID 1)</strong> bypasses the store-access check and has implicit access to <strong>all stores</strong>.</li>
+    </ul>
+
+    <h4>Landing Page Resolution</h4>
+    <p>The <code>LandingPageResolver</code> infers a user's default landing page from their permission bitmask on login:</p>
+    <ul>
+        <li>If <code>USE_POS</code> is present <strong>and</strong> <code>VIEW_DASHBOARD</code> is absent &rarr; landing page is <code>POS</code>.</li>
+        <li>Otherwise &rarr; landing page is <code>DASHBOARD</code>.</li>
+    </ul>
+    <p>The resolved value is returned in the login response as <code>landingPage</code>, and the frontend routes the user accordingly after authentication.</p>
+
     <h3>API Response Format</h3>
     <p>All API responses use a standardized <code>ApiResponse&lt;T&gt;</code> wrapper:</p>
 <pre><code>{
@@ -369,22 +396,36 @@
     <table>
         <tr><th>Table</th><th>Purpose</th><th>Key Fields</th></tr>
         <tr><td><code>users</code></td><td>System users and authentication</td><td>id, username, password_hash, full_name, permissions, active</td></tr>
-        <tr><td><code>categories</code></td><td>Item classification</td><td>id, name, description, active</td></tr>
-        <tr><td><code>items</code></td><td>Product/item catalog</td><td>id, name, sku, barcode, category_id, cost_price, selling_price, stock_quantity, reorder_level</td></tr>
-        <tr><td><code>customers</code></td><td>Customer records</td><td>id, name, contact_number, email, address, is_senior, is_pwd</td></tr>
-        <tr><td><code>suppliers</code></td><td>Supplier/vendor records</td><td>id, name, contact_person, contact_number, email, address</td></tr>
-        <tr><td><code>stock_transactions</code></td><td>Stock movement header</td><td>id, transaction_number, type (IN/OUT/ADJUST), supplier_id, status, remarks, created_by</td></tr>
+        <tr><td><code>stores</code></td><td>Physical stores/branches</td><td>id, code (unique), name, address, tin, phone, active</td></tr>
+        <tr><td><code>user_stores</code></td><td>User&harr;store access (many-to-many join)</td><td>user_id, store_id</td></tr>
+        <tr><td><code>categories</code></td><td>Item classification (global/shared)</td><td>id, name, description, active</td></tr>
+        <tr><td><code>items</code></td><td>Product/item catalog (global/shared)</td><td>id, name, sku, barcode, category_id, cost_price, selling_price, stock_quantity, reorder_level</td></tr>
+        <tr><td><code>customers</code></td><td>Customer records (global/shared)</td><td>id, name, contact_number, email, address, is_senior, is_pwd</td></tr>
+        <tr><td><code>suppliers</code></td><td>Supplier/vendor records (global/shared)</td><td>id, name, contact_person, contact_number, email, address</td></tr>
+        <tr><td><code>stock</code></td><td>Per-store stock levels</td><td>id, item_id, store_id, quantity (unique on item_id+store_id)</td></tr>
+        <tr><td><code>stock_transactions</code></td><td>Stock movement header (store-scoped)</td><td>id, transaction_number, store_id, type (IN/OUT/ADJUST), supplier_id, status, remarks, created_by</td></tr>
         <tr><td><code>stock_transaction_addons</code></td><td>Stock movement line items</td><td>id, stock_transaction_id, item_id, quantity, unit_cost</td></tr>
-        <tr><td><code>sales</code></td><td>POS sale header</td><td>id, sale_number, customer_id, subtotal, tax_amount, discount_amount, total, status, shift_id</td></tr>
+        <tr><td><code>sales</code></td><td>POS sale header (store-scoped)</td><td>id, sale_number, store_id, customer_id, subtotal, tax_amount, discount_amount, total, status, shift_id</td></tr>
         <tr><td><code>sale_items</code></td><td>POS sale line items</td><td>id, sale_id, item_id, quantity, unit_price, discount, line_total</td></tr>
         <tr><td><code>sale_payments</code></td><td>Payment records per sale</td><td>id, sale_id, payment_method, amount, reference_number</td></tr>
-        <tr><td><code>shifts</code></td><td>Cashier shift management</td><td>id, user_id, start_time, end_time, opening_amount, closing_amount, status</td></tr>
-        <tr><td><code>app_settings</code></td><td>Application configuration</td><td>id, setting_key, setting_value, description</td></tr>
+        <tr><td><code>shifts</code></td><td>Cashier shift management (store-scoped)</td><td>id, store_id, user_id, start_time, end_time, opening_amount, closing_amount, status</td></tr>
+        <tr><td><code>app_settings</code></td><td>Application configuration (supports per-store numbering keys)</td><td>id, setting_key, setting_value, description</td></tr>
         <tr><td><code>audit_trail</code></td><td>User action audit log</td><td>id, user_id, action, entity_type, entity_id, old_value, new_value, ip_address, timestamp</td></tr>
     </table>
 
+    <div class="note">
+        <strong>Data scoping:</strong> Master data (<code>items</code>, <code>categories</code>, <code>customers</code>, <code>suppliers</code>) is <strong>global/shared</strong> across all stores. Transactional data (<code>stock</code>, <code>stock_transactions</code>, <code>sales</code>, <code>shifts</code>) is scoped per store via a <code>store_id</code> foreign key. The <code>stock</code> table carries a <strong>composite unique constraint on (item_id, store_id)</strong> so each item has exactly one stock row per store.
+    </div>
+
     <h3>Key Relationships</h3>
     <ul>
+        <li><code>user_stores.user_id</code> → <code>users.id</code> (Many-to-Many join with stores)</li>
+        <li><code>user_stores.store_id</code> → <code>stores.id</code> (Many-to-Many join with users)</li>
+        <li><code>stock.item_id</code> → <code>items.id</code> (Many-to-One; unique with store_id)</li>
+        <li><code>stock.store_id</code> → <code>stores.id</code> (Many-to-One; unique with item_id)</li>
+        <li><code>stock_transactions.store_id</code> → <code>stores.id</code> (Many-to-One)</li>
+        <li><code>sales.store_id</code> → <code>stores.id</code> (Many-to-One)</li>
+        <li><code>shifts.store_id</code> → <code>stores.id</code> (Many-to-One)</li>
         <li><code>items.category_id</code> → <code>categories.id</code> (Many-to-One)</li>
         <li><code>stock_transactions.supplier_id</code> → <code>suppliers.id</code> (Many-to-One)</li>
         <li><code>stock_transactions.created_by</code> → <code>users.id</code> (Many-to-One)</li>
@@ -406,6 +447,11 @@
         <tr><td>items</td><td>idx_items_barcode</td><td>barcode</td><td>POS barcode scanning</td></tr>
         <tr><td>items</td><td>idx_items_category</td><td>category_id</td><td>Category filtering</td></tr>
         <tr><td>items</td><td>idx_items_name</td><td>name</td><td>Search by name</td></tr>
+        <tr><td>stores</td><td>idx_stores_code</td><td>code</td><td>Unique store code lookup</td></tr>
+        <tr><td>stock</td><td>uq_stock_item_store</td><td>item_id, store_id</td><td>Composite unique: one stock row per item per store</td></tr>
+        <tr><td>stock_transactions</td><td>idx_stock_tx_store</td><td>store_id</td><td>Store-scoped transaction queries</td></tr>
+        <tr><td>sales</td><td>idx_sales_store</td><td>store_id</td><td>Store-scoped sales reporting</td></tr>
+        <tr><td>shifts</td><td>idx_shifts_store</td><td>store_id</td><td>Store-scoped shift queries</td></tr>
         <tr><td>sales</td><td>idx_sales_date</td><td>created_at</td><td>Date-range report queries</td></tr>
         <tr><td>sales</td><td>idx_sales_number</td><td>sale_number</td><td>Unique sale number lookup</td></tr>
         <tr><td>sales</td><td>idx_sales_shift</td><td>shift_id</td><td>Shift-based reporting</td></tr>
@@ -459,10 +505,17 @@
       "id": 1,
       "username": "admin",
       "fullName": "System Administrator",
-      "permissions": 33554431
+      "permissions": 33554431,
+      "landingPage": "DASHBOARD",
+      "stores": [
+        { "id": 1, "code": "MAIN", "name": "Main Store", "active": true }
+      ]
     }
   }
 }</code></pre>
+    <div class="note">
+        <strong>Multi-store:</strong> The login response now includes <code>user.stores[]</code> (the stores the user may access) and <code>user.landingPage</code> (<code>POS</code> or <code>DASHBOARD</code>, resolved from the user's permissions). The frontend uses <code>landingPage</code> to route the user after login and <code>stores[]</code> to populate the store selector.
+    </div>
 
     <h3>CRUD Endpoints (Categories, Items, Customers, Suppliers)</h3>
     <p>All CRUD modules follow the same RESTful pattern:</p>
@@ -475,6 +528,31 @@
         <tr><td><span class="badge badge-delete">DELETE</span></td><td><code>/api/{resource}/{id}</code></td><td>Soft-delete or deactivate record</td></tr>
     </table>
     <p>Resources: <code>/api/categories</code>, <code>/api/items</code>, <code>/api/customers</code>, <code>/api/suppliers</code></p>
+
+    <div class="note">
+        <strong>User store assignment:</strong> The user create/update payloads (<code>POST /api/users</code>, <code>PUT /api/users/{id}</code>) now accept a <code>storeIds[]</code> array specifying which stores the user may access. This drives the <code>user_stores</code> relationship enforced by <code>StoreContextInterceptor</code>. Example: <code>{ "username": "cashier1", "fullName": "...", "permissions": 213056, "storeIds": [1, 2] }</code>.
+    </div>
+
+    <h3>Store Management Endpoints</h3>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Description</th><th>Permission</th></tr>
+        <tr><td><span class="badge badge-get">GET</span></td><td><code>/api/stores</code></td><td>List all stores (paginated: ?page=0&amp;size=20&amp;search=)</td><td>MANAGE_SETTINGS</td></tr>
+        <tr><td><span class="badge badge-get">GET</span></td><td><code>/api/stores/active</code></td><td>List active stores (for store selector)</td><td>Any authenticated user</td></tr>
+        <tr><td><span class="badge badge-get">GET</span></td><td><code>/api/stores/{id}</code></td><td>Get single store by ID</td><td>MANAGE_SETTINGS</td></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/stores</code></td><td>Create new store</td><td>MANAGE_SETTINGS</td></tr>
+        <tr><td><span class="badge badge-put">PUT</span></td><td><code>/api/stores/{id}</code></td><td>Update existing store</td><td>MANAGE_SETTINGS</td></tr>
+        <tr><td><span class="badge badge-put">PATCH</span></td><td><code>/api/stores/{id}/status</code></td><td>Activate/deactivate a store</td><td>MANAGE_SETTINGS</td></tr>
+    </table>
+
+    <h3>Store Context Header (<code>X-Store-Id</code>)</h3>
+    <p>Store-scoped endpoints require the terminal to send the active store via the <code>X-Store-Id</code> header on every request. This applies to <strong>stock</strong>, <strong>POS</strong>, <strong>stock transactions</strong>, and <strong>shift</strong> endpoints.</p>
+<pre><code>Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+X-Store-Id: 1</code></pre>
+    <ul>
+        <li><strong>Missing header</strong> on a store-scoped endpoint &rarr; <strong>400 Bad Request</strong> (<code>StoreContext.requireStoreId()</code> found no store).</li>
+        <li><strong>Store the user cannot access</strong> &rarr; <strong>403 Forbidden</strong> (enforced by <code>StoreContextInterceptor</code>).</li>
+        <li>The <strong>Super Administrator (user ID 1)</strong> may pass any valid <code>X-Store-Id</code>.</li>
+    </ul>
 
     <h3>Stock Management Endpoints</h3>
     <table>
@@ -623,6 +701,28 @@ public ApiResponse&lt;ItemResponse&gt; createItem(@RequestBody ItemRequest reque
         <li><strong>Backend (Controller):</strong> <code>@RequiresPermission</code> annotation checked by AOP aspect before method execution. Returns 403 if check fails.</li>
         <li><strong>Frontend (Router):</strong> Vue Router <code>beforeEach</code> guard checks user permissions from auth store against route <code>meta.permission</code> requirement. Redirects to unauthorized page if insufficient.</li>
     </ul>
+
+    <h3>Store Access Enforcement</h3>
+    <p>In addition to permission-based authorization, the system enforces <strong>per-store data isolation</strong> on the backend. Hiding stores in the UI is not sufficient — every store-scoped request is validated server-side.</p>
+    <ol>
+        <li>The terminal sends the active store as an <code>X-Store-Id</code> header (see API &sect;5).</li>
+        <li><code>StoreContextInterceptor</code> resolves the authenticated user and calls <code>StoreRepository.userHasStoreAccess(userId, storeId)</code>, which checks the <code>user_stores</code> relationship.</li>
+        <li>If the user has access, the store ID is placed in a thread-local <code>StoreContext</code>. Store-scoped services read it via <code>StoreContext.requireStoreId()</code>.</li>
+        <li>If the user is <strong>not</strong> assigned to the requested store, the interceptor short-circuits with <strong>403 Forbidden</strong>.</li>
+        <li>If a store-scoped operation runs without any selected store, <code>requireStoreId()</code> raises <strong>400 Bad Request</strong>.</li>
+    </ol>
+    <div class="warning">
+        <strong>Super Administrator bypass:</strong> User ID 1 (Super Administrator) bypasses the <code>user_stores</code> access check and has implicit access to <strong>all stores</strong>. All other users are restricted to their explicitly assigned stores.
+    </div>
+
+    <h3>Landing Page Resolution</h3>
+    <p>On login, <code>LandingPageResolver</code> derives the user's default landing page from their permission bitmask, returned as <code>landingPage</code> in the login response:</p>
+    <table>
+        <tr><th>Condition</th><th>Resolved Landing Page</th></tr>
+        <tr><td><code>USE_POS</code> present <strong>and</strong> <code>VIEW_DASHBOARD</code> absent</td><td><code>POS</code></td></tr>
+        <tr><td>Otherwise</td><td><code>DASHBOARD</code></td></tr>
+    </table>
+    <p>This lets POS-only cashiers land directly on the POS screen while managers/admins land on the dashboard. The frontend routes accordingly after authentication.</p>
 </section>
 
 <!-- 7. Deployment Guide -->
@@ -647,6 +747,10 @@ GRANT ALL PRIVILEGES ON inventory_db.* TO 'inventory_user'@'localhost';
 FLUSH PRIVILEGES;</code></pre>
     <div class="note">
         <strong>Note:</strong> Spring Boot auto-creates all tables via Hibernate <code>ddl-auto=update</code> on first startup. A default admin user (<code>admin/admin</code>) is seeded automatically on first run via <code>DataSeeder.java</code>.
+    </div>
+
+    <div class="warning">
+        <strong>Multi-store schema change (v1.2):</strong> Version 1.2 introduces the <code>stores</code> and <code>user_stores</code> tables and adds a <code>store_id</code> column to <code>stock</code>, <code>stock_transactions</code>, <code>sales</code>, and <code>shifts</code>. The seed data creates a default store with code <code>MAIN</code> and assigns the administrator (user ID 1) to it. Since v1.2 is <strong>not yet deployed</strong> to any environment, the recommended path is to <strong>recreate the database fresh</strong> rather than migrate — drop and re-create <code>inventory_db</code> and let Hibernate + <code>DataSeeder</code> rebuild the schema and seed data.
     </div>
 
     <h3>Build Steps</h3>
@@ -770,7 +874,7 @@ npm run dev</code></pre>
     <h3>Running Tests</h3>
     <table>
         <tr><th>Command</th><th>What It Runs</th><th>Count</th></tr>
-        <tr><td><code>mvn test</code></td><td>Unit + Integration tests</td><td>85 tests (53 unit + 32 integration)</td></tr>
+        <tr><td><code>mvn test</code></td><td>Unit + Integration tests</td><td>102 tests (70 unit + 32 integration)</td></tr>
         <tr><td><code>npm run test:e2e</code></td><td>Playwright E2E tests (headless)</td><td>21 tests</td></tr>
         <tr><td><code>npm run test:e2e:headed</code></td><td>Playwright E2E tests (with browser)</td><td>21 tests</td></tr>
         <tr><td><code>npx playwright test --headed</code></td><td>Alternative E2E invocation</td><td>21 tests</td></tr>
@@ -783,10 +887,11 @@ npm run dev</code></pre>
     <h3>Test Architecture</h3>
     <table>
         <tr><th>Level</th><th>Framework</th><th>Count</th><th>Location</th></tr>
-        <tr><td>Unit Tests</td><td>JUnit 5 + Mockito</td><td>53 tests / 7 files</td><td><code>src/test/java/**/service/</code></td></tr>
+        <tr><td>Unit Tests</td><td>JUnit 5 + Mockito</td><td>70 tests</td><td><code>src/test/java/**/service/</code>, <code>**/security/</code>, <code>**/context/</code></td></tr>
         <tr><td>Integration Tests</td><td>Spring MockMvc</td><td>32 tests / 5 files</td><td><code>src/test/java/**/controller/</code></td></tr>
         <tr><td>E2E Tests</td><td>Playwright</td><td>21 tests</td><td><code>frontend/e2e/</code></td></tr>
     </table>
+    <p>Backend total: <strong>102 tests</strong> (up from 85 in v1.1) — the multi-store work added <code>LandingPageResolverTest</code>, <code>StoreContextInterceptorTest</code>, <code>StoreContextTest</code>, and new store/landing-page cases in <code>AuthServiceImplTest</code>.</p>
 
     <h3>Unit Tests (Service Layer)</h3>
     <p>Each service implementation has a corresponding test file that mocks repository dependencies and validates business logic in isolation.</p>
@@ -798,6 +903,10 @@ npm run dev</code></pre>
         <li><code>StockServiceTest</code> — Stock in/out/adjust, approval flow, quantity validation</li>
         <li><code>SaleServiceTest</code> — Sale creation, payment processing, void logic</li>
         <li><code>AuthServiceTest</code> — Login, token generation, refresh flow</li>
+        <li><code>AuthServiceImplTest</code> — Store assignment resolution and landing-page inference on login</li>
+        <li><code>LandingPageResolverTest</code> — POS vs DASHBOARD resolution from permission bitmask</li>
+        <li><code>StoreContextInterceptorTest</code> — <code>X-Store-Id</code> parsing, access validation (403), super-admin bypass</li>
+        <li><code>StoreContextTest</code> — Thread-local set/get/clear and <code>requireStoreId()</code> 400 behavior</li>
     </ul>
 
     <h3>Integration Tests (Controller Layer)</h3>
@@ -916,6 +1025,10 @@ npx newman run postman/Inventory-POS-API.postman_collection.json \
         <tr><td><code>adjust_next_number</code></td><td>1</td><td>Next sequential number for adjustments</td></tr>
     </table>
 
+    <div class="note">
+        <strong>Per-store document numbering (v1.2):</strong> In a multi-store deployment, numbering keys are stored per store using a <code>store_{id}_</code> prefix in <code>app_settings</code> (for example, <code>store_1_or_next_number</code>, <code>store_2_sale_next_number</code>). This gives each store its own independent sequence for official receipts and transaction numbers. The unprefixed keys above act as the defaults/templates.
+    </div>
+
     <h3>Discount Settings</h3>
     <table>
         <tr><th>Key</th><th>Default</th><th>Description</th></tr>
@@ -1029,6 +1142,22 @@ set JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC</code></pre>
 <section id="changelog">
     <h2>13. Changelog</h2>
 
+    <h3>Version 1.2 — August 2026</h3>
+    <p><strong>Multi-Store Support</strong></p>
+    <ul>
+        <li>New <code>Store</code> entity and <code>stores</code> table (code, name, address, TIN, phone, active)</li>
+        <li>Per-store scoping of stock, sales, and shifts via a <code>store_id</code> foreign key; <code>stock</code> is unique on (item_id, store_id)</li>
+        <li>Master data (items, categories, customers, suppliers) remains global/shared across stores</li>
+        <li>Per-user store access via the <code>user_stores</code> join table; user create/update accepts <code>storeIds[]</code></li>
+        <li>Backend store-access enforcement: <code>StoreContextInterceptor</code> reads the <code>X-Store-Id</code> header, validates access (403 on unassigned store, 400 when no store selected), and sets a thread-local <code>StoreContext</code></li>
+        <li>Super Administrator (user ID 1) bypasses store-access checks with implicit access to all stores</li>
+        <li>Per-store document numbering using <code>store_{id}_</code>-prefixed <code>app_settings</code> keys</li>
+        <li>Permission-inferred landing page via <code>LandingPageResolver</code> (POS vs DASHBOARD), returned as <code>landingPage</code>; login response now includes <code>user.stores[]</code></li>
+        <li>New Store REST endpoints under <code>/api/stores</code></li>
+        <li>Testing: backend suite grown to 102 tests (added <code>LandingPageResolverTest</code>, <code>StoreContextInterceptorTest</code>, <code>StoreContextTest</code>, and <code>AuthServiceImplTest</code> store/landing cases)</li>
+        <li>Schema change: recreate the database fresh; seed data creates a default <code>MAIN</code> store and assigns the admin to it</li>
+    </ul>
+
     <h3>Version 1.1 — August 14, 2026</h3>
     <p><strong>UI Overhaul &amp; Quality Improvements</strong></p>
     <ul>
@@ -1065,7 +1194,7 @@ set JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC</code></pre>
 </div>
 
 <footer>
-    <p>Inventory + POS System v1.1 — Technical Documentation</p>
+    <p>Inventory + POS System v1.2 — Technical Documentation</p>
     <p>&copy; 2026 Joven Q. Divinagracia Jr. All rights reserved.</p>
     <p>Generated: August 14, 2026</p>
 </footer>

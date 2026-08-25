@@ -49,7 +49,10 @@ export const useAuthStore = defineStore('auth', {
 
     hasPermission: (state) => {
       return (bit) => (state.user?.accessRights & (1 << bit)) !== 0
-    }
+    },
+
+    /** Route path for the user's inferred landing page (POS or Dashboard). */
+    landingPath: (state) => (state.user?.landingPage === 'POS' ? '/pos' : '/dashboard')
   },
 
   actions: {

@@ -62,13 +62,13 @@ onMounted(async () => {
   // If only one store, auto-select and proceed
   if (storeStore.accessibleStores.length === 1) {
     storeStore.setCurrentStore(storeStore.accessibleStores[0].id)
-    router.push('/dashboard')
+    router.push(authStore.landingPath)
   }
 })
 
 function choose(storeId) {
   storeStore.setCurrentStore(storeId)
-  router.push('/dashboard')
+  router.push(authStore.landingPath)
 }
 </script>
 

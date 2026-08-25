@@ -1,5 +1,7 @@
 package com.joven.inventory.context;
 
+import com.joven.inventory.exception.BadRequestException;
+
 /**
  * Thread-local context that holds the current store ID for the active request.
  * Set by {@code StoreContextInterceptor} at the start of each request from the
@@ -34,6 +36,22 @@ public final class StoreContext {
      */
     public static Long getStoreId() {
         return CURRENT_STORE.get();
+    }
+
+    /**
+     * Retrieves the current store ID, throwing if none is set. Use this in
+     * store-scoped operations that cannot proceed without a store context.
+     *
+     * @return the current store ID
+     * @throws IllegalStateException if no store is set for the current request
+     */
+    public static Long requireStoreId() {
+        Long storeId = CURRENT_STORE.get();
+        if (storeId == null) {
+            throw new BadRequestException(
+                    "No store selected. This operation requires an active store (X-Store-Id header).");
+        }
+        return storeId;
     }
 
     /**

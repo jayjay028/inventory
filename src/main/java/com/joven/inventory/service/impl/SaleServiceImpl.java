@@ -102,9 +102,10 @@ public class SaleServiceImpl implements SaleService {
         String currentUser = AuditContext.getCurrentUser();
 
         // Resolve the current store from the request context
-        Store store = storeRepository.findById(StoreContext.getStoreId())
+        Long currentStoreId = StoreContext.requireStoreId();
+        Store store = storeRepository.findById(currentStoreId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Store not found with id: " + StoreContext.getStoreId()));
+                        "Store not found with id: " + currentStoreId));
 
         // Validate open shift scoped to the current store
         Shift shift = shiftRepository.findByStoreIdAndCashierAndStatus(store.getId(), currentUser, ShiftStatus.OPEN)

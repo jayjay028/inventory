@@ -174,7 +174,7 @@ public class StockTransactionServiceImpl implements StockTransactionService {
         }
 
         // Validate sufficient stock (validation only — actual deduction on approval)
-        Long storeId = StoreContext.getStoreId();
+        Long storeId = StoreContext.requireStoreId();
         Stock stock = stockRepository.findByItemIdAndStoreId(request.getItemId(), storeId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Stock not found for item ID: " + request.getItemId() + " in store ID: " + storeId));
@@ -407,7 +407,7 @@ public class StockTransactionServiceImpl implements StockTransactionService {
      * @throws ResourceNotFoundException if no store is found for the current store ID
      */
     private Store resolveCurrentStore() {
-        Long storeId = StoreContext.getStoreId();
+        Long storeId = StoreContext.requireStoreId();
         return storeRepository.findById(storeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Store not found with id: " + storeId));
     }

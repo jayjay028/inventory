@@ -4,11 +4,14 @@ import com.joven.inventory.dto.request.LoginRequest;
 import com.joven.inventory.dto.request.RefreshTokenRequest;
 import com.joven.inventory.dto.response.LoginResponse;
 import com.joven.inventory.entity.User;
+import com.joven.inventory.entity.Store;
 import com.joven.inventory.exception.ResourceNotFoundException;
 import com.joven.inventory.exception.UnauthorizedException;
+import com.joven.inventory.repository.StoreRepository;
 import com.joven.inventory.repository.UserRepository;
 import com.joven.inventory.security.CustomUserDetails;
 import com.joven.inventory.security.JwtTokenProvider;
+import com.joven.inventory.security.LandingPageResolver;
 import com.joven.inventory.service.AuthService;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +38,13 @@ import java.util.List;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
+    /** User ID of the bootstrap super administrator, who has implicit access to all stores. */
+    private static final long SUPER_ADMIN_USER_ID = 1L;
+
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final StoreRepository storeRepository;
 
     @Value("${app.jwt.access-token-expiry}")
     private long accessTokenExpiry;
@@ -174,7 +181,12 @@ public class AuthServiceImpl implements AuthService {
      * @return the user info DTO
      */
     private LoginResponse.UserInfo buildUserInfo(User user) {
-        List<LoginResponse.StoreInfo> stores = user.getAccessibleStores().stream()
+        // Super admin (user ID 1) has implicit access to all active stores.
+        List<Store> sourceStores = SUPER_ADMIN_USER_ID == user.getId()
+                ? storeRepository.findByActiveTrue()
+                : List.copyOf(user.getAccessibleStores());
+
+        List<LoginResponse.StoreInfo> stores = sourceStores.stream()
                 .map(store -> LoginResponse.StoreInfo.builder()
                         .id(store.getId())
                         .code(store.getCode())
@@ -190,6 +202,7 @@ public class AuthServiceImpl implements AuthService {
                 .role(user.getRole().name())
                 .accessRights(user.getAccessRights())
                 .stores(stores)
+                .landingPage(LandingPageResolver.resolve(user.getAccessRights()))
                 .build();
     }
 }

@@ -35,6 +35,8 @@ public class LoginResponse {
         private Long accessRights;
         /** Stores this user is granted access to. */
         private List<StoreInfo> stores;
+        /** Suggested landing page inferred from permissions: "POS" or "DASHBOARD". */
+        private String landingPage;
     }
 
     /**

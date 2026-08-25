@@ -158,7 +158,7 @@
 <header>
     <h1>📦 Inventory + POS System</h1>
     <p>User Manual</p>
-    <div class="version">Version 1.1 — August 2026 | Developed by Joven Q. Divinagracia Jr.</div>
+    <div class="version">Version 1.2 — August 2026 | Developed by Joven Q. Divinagracia Jr.</div>
 </header>
 
 <div class="container">
@@ -173,43 +173,52 @@
                 <li><a href="#right-panel">1.3 Quick Access Panel (Right Sidebar)</a></li>
             </ul>
         </li>
-        <li><a href="#dashboard">2. Dashboard</a></li>
-        <li><a href="#categories">3. Categories</a></li>
-        <li><a href="#items">4. Items</a></li>
-        <li><a href="#customers">5. Customers</a></li>
-        <li><a href="#suppliers">6. Suppliers</a></li>
-        <li><a href="#stock">7. Stock Operations</a>
+        <li><a href="#multi-store">2. Multi-Store System</a>
             <ul>
-                <li><a href="#stock-in">7.1 Stock In</a></li>
-                <li><a href="#stock-out">7.2 Stock Out</a></li>
-                <li><a href="#stock-adjust">7.3 Stock Adjustment</a></li>
-                <li><a href="#stock-approval">7.4 Transaction Approval</a></li>
+                <li><a href="#store-overview">2.1 Overview</a></li>
+                <li><a href="#store-selection">2.2 Store Selection</a></li>
+                <li><a href="#super-admin">2.3 Super Administrator</a></li>
+                <li><a href="#landing-page">2.4 Default Landing Page</a></li>
+                <li><a href="#store-management">2.5 Store Management (Admins)</a></li>
             </ul>
         </li>
-        <li><a href="#pos">8. POS Terminal</a>
+        <li><a href="#dashboard">3. Dashboard</a></li>
+        <li><a href="#categories">4. Categories</a></li>
+        <li><a href="#items">5. Items</a></li>
+        <li><a href="#customers">6. Customers</a></li>
+        <li><a href="#suppliers">7. Suppliers</a></li>
+        <li><a href="#stock">8. Stock Operations</a>
             <ul>
-                <li><a href="#pos-shift">8.1 Shift Management</a></li>
-                <li><a href="#pos-sale">8.2 Creating a Sale</a></li>
-                <li><a href="#pos-payment">8.3 Processing Payment</a></li>
-                <li><a href="#pos-void">8.4 Voiding a Sale</a></li>
-                <li><a href="#pos-receipt">8.5 Receipts</a></li>
+                <li><a href="#stock-in">8.1 Stock In</a></li>
+                <li><a href="#stock-out">8.2 Stock Out</a></li>
+                <li><a href="#stock-adjust">8.3 Stock Adjustment</a></li>
+                <li><a href="#stock-approval">8.4 Transaction Approval</a></li>
             </ul>
         </li>
-        <li><a href="#reports">9. Reports</a></li>
-        <li><a href="#settings">10. Settings</a>
+        <li><a href="#pos">9. POS Terminal</a>
             <ul>
-                <li><a href="#settings-company">10.1 Company Info</a></li>
-                <li><a href="#settings-tax">10.2 Tax Settings</a></li>
-                <li><a href="#settings-numbering">10.3 Document Numbering</a></li>
-                <li><a href="#settings-pos">10.4 POS Settings</a></li>
-                <li><a href="#settings-discount">10.5 Discount Settings</a></li>
-                <li><a href="#settings-access">10.6 User Access Rights</a></li>
+                <li><a href="#pos-shift">9.1 Shift Management</a></li>
+                <li><a href="#pos-sale">9.2 Creating a Sale</a></li>
+                <li><a href="#pos-payment">9.3 Processing Payment</a></li>
+                <li><a href="#pos-void">9.4 Voiding a Sale</a></li>
+                <li><a href="#pos-receipt">9.5 Receipts</a></li>
             </ul>
         </li>
-        <li><a href="#users">11. User Management</a></li>
-        <li><a href="#audit">12. Audit Trail</a></li>
-        <li><a href="#roles">13. Roles & Permissions</a></li>
-        <li><a href="#faq">14. FAQ & Troubleshooting</a></li>
+        <li><a href="#reports">10. Reports</a></li>
+        <li><a href="#settings">11. Settings</a>
+            <ul>
+                <li><a href="#settings-company">11.1 Company Info</a></li>
+                <li><a href="#settings-tax">11.2 Tax Settings</a></li>
+                <li><a href="#settings-numbering">11.3 Document Numbering</a></li>
+                <li><a href="#settings-pos">11.4 POS Settings</a></li>
+                <li><a href="#settings-discount">11.5 Discount Settings</a></li>
+                <li><a href="#settings-access">11.6 User Access Rights</a></li>
+            </ul>
+        </li>
+        <li><a href="#users">12. User Management</a></li>
+        <li><a href="#audit">13. Audit Trail</a></li>
+        <li><a href="#roles">14. Roles & Permissions</a></li>
+        <li><a href="#faq">15. FAQ & Troubleshooting</a></li>
     </ul>
 </nav>
 
@@ -249,7 +258,7 @@
         <li><strong>Sales</strong> — Sales History, Shifts</li>
         <li><strong>Contacts</strong> — Customers, Suppliers</li>
         <li><strong>Reports</strong> — PDF report generation</li>
-        <li><strong>Administration</strong> — Users, Add-ons, Settings, Audit Trail</li>
+        <li><strong>Administration</strong> — Stores, Users, Add-ons, Settings, Audit Trail</li>
     </ul>
     <p>At the bottom of the left sidebar, you'll see <strong>Recent Transactions</strong> — the last 8 stock transactions with their status and relative time (e.g., "5m ago").</p>
 
@@ -265,7 +274,7 @@
         <tr><td><strong>Reports</strong></td><td>Grouped by: Inventory (Stock Level, Movement, Low Stock, Valuation), Financial (Sales Summary, Gross Profit, VAT Summary), POS (Z-Reading, X-Reading, Cashier Sales)</td></tr>
         <tr><td><strong>Inventory</strong></td><td>Items, Categories, Suppliers, Customers</td></tr>
         <tr><td><strong>Settings</strong></td><td>Company Info, Tax Settings, Document Numbering, POS Settings, Discount Settings, <strong>Access Rights</strong></td></tr>
-        <tr><td><strong>Administration</strong></td><td>Users, Add-ons, Audit Trail</td></tr>
+        <tr><td><strong>Administration</strong></td><td>Stores, Users, Add-ons, Audit Trail</td></tr>
     </table>
 
     <p><strong>How it works:</strong></p>
@@ -280,9 +289,94 @@
     <div class="info">The Quick Access Panel is permission-filtered — you only see sections your role has access to.</div>
 </section>
 
-<!-- 2. Dashboard -->
+<!-- 2. Multi-Store System -->
+<section id="multi-store">
+    <h2>2. Multi-Store System</h2>
+
+    <h3 id="store-overview">2.1 Overview</h3>
+    <p>The system now supports <strong>multiple stores / branches</strong> operating within a single system. This lets a business run several outlets while keeping each store's operations separate and its shared reference data consistent.</p>
+
+    <h4>What is separate per store</h4>
+    <p>Each store maintains its own independent:</p>
+    <ul>
+        <li><strong>Stock</strong> — Quantities on hand are tracked per store</li>
+        <li><strong>Sales</strong> — POS sales belong to the store where they were made</li>
+        <li><strong>Shifts</strong> — Cashier shifts are opened and closed per store</li>
+        <li><strong>Document numbering</strong> — OR, SI, and DR sequences run independently for each store</li>
+    </ul>
+
+    <h4>What is shared across all stores</h4>
+    <p>Master data is defined once and shared by every store:</p>
+    <ul>
+        <li><strong>Items</strong></li>
+        <li><strong>Categories</strong></li>
+        <li><strong>Customers</strong></li>
+        <li><strong>Suppliers</strong></li>
+    </ul>
+
+    <div class="info">Users are granted access to specific stores. A user can only see and operate the stores they are assigned to.</div>
+
+    <h3 id="store-selection">2.2 Store Selection</h3>
+    <p>After you log in, the store you work in is determined by your assigned store access:</p>
+    <ul>
+        <li>If you have access to <strong>multiple stores</strong>, a <strong>Store Selection</strong> screen appears so you can choose which store to work in.</li>
+        <li>If you have access to only <strong>one store</strong>, it is <strong>auto-selected</strong> and you skip the selection screen.</li>
+    </ul>
+
+    <h4>Switching stores</h4>
+    <p>The current store is shown in the <strong>top navbar</strong> alongside a <strong>Store Selector</strong> dropdown:</p>
+    <ol>
+        <li>Click the Store Selector dropdown in the navbar</li>
+        <li>Choose a different store from the list</li>
+        <li>The system reloads store-scoped data (stock, sales, shifts, numbering) for the selected store</li>
+    </ol>
+
+    <div class="info">The store selector only appears when your account has store access. Users with no store access will not see it.</div>
+
+    <h3 id="super-admin">2.3 Super Administrator</h3>
+    <ul>
+        <li><strong>User ID 1</strong> — the initial <code>admin</code> account — is the <strong>Super Administrator</strong>.</li>
+        <li>The super admin has access to <strong>all stores automatically</strong>, including any newly created stores, without needing explicit assignment.</li>
+        <li>The super admin is responsible for granting store access and permissions to other users.</li>
+    </ul>
+
+    <h3 id="landing-page">2.4 Default Landing Page</h3>
+    <p>Where you land after login is determined automatically from your permissions — there is no separate setting to configure:</p>
+    <ul>
+        <li>By default, all users land on the <strong>Dashboard</strong>.</li>
+        <li><strong>Exception:</strong> a user who can use the <strong>POS terminal</strong> but does <strong>not</strong> have dashboard access lands directly on the <strong>POS terminal</strong>. This is ideal for cashiers.</li>
+    </ul>
+
+    <h3 id="store-management">2.5 Store Management (Admins)</h3>
+    <p>Administrators manage stores under <strong>Administration → Stores</strong> (accessible via the left sidebar or the Quick Access panel).</p>
+
+    <h4>Create a Store</h4>
+    <ol>
+        <li>Go to <strong>Administration → Stores</strong></li>
+        <li>Click <strong>New Store</strong></li>
+        <li>Fill in the fields:</li>
+    </ol>
+    <table>
+        <tr><th>Field</th><th>Required</th><th>Description</th></tr>
+        <tr><td>Code</td><td>Yes</td><td>Unique store code (e.g., MAIN)</td></tr>
+        <tr><td>Name</td><td>Yes</td><td>Store / branch name</td></tr>
+        <tr><td>Address</td><td>No</td><td>Store address (appears on documents)</td></tr>
+        <tr><td>TIN</td><td>No</td><td>Tax Identification Number</td></tr>
+        <tr><td>Phone</td><td>No</td><td>Store contact number</td></tr>
+    </table>
+
+    <h4>Edit / Deactivate</h4>
+    <ul>
+        <li>Edit a store to update its details</li>
+        <li>Deactivate a store to remove it from active use without deleting its records</li>
+    </ul>
+
+    <div class="info">Stores are also reachable from the Quick Access panel under Administration → Stores.</div>
+</section>
+
+<!-- 3. Dashboard -->
 <section id="dashboard">
-    <h2>2. Dashboard</h2>
+    <h2>3. Dashboard</h2>
     <p>The dashboard displays key business metrics at a glance:</p>
 
     <table>
@@ -301,9 +395,9 @@
     </ul>
 </section>
 
-<!-- 3. Categories -->
+<!-- 4. Categories -->
 <section id="categories">
-    <h2>3. Categories</h2>
+    <h2>4. Categories</h2>
     <p>Categories organize your items (e.g., Electronics, Food & Beverages, Office Supplies).</p>
 
     <h3>Create a Category</h3>
@@ -323,9 +417,9 @@
     <div class="info">Deactivated categories are not deleted — they can be reactivated anytime.</div>
 </section>
 
-<!-- 4. Items -->
+<!-- 5. Items -->
 <section id="items">
-    <h2>4. Items</h2>
+    <h2>5. Items</h2>
     <p>Items are the products you buy, sell, and track in inventory.</p>
 
     <h3>Create an Item</h3>
@@ -350,9 +444,9 @@
     <p>Use the search bar to find items by name or code. Use the category dropdown filter to show items in a specific category.</p>
 </section>
 
-<!-- 5. Customers -->
+<!-- 6. Customers -->
 <section id="customers">
-    <h2>5. Customers</h2>
+    <h2>6. Customers</h2>
     <p>Manage customers for sales transactions, Official Receipts (OR), and Sales Invoices (SI).</p>
 
     <h3>Create a Customer</h3>
@@ -366,9 +460,9 @@
     <div class="info">Customers are needed when issuing Official Receipts (OR) or Sales Invoices (SI) per BIR requirements.</div>
 </section>
 
-<!-- 6. Suppliers -->
+<!-- 7. Suppliers -->
 <section id="suppliers">
-    <h2>6. Suppliers</h2>
+    <h2>7. Suppliers</h2>
     <p>Manage suppliers for purchase tracking and stock-in transactions.</p>
 
     <h3>Create a Supplier</h3>
@@ -380,9 +474,9 @@
     </ol>
 </section>
 
-<!-- 7. Stock Operations -->
+<!-- 8. Stock Operations -->
 <section id="stock">
-    <h2>7. Stock Operations</h2>
+    <h2>8. Stock Operations</h2>
 
     <h3>Stock Overview</h3>
     <p>Go to <strong>Inventory → Stock Overview</strong> or <strong>Quick Access → Transactions → Stock Overview</strong> to see current stock levels.</p>
@@ -393,7 +487,7 @@
         <li><span class="badge badge-danger">OUT OF STOCK</span> — Zero quantity</li>
     </ul>
 
-    <h3 id="stock-in">7.1 Stock In (Receiving Goods)</h3>
+    <h3 id="stock-in">8.1 Stock In (Receiving Goods)</h3>
     <div class="workflow">
         <span class="workflow-step">Create Transaction</span>
         <span class="workflow-arrow">→</span>
@@ -416,7 +510,7 @@
 
     <div class="warning">Stock is NOT updated immediately. The transaction must be <strong>Approved</strong> first.</div>
 
-    <h3 id="stock-out">7.2 Stock Out (Releasing Goods)</h3>
+    <h3 id="stock-out">8.2 Stock Out (Releasing Goods)</h3>
     <ol>
         <li>Go to <strong>Inventory → Stock Out</strong> or <strong>Quick Access → Transactions → Stock Out</strong></li>
         <li>Select the <strong>Item</strong> (validates sufficient stock)</li>
@@ -427,7 +521,7 @@
         <li>Click <strong>Submit</strong></li>
     </ol>
 
-    <h3 id="stock-adjust">7.3 Stock Adjustment</h3>
+    <h3 id="stock-adjust">8.3 Stock Adjustment</h3>
     <p>Use for physical count corrections or inventory adjustments.</p>
     <ol>
         <li>Go to <strong>Inventory → Stock Adjustment</strong></li>
@@ -437,7 +531,7 @@
         <li>Click <strong>Submit</strong></li>
     </ol>
 
-    <h3 id="stock-approval">7.4 Transaction Approval</h3>
+    <h3 id="stock-approval">8.4 Transaction Approval</h3>
     <p>All stock transactions go through an approval workflow:</p>
 
     <table>
@@ -457,12 +551,12 @@
     <div class="info">Requires APPROVE_TRANSACTIONS or CANCEL_TRANSACTIONS permission.</div>
 </section>
 
-<!-- 8. POS Terminal -->
+<!-- 9. POS Terminal -->
 <section id="pos">
-    <h2>8. POS Terminal</h2>
+    <h2>9. POS Terminal</h2>
     <p>The Point of Sale terminal is a full-screen cashier interface for processing sales. It has a professional layout with product search on the left and the cart on the right.</p>
 
-    <h3 id="pos-shift">8.1 Shift Management</h3>
+    <h3 id="pos-shift">9.1 Shift Management</h3>
     <p>Before making sales, you must open a shift:</p>
 
     <h4>Opening a Shift</h4>
@@ -484,7 +578,7 @@
 
     <div class="warning">Only ONE shift can be open per cashier at a time.</div>
 
-    <h3 id="pos-sale">8.2 Creating a Sale</h3>
+    <h3 id="pos-sale">9.2 Creating a Sale</h3>
     <ol>
         <li>In the POS terminal, use the <strong>search bar</strong> (with barcode icon) to find items</li>
         <li>Click on a product card to add it to the cart</li>
@@ -494,7 +588,7 @@
         <li>Click <strong>Pay</strong> when ready</li>
     </ol>
 
-    <h3 id="pos-payment">8.3 Processing Payment</h3>
+    <h3 id="pos-payment">9.3 Processing Payment</h3>
     <ol>
         <li>Select <strong>Payment Method</strong>: Cash, GCash, Bank Transfer, Credit, or Multiple</li>
         <li>Enter the <strong>Amount Tendered</strong></li>
@@ -522,7 +616,7 @@
         <tr><td><span class="badge badge-danger">VOIDED</span></td><td>Cancelled</td><td>View only</td></tr>
     </table>
 
-    <h3 id="pos-void">8.4 Voiding a Sale</h3>
+    <h3 id="pos-void">9.4 Voiding a Sale</h3>
     <ol>
         <li>Go to <strong>Sales → Sales History</strong></li>
         <li>Find the sale and click <strong>Void</strong></li>
@@ -532,7 +626,7 @@
 
     <div class="warning">Voiding a PAID or CLOSED sale reverses the stock deduction. A void reason is required and logged in the audit trail.</div>
 
-    <h3 id="pos-receipt">8.5 Receipts</h3>
+    <h3 id="pos-receipt">9.5 Receipts</h3>
     <p>Receipts can be viewed and printed for any PAID or CLOSED sale.</p>
 
     <h4>Receipt Contents (BIR-compliant)</h4>
@@ -553,9 +647,9 @@
     </ul>
 </section>
 
-<!-- 9. Reports -->
+<!-- 10. Reports -->
 <section id="reports">
-    <h2>9. Reports</h2>
+    <h2>10. Reports</h2>
     <p>The system generates PDF reports organized in three categories. Access via <strong>Reports</strong> in the left sidebar or expand <strong>Reports</strong> in the Quick Access panel for direct links.</p>
 
     <h3>Inventory Reports</h3>
@@ -602,20 +696,20 @@
     </ol>
 </section>
 
-<!-- 10. Settings -->
+<!-- 11. Settings -->
 <section id="settings">
-    <h2>10. Settings</h2>
+    <h2>11. Settings</h2>
     <p>Configure system behavior from <strong>Administration → Settings</strong> or via <strong>Quick Access → Settings</strong> (which links directly to each sub-section).</p>
 
     <p>Settings is organized into 6 tabs:</p>
 
-    <h3 id="settings-company">10.1 Company Info</h3>
+    <h3 id="settings-company">11.1 Company Info</h3>
     <ul>
         <li>Business Name, TIN, Address, Phone, Email</li>
         <li>Appears on receipts, reports, and documents</li>
     </ul>
 
-    <h3 id="settings-tax">10.2 Tax Settings</h3>
+    <h3 id="settings-tax">11.2 Tax Settings</h3>
     <table>
         <tr><th>Setting</th><th>Description</th></tr>
         <tr><td>Tax Enabled</td><td>Toggle VAT computation on/off globally</td></tr>
@@ -626,7 +720,7 @@
 
     <div class="info">When tax is disabled, all tax fields are hidden throughout the system. Enable only if your business is VAT-registered.</div>
 
-    <h3 id="settings-numbering">10.3 Document Numbering</h3>
+    <h3 id="settings-numbering">11.3 Document Numbering</h3>
     <p>Configure prefixes and sequential numbers for:</p>
     <table>
         <tr><th>Document</th><th>Prefix Example</th><th>Result</th></tr>
@@ -635,7 +729,9 @@
         <tr><td>Stock Out</td><td>SO-</td><td>SO-00001, SO-00002...</td></tr>
     </table>
 
-    <h3 id="settings-pos">10.4 POS Settings</h3>
+    <div class="info">In a multi-store setup, document sequences (including OR, SI, and DR) run independently per store, so each store keeps its own numbering.</div>
+
+    <h3 id="settings-pos">11.4 POS Settings</h3>
     <ul>
         <li><strong>Receipt Header</strong> — Custom text at top of receipts</li>
         <li><strong>Receipt Footer</strong> — Custom text at bottom of receipts</li>
@@ -643,14 +739,14 @@
         <li><strong>Require Open Shift</strong> — Must have a shift open to create sales</li>
     </ul>
 
-    <h3 id="settings-discount">10.5 Discount Settings</h3>
+    <h3 id="settings-discount">11.5 Discount Settings</h3>
     <ul>
         <li><strong>Enable Discounts</strong> — Show/hide discount fields globally</li>
         <li><strong>Max Discount %</strong> — Maximum allowable discount percentage</li>
         <li><strong>Senior/PWD Rate</strong> — Discount rate for SC/PWD (default: 20%)</li>
     </ul>
 
-    <h3 id="settings-access">10.6 User Access Rights</h3>
+    <h3 id="settings-access">11.6 User Access Rights</h3>
     <p>This tab allows you to configure <strong>default permission presets</strong> for each role. It shows a matrix table:</p>
 
     <table>
@@ -681,9 +777,9 @@
     </table>
 </section>
 
-<!-- 11. User Management -->
+<!-- 12. User Management -->
 <section id="users">
-    <h2>11. User Management</h2>
+    <h2>12. User Management</h2>
     <p>Manage user accounts from <strong>Administration → Users</strong> or <strong>Quick Access → Administration → Users</strong>.</p>
 
     <h3>Create a User</h3>
@@ -692,8 +788,19 @@
         <li>Fill in: Username, Password, Full Name, Email</li>
         <li>Select <strong>Role</strong></li>
         <li>Check the desired <strong>Permissions</strong> (checkboxes)</li>
+        <li>Use the <strong>Store Access</strong> multi-select to assign which stores the user can access</li>
         <li>Click <strong>Create</strong></li>
     </ol>
+
+    <h3>Store Access</h3>
+    <p>The User form includes a <strong>Store Access</strong> multi-select that controls which stores a user can work in:</p>
+    <ul>
+        <li><strong>At least one store</strong> must be assigned to non-admin users.</li>
+        <li>Users only see the menu items and data for their <strong>assigned stores</strong>.</li>
+        <li>The Super Administrator (user ID 1) automatically has access to all stores and does not need explicit assignment.</li>
+    </ul>
+
+    <div class="info">Assigning stores here determines which stores appear in the user's Store Selector after login. A user assigned to a single store is taken straight into it; a user assigned to multiple stores chooses at the Store Selection screen.</div>
 
     <h3>Role Presets</h3>
     <table>
@@ -714,9 +821,9 @@
     </ul>
 </section>
 
-<!-- 12. Audit Trail -->
+<!-- 13. Audit Trail -->
 <section id="audit">
-    <h2>12. Audit Trail</h2>
+    <h2>13. Audit Trail</h2>
     <p>Every change in the system is automatically recorded. Access from <strong>Administration → Audit Trail</strong> or <strong>Quick Access → Administration → Audit Trail</strong>.</p>
 
     <p>Each audit record shows:</p>
@@ -732,9 +839,9 @@
     <p>Use filters to narrow results by entity type, user, date range, or action type.</p>
 </section>
 
-<!-- 13. Roles & Permissions -->
+<!-- 14. Roles & Permissions -->
 <section id="roles">
-    <h2>13. Roles & Permissions</h2>
+    <h2>14. Roles & Permissions</h2>
     <p>The system uses a bitwise permission system with 25 individual permissions:</p>
 
     <table>
@@ -763,12 +870,24 @@
     <div class="info">Permissions are stored as a single integer using bitwise operations. Each permission is a bit position (0–24). This allows efficient storage and fast permission checking.</div>
 </section>
 
-<!-- 14. FAQ -->
+<!-- 15. FAQ -->
 <section id="faq">
-    <h2>14. FAQ & Troubleshooting</h2>
+    <h2>15. FAQ & Troubleshooting</h2>
 
     <h3>Q: Where is the Quick Access panel?</h3>
     <p>Look for the small arrow tab on the <strong>right edge</strong> of your screen. Click it to slide open the Quick Access panel with shortcuts to Transactions, Reports, Settings, and more.</p>
+
+    <h3>Q: How do I switch between stores?</h3>
+    <p>Use the <strong>Store Selector</strong> dropdown in the top navbar. Click it and choose a different store — the system reloads store-scoped data (stock, sales, shifts, numbering) for the selected store.</p>
+
+    <h3>Q: Why can't I see a store?</h3>
+    <p>You need to be <strong>assigned access</strong> to that store by an administrator. You only see and can operate the stores assigned to your account under User Management → Store Access.</p>
+
+    <h3>Q: Why did I land on the POS screen instead of the dashboard?</h3>
+    <p>Your account is <strong>POS-focused</strong> — it has POS access but not dashboard access. In that case the system takes you directly to the POS terminal after login. This is ideal for cashiers.</p>
+
+    <h3>Q: Can one store see another store's stock?</h3>
+    <p>No. <strong>Stock is per-store</strong> — each store tracks its own quantities, sales, and shifts. However, <strong>items, categories, customers, and suppliers are shared</strong> across all stores.</p>
 
     <h3>Q: How do I configure user access rights?</h3>
     <p>Go to <strong>Settings → User Access Rights</strong> tab (the 6th tab). Or use the Quick Access panel → Settings → Access Rights. This shows a matrix of all permissions × roles.</p>
@@ -810,7 +929,7 @@
 </div>
 
 <footer>
-    <p>Inventory + POS System v1.1 — © 2026 Joven Q. Divinagracia Jr.</p>
+    <p>Inventory + POS System v1.2 — © 2026 Joven Q. Divinagracia Jr.</p>
     <p>For technical support, contact the system administrator.</p>
 </footer>
 
