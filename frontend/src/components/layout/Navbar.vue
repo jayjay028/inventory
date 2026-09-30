@@ -9,12 +9,24 @@
       >
         <i class="bi bi-list"></i>
       </button>
-      <div class="navbar-context">
-        <span class="navbar-app-name">Inventory + POS</span>
-      </div>
+      <router-link :to="authStore.landingPath || '/dashboard'" class="navbar-context" aria-label="Go to home">
+        <img src="/maracoder-logo.png" class="navbar-logo" alt="" />
+        <span class="navbar-app-name">MaraCoder Inventory+POS</span>
+      </router-link>
     </div>
 
     <div class="navbar-right">
+      <!-- Theme toggle -->
+      <button
+        class="theme-toggle"
+        type="button"
+        :aria-label="appStore.theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+        :title="appStore.theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+        @click="appStore.toggleTheme()"
+      >
+        <i :class="appStore.theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars'"></i>
+      </button>
+
       <!-- Store Selector -->
       <div v-if="storeStore.hasStore" class="navbar-store" ref="storeDropdownRef">
         <button
@@ -49,6 +61,12 @@
             </button>
           </div>
         </transition>
+      </div>
+
+      <!-- Live Clock -->
+      <div class="navbar-clock d-none d-lg-flex">
+        <span class="navbar-clock-time">{{ clockTime }}</span>
+        <span class="navbar-clock-date">{{ clockDate }}</span>
       </div>
 
       <div class="navbar-user" ref="dropdownRef">
@@ -98,6 +116,27 @@ const dropdownRef = ref(null)
 const storeDropdownOpen = ref(false)
 const storeDropdownRef = ref(null)
 
+// Live clock
+const clockTime = ref('')
+const clockDate = ref('')
+let clockTimer = null
+
+function updateClock() {
+  const now = new Date()
+  clockTime.value = now.toLocaleTimeString('en-US', {
+    hour12: false,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  })
+  clockDate.value = now.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
 const userInitials = computed(() => {
   const name = authStore.userName || ''
   const parts = name.trim().split(/\s+/)
@@ -138,10 +177,16 @@ function handleLogout() {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  updateClock()
+  clockTimer = setInterval(updateClock, 1000)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
+  if (clockTimer) {
+    clearInterval(clockTimer)
+    clockTimer = null
+  }
 })
 </script>
 
@@ -155,9 +200,9 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   height: 56px;
   padding: 0 1.25rem;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: none;
 }
 
 /* Left section */
@@ -176,25 +221,43 @@ onBeforeUnmount(() => {
   border: none;
   background: none;
   border-radius: 4px;
-  color: #374151;
+  color: var(--color-text-muted);
   font-size: 1.25rem;
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
 .navbar-toggle:hover {
-  background-color: #f3f4f6;
+  background-color: var(--color-card-hover);
 }
 
 .navbar-context {
   display: flex;
   align-items: center;
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 0.2rem 0.35rem;
+  transition: background-color 0.15s ease;
+}
+
+.navbar-context:hover {
+  background-color: var(--color-card-hover);
 }
 
 .navbar-app-name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-heading);
+}
+
+.navbar-logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: #fff;
+  padding: 1px;
+  margin-right: 0.4rem;
 }
 
 /* Right section */
@@ -202,6 +265,27 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+/* Theme toggle */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--color-border-light);
+  background: var(--color-surface-2);
+  border-radius: 8px;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--color-card-hover);
+  color: var(--color-text);
 }
 
 /* Store selector */
@@ -214,16 +298,16 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.375rem 0.75rem;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border: 1px solid var(--color-border-light);
+  background: var(--color-surface-2);
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .store-trigger:hover:not(:disabled) {
-  background-color: #f3f4f6;
-  border-color: #d1d5db;
+  background-color: var(--color-card-hover);
+  border-color: var(--color-border-light);
 }
 
 .store-trigger:disabled {
@@ -233,13 +317,13 @@ onBeforeUnmount(() => {
 
 .store-icon {
   font-size: 0.9rem;
-  color: #1e40af;
+  color: #22d3ee;
 }
 
 .store-name {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text);
   max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -248,7 +332,7 @@ onBeforeUnmount(() => {
 
 .store-chevron {
   font-size: 0.625rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .store-dropdown {
@@ -256,10 +340,10 @@ onBeforeUnmount(() => {
   top: calc(100% + 0.5rem);
   right: 0;
   width: 240px;
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   z-index: 1050;
   padding: 0.25rem 0;
@@ -271,7 +355,7 @@ onBeforeUnmount(() => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .store-option {
@@ -288,20 +372,20 @@ onBeforeUnmount(() => {
 }
 
 .store-option:hover {
-  background-color: #f9fafb;
+  background-color: var(--color-card-hover);
 }
 
 .store-option.active {
-  background-color: #eff6ff;
+  background-color: rgba(37, 99, 235, 0.18);
 }
 
 .store-option > i:first-child {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .store-option.active > i:first-child {
-  color: #1e40af;
+  color: #22d3ee;
 }
 
 .store-option-info {
@@ -314,7 +398,7 @@ onBeforeUnmount(() => {
 .store-option-name {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: #111827;
+  color: var(--color-heading);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -322,12 +406,33 @@ onBeforeUnmount(() => {
 
 .store-option-code {
   font-size: 0.6875rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .store-check {
   font-size: 0.875rem;
-  color: #1e40af;
+  color: #22d3ee;
+}
+
+/* Live clock */
+.navbar-clock {
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+  margin-right: 0.25rem;
+}
+
+.navbar-clock-time {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.navbar-clock-date {
+  font-size: 10px;
+  color: var(--color-text-muted);
 }
 
 .navbar-user {
@@ -347,7 +452,7 @@ onBeforeUnmount(() => {
 }
 
 .user-trigger:hover {
-  background-color: #f3f4f6;
+  background-color: var(--color-card-hover);
 }
 
 .user-avatar {
@@ -357,7 +462,7 @@ onBeforeUnmount(() => {
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background-color: #1e40af;
+  background: linear-gradient(135deg, #2563eb, #06b6d4);
   color: #ffffff;
   font-size: 0.6875rem;
   font-weight: 600;
@@ -367,12 +472,12 @@ onBeforeUnmount(() => {
 .user-name {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text);
 }
 
 .user-chevron {
   font-size: 0.625rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   transition: transform 0.15s ease;
 }
 
@@ -386,10 +491,10 @@ onBeforeUnmount(() => {
   top: calc(100% + 0.5rem);
   right: 0;
   width: 200px;
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   z-index: 1050;
 }
@@ -404,18 +509,18 @@ onBeforeUnmount(() => {
 .dropdown-user-name {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-heading);
 }
 
 .dropdown-user-role {
   font-size: 0.6875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   text-transform: capitalize;
 }
 
 .dropdown-divider {
   height: 1px;
-  background-color: #f3f4f6;
+  background-color: var(--color-border);
   margin: 0;
 }
 
@@ -428,22 +533,22 @@ onBeforeUnmount(() => {
   border: none;
   background: none;
   font-size: 0.8125rem;
-  color: #374151;
+  color: var(--color-text);
   cursor: pointer;
   transition: background-color 0.15s ease;
   text-align: left;
 }
 
 .dropdown-action:hover {
-  background-color: #f9fafb;
+  background-color: var(--color-card-hover);
 }
 
 .logout-action {
-  color: #dc2626;
+  color: #f87171;
 }
 
 .logout-action:hover {
-  background-color: #fef2f2;
+  background-color: rgba(239, 68, 68, 0.12);
 }
 
 .logout-action i {

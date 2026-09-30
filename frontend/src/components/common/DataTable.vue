@@ -255,7 +255,7 @@ function handleRowClick(row) {
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   pointer-events: none;
 }
 
@@ -264,16 +264,16 @@ function handleRowClick(row) {
   height: 36px;
   padding: 0 2rem 0 2.25rem;
   font-size: 0.8125rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  background: #fff;
-  color: #1e293b;
+  background: var(--color-input-bg);
+  color: var(--color-text);
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .dt-search-input::placeholder {
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 
 .dt-search-input:focus {
@@ -288,7 +288,7 @@ function handleRowClick(row) {
   transform: translateY(-50%);
   border: none;
   background: none;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   cursor: pointer;
   padding: 0.125rem;
   font-size: 1rem;
@@ -298,12 +298,12 @@ function handleRowClick(row) {
 }
 
 .dt-search-clear:hover {
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 /* Table */
 .dt-table-wrap {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -315,7 +315,7 @@ function handleRowClick(row) {
 }
 
 .dt-table thead {
-  background-color: #f8fafc;
+  background-color: var(--color-surface-2);
 }
 
 .dt-table thead th {
@@ -324,8 +324,8 @@ function handleRowClick(row) {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #64748b;
-  border-bottom: 1px solid #e5e7eb;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
   white-space: nowrap;
   text-align: left;
 }
@@ -343,7 +343,7 @@ function handleRowClick(row) {
 }
 
 .dt-sortable:hover {
-  background-color: #f1f5f9;
+  background-color: var(--color-card-hover);
 }
 
 .dt-sort-icon {
@@ -356,14 +356,14 @@ function handleRowClick(row) {
 }
 
 .dt-sort-idle {
-  color: #cbd5e1;
+  color: var(--color-border-light);
   font-size: 0.5625rem;
 }
 
 .dt-table tbody td {
   padding: 0.75rem 1rem;
-  color: #334155;
-  border-bottom: 1px solid #f1f5f9;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
   vertical-align: middle;
 }
 
@@ -372,7 +372,7 @@ function handleRowClick(row) {
 }
 
 .dt-table tbody tr:hover {
-  background-color: #f8fafc;
+  background-color: var(--color-card-hover);
 }
 
 .dt-row-clickable {
@@ -386,7 +386,7 @@ function handleRowClick(row) {
   align-items: center;
   justify-content: center;
   padding: 3rem 1rem;
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 
 .dt-empty i {
@@ -431,7 +431,7 @@ function handleRowClick(row) {
 
 .dt-page-info {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 .dt-page-list {
@@ -452,17 +452,17 @@ function handleRowClick(row) {
   padding: 0 0.375rem;
   font-size: 0.75rem;
   font-weight: 500;
-  color: #475569;
-  background: #fff;
-  border: 1px solid #e2e8f0;
+  color: var(--color-text);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .dt-page-btn:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
+  background: var(--color-card-hover);
+  border-color: var(--color-border-light);
 }
 
 .dt-page-list li.active .dt-page-btn {
@@ -472,7 +472,7 @@ function handleRowClick(row) {
 }
 
 .dt-page-list li.disabled .dt-page-btn {
-  color: #cbd5e1;
+  color: var(--color-border-light);
   pointer-events: none;
   cursor: default;
 }

@@ -65,18 +65,18 @@ defineProps({
   display: inline-flex;
   align-items: center;
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .ph-breadcrumbs li + li::before {
   content: '/';
   margin: 0 0.5rem;
-  color: #d1d5db;
+  color: var(--color-border);
   font-size: 0.6875rem;
 }
 
 .ph-breadcrumbs li a {
-  color: #6b7280;
+  color: var(--color-text-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
@@ -86,7 +86,7 @@ defineProps({
 }
 
 .ph-crumb-active {
-  color: #374151;
+  color: var(--color-text);
   font-weight: 500;
 }
 
@@ -106,14 +106,14 @@ defineProps({
 .ph-title {
   font-size: 1.375rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-heading);
   margin: 0;
   line-height: 1.3;
 }
 
 .ph-subtitle {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0.25rem 0 0;
   line-height: 1.4;
 }

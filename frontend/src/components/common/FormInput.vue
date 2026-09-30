@@ -117,7 +117,7 @@ const inputId = `form-input-${++_idCounter}-${Math.random().toString(36).substri
   display: block;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text);
   margin-bottom: 0.375rem;
   line-height: 1.4;
 }
@@ -136,9 +136,9 @@ const inputId = `form-input-${++_idCounter}-${Math.random().toString(36).substri
   padding: 0 0.75rem;
   font-size: 0.8125rem;
   font-family: inherit;
-  color: #1e293b;
-  background-color: #fff;
-  border: 1px solid #d1d5db;
+  color: var(--color-text);
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -169,7 +169,7 @@ const inputId = `form-input-${++_idCounter}-${Math.random().toString(36).substri
 
 .fi-input::placeholder,
 .fi-textarea::placeholder {
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .fi-input:focus,
@@ -182,8 +182,8 @@ const inputId = `form-input-${++_idCounter}-${Math.random().toString(36).substri
 .fi-input:disabled,
 .fi-select:disabled,
 .fi-textarea:disabled {
-  background-color: #f9fafb;
-  color: #9ca3af;
+  background-color: var(--color-surface-2);
+  color: var(--color-text-muted);
   cursor: not-allowed;
 }
 
@@ -206,7 +206,7 @@ const inputId = `form-input-${++_idCounter}-${Math.random().toString(36).substri
 .fi-help {
   margin: 0.25rem 0 0;
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   line-height: 1.4;
 }
 </style>

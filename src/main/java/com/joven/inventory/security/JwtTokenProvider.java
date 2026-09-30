@@ -76,7 +76,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .claim("userId", userDetails.getId())
-                .claim("role", userDetails.getRole().name())
+                .claim("role", userDetails.getRoleName())
                 .claim("accessRights", userDetails.getAccessRights())
                 .issuer(issuer)
                 .issuedAt(now)

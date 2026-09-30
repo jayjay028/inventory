@@ -4,10 +4,12 @@ import com.joven.inventory.dto.request.PasswordResetRequest;
 import com.joven.inventory.dto.request.UserRequest;
 import com.joven.inventory.dto.response.UserResponse;
 import com.joven.inventory.entity.Store;
+import com.joven.inventory.entity.Role;
 import com.joven.inventory.entity.User;
 import com.joven.inventory.exception.DuplicateResourceException;
 import com.joven.inventory.exception.ResourceNotFoundException;
 import com.joven.inventory.mapper.UserMapper;
+import com.joven.inventory.repository.RoleRepository;
 import com.joven.inventory.repository.StoreRepository;
 import com.joven.inventory.repository.UserRepository;
 import com.joven.inventory.service.UserService;
@@ -25,7 +27,7 @@ import java.util.Set;
 
 /**
  * Implementation of {@link UserService} providing CRUD operations for user management.
- * Handles password encoding, role assignment, access rights, and store access.
+ * Handles password encoding, role assignment, and store access.
  *
  * @author Joven Q. Divinagracia Jr.
  */
@@ -36,6 +38,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -72,8 +75,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
-        user.setRole(request.getRole());
-        user.setAccessRights(request.getAccessRights());
+        user.setRole(resolveRole(request.getRoleId()));
         user.setActive(true);
         user.setAccessibleStores(resolveStores(request.getStoreIds()));
 
@@ -98,8 +100,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(request.getUsername());
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
-        user.setRole(request.getRole());
-        user.setAccessRights(request.getAccessRights());
+        user.setRole(resolveRole(request.getRoleId()));
 
         // Update store access if provided
         if (request.getStoreIds() != null) {
@@ -173,5 +174,17 @@ public class UserServiceImpl implements UserService {
             stores.add(store);
         }
         return stores;
+    }
+
+    /**
+     * Resolves a role ID into a Role entity.
+     *
+     * @param roleId the role ID
+     * @return the resolved Role entity
+     * @throws ResourceNotFoundException if the role does not exist
+     */
+    private Role resolveRole(Long roleId) {
+        return roleRepository.findById(roleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + roleId));
     }
 }

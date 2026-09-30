@@ -1,7 +1,6 @@
 package com.joven.inventory.security;
 
 import com.joven.inventory.entity.User;
-import com.joven.inventory.enums.UserRole;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,8 +14,9 @@ import java.util.Collections;
  * Wraps the application's {@link User} entity to integrate with the
  * Spring Security authentication and authorization framework.
  *
- * <p>Includes additional fields such as access rights and role for
+ * <p>Includes additional fields such as access rights and role name for
  * fine-grained permission evaluation beyond standard Spring Security authorities.
+ * Access rights are derived from the user's assigned role.
  *
  * @author Joven Q. Divinagracia Jr.
  */
@@ -35,10 +35,10 @@ public class CustomUserDetails implements UserDetails {
     /** Display name of the user */
     private final String fullName;
 
-    /** Role assigned to the user (ADMIN or STAFF) */
-    private final UserRole role;
+    /** Name of the role assigned to the user */
+    private final String roleName;
 
-    /** Bitwise access rights mask for granular permission control */
+    /** Bitwise access rights mask (derived from the user's role) */
     private final Long accessRights;
 
     /** Whether the user account is active */
@@ -51,35 +51,38 @@ public class CustomUserDetails implements UserDetails {
      * @param username     the user's login username
      * @param password     the user's encoded password
      * @param fullName     the user's display name
-     * @param role         the user's role
+     * @param roleName     the user's role name
      * @param accessRights the user's bitwise access rights
      * @param active       whether the user account is active
      */
     public CustomUserDetails(Long id, String username, String password, String fullName,
-                             UserRole role, Long accessRights, Boolean active) {
+                             String roleName, Long accessRights, Boolean active) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.fullName = fullName;
-        this.role = role;
+        this.roleName = roleName;
         this.accessRights = accessRights;
         this.active = active;
     }
 
     /**
      * Factory method to create a {@link CustomUserDetails} from a {@link User} entity.
+     * Role name and access rights are taken from the user's assigned role.
      *
      * @param user the user entity to convert
      * @return a new CustomUserDetails instance populated from the entity
      */
     public static CustomUserDetails fromUser(User user) {
+        String roleName = user.getRole() != null ? user.getRole().getName() : "UNKNOWN";
+        Long accessRights = user.getRole() != null ? user.getRole().getAccessRights() : 0L;
         return new CustomUserDetails(
                 user.getId(),
                 user.getUsername(),
                 user.getPassword(),
                 user.getFullName(),
-                user.getRole(),
-                user.getAccessRights(),
+                roleName,
+                accessRights,
                 user.getActive()
         );
     }
@@ -92,7 +95,7 @@ public class CustomUserDetails implements UserDetails {
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String authority = "ROLE_" + role.name();
+        String authority = "ROLE_" + roleName;
         return Collections.singletonList(new SimpleGrantedAuthority(authority));
     }
 

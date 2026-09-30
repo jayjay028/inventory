@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory + POS System - User Manual</title>
+    <title>MaraCoder Inventory+POS — User Manual</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -136,6 +136,160 @@
             font-size: 0.85rem;
             margin: 1rem 0;
         }
+        /* Numbered step-by-step blocks */
+        .steps { list-style: none; margin: 1rem 0; counter-reset: step; }
+        .steps > li {
+            position: relative;
+            padding: 0.5rem 0 0.75rem 2.5rem;
+            margin: 0;
+            border-left: 2px solid var(--border);
+            counter-increment: step;
+        }
+        .steps > li:last-child { border-left-color: transparent; }
+        .steps > li::before {
+            content: counter(step);
+            position: absolute;
+            left: -0.85rem;
+            top: 0.4rem;
+            width: 1.7rem;
+            height: 1.7rem;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .steps > li strong { color: var(--text); }
+        /* UI mockup — approximate screenshot rendered from HTML/CSS */
+        .ui-mock {
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            margin: 1.25rem 0;
+            overflow: hidden;
+            background: #0f172a;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+            font-size: 0.82rem;
+        }
+        .ui-mock .ui-titlebar {
+            background: #111c33;
+            border-bottom: 1px solid #1e293b;
+            padding: 0.5rem 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #94a3b8;
+            font-size: 0.75rem;
+        }
+        .ui-mock .ui-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .ui-mock .ui-dot.r { background: #ef4444; }
+        .ui-mock .ui-dot.y { background: #f59e0b; }
+        .ui-mock .ui-dot.g { background: #22c55e; }
+        .ui-mock .ui-caption { margin-left: auto; font-style: italic; }
+        .ui-mock .ui-body { padding: 1rem 1.1rem; background: #0f172a; }
+        .ui-mock .ui-pageheader {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #1e293b; padding-bottom: 0.6rem; margin-bottom: 0.8rem;
+        }
+        .ui-mock .ui-pageheader h5 { color: #f1f5f9; font-size: 1rem; margin: 0; }
+        .ui-mock .ui-pageheader small { color: #94a3b8; }
+        .ui-btn {
+            display: inline-block; padding: 0.35rem 0.8rem; border-radius: 6px;
+            font-size: 0.78rem; font-weight: 600; border: 1px solid transparent;
+        }
+        .ui-btn.primary { background: #2563eb; color: #fff; }
+        .ui-btn.secondary { background: #1e293b; color: #cbd5e1; border-color: #334155; }
+        .ui-btn.sm { padding: 0.2rem 0.5rem; font-size: 0.72rem; }
+        .ui-field { margin-bottom: 0.7rem; }
+        .ui-field label { display: block; font-size: 0.72rem; font-weight: 600; color: #94a3b8; margin-bottom: 0.2rem; }
+        .ui-input, .ui-select {
+            width: 100%; padding: 0.4rem 0.6rem; border: 1px solid #334155;
+            border-radius: 6px; background: #0b1120; color: #e2e8f0; font-size: 0.8rem;
+        }
+        .ui-select::after { content: "▾"; float: right; }
+        .ui-hint { font-size: 0.7rem; color: #64748b; margin-top: 0.15rem; }
+        .ui-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+        .ui-table th, .ui-table td { border: 1px solid #1e293b; padding: 0.4rem 0.6rem; text-align: left; }
+        .ui-table th { background: #111c33; font-size: 0.68rem; text-transform: uppercase; color: #94a3b8; }
+        .ui-table td { color: #cbd5e1; }
+        .ui-badge { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.65rem; font-weight: 600; }
+        .ui-badge.green { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+        .ui-badge.gray { background: rgba(148,163,184,0.15); color: #cbd5e1; }
+        .ui-permgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.3rem 0.8rem; }
+        .ui-permgrid .grp { grid-column: 1 / -1; font-size: 0.68rem; text-transform: uppercase; font-weight: 700; color: #94a3b8; margin-top: 0.5rem; }
+        .ui-check { font-size: 0.76rem; color: #cbd5e1; }
+        .ui-check input { margin-right: 0.35rem; vertical-align: middle; }
+        .ui-disabled { opacity: 0.55; }
+
+        /* --- Extended mockup helpers (app shell, KPI, POS, chart, login) --- */
+        /* App shell: sidebar + topbar + content */
+        .ui-shell { display: flex; min-height: 300px; }
+        .ui-sidebar { width: 168px; background: #0f172a; border-right: 1px solid #1e293b; padding: 0.6rem 0; flex-shrink: 0; }
+        .ui-sidebar .ui-brand { display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.85rem 0.75rem; color: #f1f5f9; font-weight: 700; font-size: 0.82rem; border-bottom: 1px solid #1e293b; margin-bottom: 0.5rem; }
+        .ui-sidebar .ui-brand .ui-logo { width: 22px; height: 22px; border-radius: 6px; background: linear-gradient(135deg,#2563eb,#06b6d4); display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 0.7rem; }
+        .ui-navlink { display: flex; align-items: center; gap: 0.5rem; margin: 2px 8px; padding: 0.4rem 0.6rem; border-radius: 8px; color: #94a3b8; font-size: 0.75rem; }
+        .ui-navlink .ic { width: 14px; opacity: 0.8; }
+        .ui-navlink.active { background: rgba(37,99,235,0.18); color: #7dd3fc; font-weight: 600; }
+        .ui-shell-main { flex: 1; background: #020617; display: flex; flex-direction: column; min-width: 0; }
+        .ui-topbar { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.85rem; background: #0f172a; border-bottom: 1px solid #1e293b; }
+        .ui-topbar .ui-search { flex: 1; max-width: 220px; margin: 0 0.75rem; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 0.3rem 0.6rem; color: #64748b; font-size: 0.72rem; }
+        .ui-topbar .ui-clock { color: #e2e8f0; font-size: 0.72rem; font-weight: 600; text-align: right; }
+        .ui-topbar .ui-clock small { display: block; color: #64748b; font-size: 0.62rem; font-weight: 400; }
+        .ui-userchip { display: flex; align-items: center; gap: 0.4rem; }
+        .ui-avatar { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg,#2563eb,#06b6d4); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 700; }
+        .ui-shell-content { padding: 0.85rem; flex: 1; }
+        /* KPI cards */
+        .ui-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-bottom: 0.75rem; }
+        .ui-kpi { background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; padding: 0.7rem 0.8rem; }
+        .ui-kpi .lbl { color: #94a3b8; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em; }
+        .ui-kpi .val { color: #f8fafc; font-size: 1.15rem; font-weight: 700; margin-top: 0.15rem; }
+        .ui-kpi .chip { float: right; width: 30px; height: 30px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; }
+        .ui-kpi .trend { font-size: 0.62rem; margin-top: 0.35rem; }
+        .ui-kpi .trend.up { color: #34d399; }
+        .ui-kpi .trend.warn { color: #fbbf24; }
+        .chip.indigo { background: rgba(37,99,235,0.15); color: #60a5fa; }
+        .chip.emerald { background: rgba(16,185,129,0.15); color: #34d399; }
+        .chip.amber { background: rgba(245,158,11,0.15); color: #fbbf24; }
+        .chip.teal { background: rgba(13,148,136,0.15); color: #2dd4bf; }
+        .chip.rose { background: rgba(244,63,94,0.15); color: #fb7185; }
+        /* Panels row */
+        .ui-panels { display: grid; grid-template-columns: 2fr 1fr; gap: 0.6rem; }
+        .ui-panel { background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; overflow: hidden; }
+        .ui-panel .ui-panel-head { padding: 0.55rem 0.75rem; border-bottom: 1px solid #1e293b; color: #f1f5f9; font-weight: 600; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; }
+        .ui-panel .ui-panel-body { padding: 0.5rem 0.75rem; }
+        /* POS layout */
+        .ui-pos { display: grid; grid-template-columns: 1.6fr 1fr; gap: 0.6rem; }
+        .ui-prodgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+        .ui-prod { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 0.6rem; text-align: center; }
+        .ui-prod .nm { color: #e2e8f0; font-size: 0.72rem; font-weight: 500; }
+        .ui-prod .pr { color: #34d399; font-size: 0.72rem; font-weight: 700; margin-top: 0.2rem; }
+        .ui-prod .ph { height: 34px; border-radius: 6px; background: #1e293b; margin-bottom: 0.35rem; display: flex; align-items: center; justify-content: center; color: #475569; }
+        .ui-cart { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; display: flex; flex-direction: column; }
+        .ui-cart .ci { display: flex; justify-content: space-between; padding: 0.4rem 0.65rem; border-bottom: 1px solid #1e293b; font-size: 0.72rem; color: #cbd5e1; }
+        .ui-cart .ci .q { color: #64748b; }
+        .ui-cart .tot { margin-top: auto; padding: 0.6rem 0.65rem; border-top: 1px solid #334155; background: #111c33; }
+        .ui-cart .tot .row { display: flex; justify-content: space-between; font-size: 0.72rem; color: #94a3b8; }
+        .ui-cart .tot .grand { color: #f8fafc; font-size: 0.95rem; font-weight: 700; margin-top: 0.25rem; }
+        /* Simple bar chart */
+        .ui-chart { display: flex; align-items: flex-end; gap: 0.4rem; height: 90px; padding: 0.5rem 0.25rem 0; }
+        .ui-chart .bar { flex: 1; background: linear-gradient(180deg,#06b6d4,#2563eb); border-radius: 4px 4px 0 0; }
+        .ui-chart-x { display: flex; gap: 0.4rem; padding: 0.25rem 0.25rem 0; }
+        .ui-chart-x span { flex: 1; text-align: center; color: #64748b; font-size: 0.6rem; }
+        /* Login card */
+        .ui-login { max-width: 300px; margin: 0.5rem auto; background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; padding: 1.1rem 1.25rem; text-align: center; }
+        .ui-login .ui-logo { width: 40px; height: 40px; border-radius: 11px; background: linear-gradient(135deg,#2563eb,#06b6d4); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .ui-login h4 { color: #f1f5f9; font-size: 0.95rem; margin: 0 0 0.75rem; }
+        .ui-steps-flow { display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; margin: 1rem 0; }
+        .ui-steps-flow .stp { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; border-radius: 8px; padding: 0.35rem 0.7rem; font-size: 0.72rem; }
+        .ui-steps-flow .arw { color: #06b6d4; font-weight: 700; }
+        @media (max-width: 620px) {
+            .ui-kpis { grid-template-columns: repeat(2, 1fr); }
+            .ui-pos, .ui-panels { grid-template-columns: 1fr; }
+            .ui-prodgrid { grid-template-columns: repeat(2, 1fr); }
+            .ui-sidebar { display: none; }
+        }
         footer {
             text-align: center;
             padding: 2rem;
@@ -156,9 +310,9 @@
 <body>
 
 <header>
-    <h1>📦 Inventory + POS System</h1>
+    <h1><img src="assets/maracoder-logo.png" alt="MaraCoder" style="height:56px;width:56px;border-radius:12px;background:#fff;padding:4px;vertical-align:middle;margin-right:0.5rem;">MaraCoder Inventory+POS</h1>
     <p>User Manual</p>
-    <div class="version">Version 1.2 — August 2026 | Developed by Joven Q. Divinagracia Jr.</div>
+    <div class="version">Version 1.5 — September 2026 | Developed by Joven Q. Divinagracia Jr.</div>
 </header>
 
 <div class="container">
@@ -170,7 +324,6 @@
             <ul>
                 <li><a href="#login">1.1 Logging In</a></li>
                 <li><a href="#navigation">1.2 Navigation & Layout</a></li>
-                <li><a href="#right-panel">1.3 Quick Access Panel (Right Sidebar)</a></li>
             </ul>
         </li>
         <li><a href="#multi-store">2. Multi-Store System</a>
@@ -217,7 +370,12 @@
         </li>
         <li><a href="#users">12. User Management</a></li>
         <li><a href="#audit">13. Audit Trail</a></li>
-        <li><a href="#roles">14. Roles & Permissions</a></li>
+        <li><a href="#roles">14. Roles &amp; Permissions</a>
+            <ul>
+                <li><a href="#roles">14.1 Managing Roles</a></li>
+                <li><a href="#roles">14.2 Available Permissions</a></li>
+            </ul>
+        </li>
         <li><a href="#faq">15. FAQ & Troubleshooting</a></li>
     </ul>
 </nav>
@@ -233,6 +391,23 @@
         <li>Click <strong>Sign In</strong></li>
     </ol>
 
+    <div class="ui-mock">
+        <div class="ui-titlebar">
+            <span class="ui-dot r"></span><span class="ui-dot y"></span><span class="ui-dot g"></span>
+            <span>Sign In</span>
+            <span class="ui-caption">UI preview — Login screen</span>
+        </div>
+        <div class="ui-body" style="background:#020617;">
+            <div class="ui-login">
+                <div class="ui-logo">MC</div>
+                <h4>MaraCoder</h4>
+                <div class="ui-field" style="text-align:left;"><label>Username</label><div class="ui-input">admin</div></div>
+                <div class="ui-field" style="text-align:left;"><label>Password</label><div class="ui-input">••••••••</div></div>
+                <div class="ui-btn primary" style="display:block;margin-top:0.5rem;">Sign In</div>
+            </div>
+        </div>
+    </div>
+
     <div class="info">Your administrator will provide your login credentials. Change your password after first login.</div>
 
     <h3>Default Accounts</h3>
@@ -242,12 +417,49 @@
     </table>
 
     <h3 id="navigation">1.2 Navigation & Layout</h3>
-    <p>The system uses a <strong>three-panel layout</strong>:</p>
+    <p>The interface offers both a <strong>light</strong> and a <strong>dark</strong> mode, toggled via the <strong>sun/moon button</strong> in the top header. The app remembers your preference across sessions (dark is the default). Both themes use the brand's <strong>blue-to-teal</strong> accent (matching the MaraCoder logo) on buttons, active menu items, and highlights, designed for comfortable extended use. The UI previews shown throughout this manual reflect the dark appearance.</p>
+
+    <div class="tip">The menu behaves like a full web application: every menu item is <strong>clickable</strong> and navigates instantly (no page reload). Clicking the <strong>MaraCoder logo/name</strong> in the top bar returns you to your home page (Dashboard or POS). Menu groups (e.g. Inventory, Sales) expand to reveal their pages, and the group containing your current page <strong>auto-expands</strong> so you always see where you are.</p>
+    <p>The system uses a <strong>two-panel layout</strong>:</p>
+
+    <div class="ui-mock">
+        <div class="ui-titlebar">
+            <span class="ui-dot r"></span><span class="ui-dot y"></span><span class="ui-dot g"></span>
+            <span>MaraCoder</span>
+            <span class="ui-caption">UI preview — Full layout: sidebar, top bar, content</span>
+        </div>
+        <div class="ui-body" style="padding:0;">
+            <div class="ui-shell">
+                <div class="ui-sidebar">
+                    <div class="ui-brand"><span class="ui-logo">MC</span> MaraCoder</div>
+                    <div class="ui-navlink active"><span class="ic">📊</span> Dashboard</div>
+                    <div class="ui-navlink"><span class="ic">🛒</span> POS Terminal</div>
+                    <div class="ui-navlink"><span class="ic">📦</span> Inventory</div>
+                    <div class="ui-navlink"><span class="ic">🧾</span> Sales</div>
+                    <div class="ui-navlink"><span class="ic">👥</span> Contacts</div>
+                    <div class="ui-navlink"><span class="ic">📈</span> Reports</div>
+                    <div class="ui-navlink"><span class="ic">⚙</span> Administration</div>
+                </div>
+                <div class="ui-shell-main">
+                    <div class="ui-topbar">
+                        <strong style="color:#f1f5f9;font-size:0.8rem;">Dashboard</strong>
+                        <span class="ui-search">🔍 Search products, orders, SKUs...</span>
+                        <div style="display:flex;align-items:center;gap:0.6rem;">
+                            <span class="ui-clock">02:14:07 PM<small>Wed, Sep 30, 2026</small></span>
+                            <span class="ui-userchip"><span class="ui-avatar">SA</span><span style="color:#e2e8f0;font-size:0.72rem;">System Administrator <span style="color:#64748b;">· ADMIN</span></span></span>
+                        </div>
+                    </div>
+                    <div class="ui-shell-content">
+                        <span style="color:#64748b;font-size:0.75rem;">Main content area — the dashboard, forms, and tables render here based on the selected menu.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <table>
         <tr><th>Panel</th><th>Position</th><th>Purpose</th></tr>
         <tr><td><strong>Left Sidebar</strong></td><td>Left (fixed, 250px)</td><td>Main navigation menu with collapsible groups + recent transactions</td></tr>
         <tr><td><strong>Main Content</strong></td><td>Center</td><td>Active page (forms, tables, dashboard)</td></tr>
-        <tr><td><strong>Quick Access Panel</strong></td><td>Right (slide-in)</td><td>Quick links to Transactions, Reports, Settings, Administration</td></tr>
     </table>
 
     <h4>Left Sidebar Menu</h4>
@@ -263,30 +475,6 @@
     <p>At the bottom of the left sidebar, you'll see <strong>Recent Transactions</strong> — the last 8 stock transactions with their status and relative time (e.g., "5m ago").</p>
 
     <div class="tip">Click the hamburger icon (☰) in the top-left to collapse the left sidebar on smaller screens.</div>
-
-    <h3 id="right-panel">1.3 Quick Access Panel (Right Sidebar)</h3>
-    <p>The <strong>Quick Access Panel</strong> is a slide-in panel on the right side of the screen. Click the tab on the right edge to open it.</p>
-
-    <p>It contains expandable sections:</p>
-    <table>
-        <tr><th>Section</th><th>Contains</th></tr>
-        <tr><td><strong>Transactions</strong></td><td>All Transactions, Stock In, Stock Out, Stock Adjustment, Stock Overview, Sales History, Shifts</td></tr>
-        <tr><td><strong>Reports</strong></td><td>Grouped by: Inventory (Stock Level, Movement, Low Stock, Valuation), Financial (Sales Summary, Gross Profit, VAT Summary), POS (Z-Reading, X-Reading, Cashier Sales)</td></tr>
-        <tr><td><strong>Inventory</strong></td><td>Items, Categories, Suppliers, Customers</td></tr>
-        <tr><td><strong>Settings</strong></td><td>Company Info, Tax Settings, Document Numbering, POS Settings, Discount Settings, <strong>Access Rights</strong></td></tr>
-        <tr><td><strong>Administration</strong></td><td>Stores, Users, Add-ons, Audit Trail</td></tr>
-    </table>
-
-    <p><strong>How it works:</strong></p>
-    <ol>
-        <li>Click the arrow tab on the right edge of the screen</li>
-        <li>The panel slides open</li>
-        <li>Click a section heading (e.g., "Transactions") to expand it</li>
-        <li>Click a sub-item to navigate directly to that page</li>
-        <li>Only one section is expanded at a time (accordion behavior)</li>
-    </ol>
-
-    <div class="info">The Quick Access Panel is permission-filtered — you only see sections your role has access to.</div>
 </section>
 
 <!-- 2. Multi-Store System -->
@@ -325,6 +513,25 @@
 
     <h4>Switching stores</h4>
     <p>The current store is shown in the <strong>top navbar</strong> alongside a <strong>Store Selector</strong> dropdown:</p>
+
+    <div class="ui-mock">
+        <div class="ui-titlebar">
+            <span class="ui-dot r"></span><span class="ui-dot y"></span><span class="ui-dot g"></span>
+            <span>Store Selector</span>
+            <span class="ui-caption">UI preview — Navbar store dropdown</span>
+        </div>
+        <div class="ui-body">
+            <div style="max-width:260px;">
+                <div style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:0.4rem 0.6rem;color:#e2e8f0;font-size:0.75rem;display:flex;align-items:center;gap:0.4rem;">🏪 Main Store <span style="margin-left:auto;color:#64748b;">▾</span></div>
+                <div style="background:#1e293b;border:1px solid #334155;border-radius:8px;margin-top:0.35rem;overflow:hidden;">
+                    <div style="padding:0.3rem 0.6rem;color:#64748b;font-size:0.62rem;text-transform:uppercase;">Switch Store</div>
+                    <div style="padding:0.4rem 0.6rem;background:rgba(99,102,241,0.15);color:#f1f5f9;font-size:0.74rem;display:flex;align-items:center;gap:0.4rem;">🏪 Main Store <span style="color:#64748b;">(MAIN)</span><span style="margin-left:auto;color:#818cf8;">✓</span></div>
+                    <div style="padding:0.4rem 0.6rem;color:#cbd5e1;font-size:0.74rem;display:flex;align-items:center;gap:0.4rem;">🏪 Branch 2 <span style="color:#64748b;">(BR2)</span></div>
+                    <div style="padding:0.4rem 0.6rem;color:#cbd5e1;font-size:0.74rem;display:flex;align-items:center;gap:0.4rem;">🏪 Warehouse <span style="color:#64748b;">(WH1)</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
     <ol>
         <li>Click the Store Selector dropdown in the navbar</li>
         <li>Choose a different store from the list</li>
@@ -348,7 +555,7 @@
     </ul>
 
     <h3 id="store-management">2.5 Store Management (Admins)</h3>
-    <p>Administrators manage stores under <strong>Administration → Stores</strong> (accessible via the left sidebar or the Quick Access panel).</p>
+    <p>Administrators manage stores under <strong>Administration → Stores</strong> (accessible via the left sidebar).</p>
 
     <h4>Create a Store</h4>
     <ol>
@@ -371,13 +578,59 @@
         <li>Deactivate a store to remove it from active use without deleting its records</li>
     </ul>
 
-    <div class="info">Stores are also reachable from the Quick Access panel under Administration → Stores.</div>
+    <div class="info">Stores are reachable from the left sidebar under Administration → Stores.</div>
 </section>
 
 <!-- 3. Dashboard -->
 <section id="dashboard">
     <h2>3. Dashboard</h2>
     <p>The dashboard displays key business metrics at a glance:</p>
+
+    <div class="ui-mock">
+        <div class="ui-titlebar">
+            <span class="ui-dot r"></span><span class="ui-dot y"></span><span class="ui-dot g"></span>
+            <span>Dashboard</span>
+            <span class="ui-caption">UI preview — Dashboard</span>
+        </div>
+        <div class="ui-body">
+            <div class="ui-kpis">
+                <div class="ui-kpi"><span class="chip indigo">📦</span><div class="lbl">Total Items</div><div class="val">1,248</div></div>
+                <div class="ui-kpi"><span class="chip emerald">💰</span><div class="lbl">Stock Value</div><div class="val">₱ 842,500</div><div class="trend up">▲ +4.2% vs last week</div></div>
+                <div class="ui-kpi"><span class="chip amber">⚠</span><div class="lbl">Low Stock</div><div class="val">7</div><div class="trend warn">Needs attention</div></div>
+                <div class="ui-kpi"><span class="chip teal">🛒</span><div class="lbl">Today's Sales</div><div class="val">₱ 18,430</div><div class="trend up">▲ +12.5% vs yesterday</div></div>
+            </div>
+            <div class="ui-panels">
+                <div class="ui-panel">
+                    <div class="ui-panel-head">Recent Transactions <span class="ui-btn secondary sm">View All →</span></div>
+                    <div class="ui-panel-body">
+                        <table class="ui-table">
+                            <tr><th>Date</th><th>Item</th><th>Type</th><th>Qty</th><th>Status</th></tr>
+                            <tr><td>Sep 30</td><td>Wireless Mouse</td><td>IN</td><td>50</td><td><span class="ui-badge green">APPROVED</span></td></tr>
+                            <tr><td>Sep 30</td><td>USB-C Cable 1m</td><td>OUT</td><td>12</td><td><span class="ui-badge green">APPROVED</span></td></tr>
+                            <tr><td>Sep 29</td><td>Mechanical Keyboard</td><td>IN</td><td>20</td><td><span class="ui-badge gray">PENDING</span></td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="ui-panel">
+                    <div class="ui-panel-head">Low Stock Alerts</div>
+                    <div class="ui-panel-body">
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;">
+                            <div><div style="color:#f1f5f9;font-size:0.75rem;">Mechanical Keyboard</div><div style="color:#64748b;font-size:0.65rem;">Reorder: 10</div></div>
+                            <span style="background:rgba(239,68,68,0.15);color:#fca5a5;border-radius:6px;padding:0 0.45rem;font-size:0.72rem;font-weight:600;">8</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;border-top:1px solid #1e293b;">
+                            <div><div style="color:#f1f5f9;font-size:0.75rem;">Laptop Stand</div><div style="color:#64748b;font-size:0.65rem;">Reorder: 5</div></div>
+                            <span style="background:rgba(239,68,68,0.15);color:#fca5a5;border-radius:6px;padding:0 0.45rem;font-size:0.72rem;font-weight:600;">0</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;border-top:1px solid #1e293b;">
+                            <div><div style="color:#f1f5f9;font-size:0.75rem;">HDMI Adapter</div><div style="color:#64748b;font-size:0.65rem;">Reorder: 15</div></div>
+                            <span style="background:rgba(239,68,68,0.15);color:#fca5a5;border-radius:6px;padding:0 0.45rem;font-size:0.72rem;font-weight:600;">4</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <table>
         <tr><th>Metric</th><th>Description</th><th>Color Indicator</th></tr>
@@ -402,7 +655,7 @@
 
     <h3>Create a Category</h3>
     <ol>
-        <li>Go to <strong>Inventory → Categories</strong> (left sidebar) or <strong>Quick Access → Inventory → Categories</strong></li>
+        <li>Go to <strong>Inventory → Categories</strong> (left sidebar)</li>
         <li>Click <strong>New Category</strong></li>
         <li>Enter the category <strong>Name</strong> (required) and optional <strong>Description</strong></li>
         <li>Click <strong>Create</strong></li>
@@ -422,6 +675,24 @@
     <h2>5. Items</h2>
     <p>Items are the products you buy, sell, and track in inventory.</p>
 
+    <div class="ui-mock">
+        <div class="ui-titlebar">
+            <span class="ui-dot r"></span><span class="ui-dot y"></span><span class="ui-dot g"></span>
+            <span>Items</span>
+            <span class="ui-caption">UI preview — Inventory → Items</span>
+        </div>
+        <div class="ui-body">
+            <div class="ui-pageheader"><div><h5>Items</h5><small>Manage your product catalog</small></div><span class="ui-btn primary">+ New Item</span></div>
+            <table class="ui-table">
+                <tr><th>SKU</th><th>Name</th><th>Category</th><th>Cost</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr>
+                <tr><td>SKU-1001</td><td>Wireless Mouse</td><td>Peripherals</td><td>₱ 250.00</td><td>₱ 399.00</td><td>42</td><td><span class="ui-badge green">ACTIVE</span></td><td><span class="ui-btn secondary sm">✎</span></td></tr>
+                <tr><td>SKU-1002</td><td>Mechanical Keyboard</td><td>Peripherals</td><td>₱ 950.00</td><td>₱ 1,499.00</td><td>8 <span style="color:#fbbf24;font-size:0.62rem;">low</span></td><td><span class="ui-badge green">ACTIVE</span></td><td><span class="ui-btn secondary sm">✎</span></td></tr>
+                <tr><td>SKU-1003</td><td>USB-C Cable 1m</td><td>Accessories</td><td>₱ 60.00</td><td>₱ 120.00</td><td>150</td><td><span class="ui-badge green">ACTIVE</span></td><td><span class="ui-btn secondary sm">✎</span></td></tr>
+                <tr><td>SKU-1004</td><td>Laptop Stand</td><td>Accessories</td><td>₱ 480.00</td><td>₱ 799.00</td><td><span style="color:#fca5a5;">0</span></td><td><span class="ui-badge gray">INACTIVE</span></td><td><span class="ui-btn secondary sm">✎</span></td></tr>
+            </table>
+        </div>
+    </div>
+
     <h3>Create an Item</h3>
     <ol>
         <li>Go to <strong>Inventory → Items</strong></li>
@@ -440,6 +711,8 @@
         <tr><td>Taxable</td><td>No</td><td>Subject to VAT (if tax enabled)</td></tr>
     </table>
 
+    <div class="info">When you create an item, an initial stock record (quantity 0) is created for every store; use Stock In to add quantities per store.</div>
+
     <h3>Filtering & Search</h3>
     <p>Use the search bar to find items by name or code. Use the category dropdown filter to show items in a specific category.</p>
 </section>
@@ -451,7 +724,7 @@
 
     <h3>Create a Customer</h3>
     <ol>
-        <li>Go to <strong>Contacts → Customers</strong> or <strong>Quick Access → Inventory → Customers</strong></li>
+        <li>Go to <strong>Contacts → Customers</strong> (left sidebar)</li>
         <li>Click <strong>New Customer</strong></li>
         <li>Fill in: Name (required), TIN, Address, Contact Person, Contact Number, Email</li>
         <li>Click <strong>Create</strong></li>
@@ -467,7 +740,7 @@
 
     <h3>Create a Supplier</h3>
     <ol>
-        <li>Go to <strong>Contacts → Suppliers</strong> or <strong>Quick Access → Inventory → Suppliers</strong></li>
+        <li>Go to <strong>Contacts → Suppliers</strong> (left sidebar)</li>
         <li>Click <strong>New Supplier</strong></li>
         <li>Fill in: Name (required), TIN, Address, Contact Person, Contact Number, Email</li>
         <li>Click <strong>Create</strong></li>
@@ -479,7 +752,7 @@
     <h2>8. Stock Operations</h2>
 
     <h3>Stock Overview</h3>
-    <p>Go to <strong>Inventory → Stock Overview</strong> or <strong>Quick Access → Transactions → Stock Overview</strong> to see current stock levels.</p>
+    <p>Go to <strong>Inventory → Stock Overview</strong> (left sidebar) to see current stock levels.</p>
     <p>Stock status indicators:</p>
     <ul>
         <li><span class="badge badge-success">NORMAL</span> — Quantity above reorder level</li>
@@ -498,7 +771,7 @@
         <span class="workflow-step">Stock Updated ✓</span>
     </div>
     <ol>
-        <li>Go to <strong>Inventory → Stock In</strong> or <strong>Quick Access → Transactions → Stock In</strong></li>
+        <li>Go to <strong>Inventory → Stock In</strong> (left sidebar)</li>
         <li>Select the <strong>Item</strong> (current stock shown)</li>
         <li>Enter <strong>Quantity</strong> and <strong>Unit Cost</strong></li>
         <li>Optionally select a <strong>Supplier</strong></li>
@@ -512,7 +785,7 @@
 
     <h3 id="stock-out">8.2 Stock Out (Releasing Goods)</h3>
     <ol>
-        <li>Go to <strong>Inventory → Stock Out</strong> or <strong>Quick Access → Transactions → Stock Out</strong></li>
+        <li>Go to <strong>Inventory → Stock Out</strong> (left sidebar)</li>
         <li>Select the <strong>Item</strong> (validates sufficient stock)</li>
         <li>Enter <strong>Quantity</strong> and <strong>Unit Price</strong></li>
         <li>Optionally select a <strong>Customer</strong></li>
@@ -543,7 +816,7 @@
 
     <p>To approve or cancel:</p>
     <ol>
-        <li>Go to <strong>Inventory → Transactions</strong> or <strong>Quick Access → Transactions → All Transactions</strong></li>
+        <li>Go to <strong>Inventory → Transactions</strong> (left sidebar)</li>
         <li>Filter by <strong>Status: CREATED</strong></li>
         <li>Click <strong>Approve</strong> or <strong>Cancel</strong> on the transaction</li>
     </ol>
@@ -556,12 +829,54 @@
     <h2>9. POS Terminal</h2>
     <p>The Point of Sale terminal is a full-screen cashier interface for processing sales. It has a professional layout with product search on the left and the cart on the right.</p>
 
+    <div class="ui-mock">
+        <div class="ui-titlebar">
+            <span class="ui-dot r"></span><span class="ui-dot y"></span><span class="ui-dot g"></span>
+            <span>POS Terminal</span>
+            <span class="ui-caption">UI preview — POS sale in progress</span>
+        </div>
+        <div class="ui-body">
+            <div class="ui-pos">
+                <div class="ui-prodgrid">
+                    <div class="ui-prod"><div class="ph">🖱️</div><div class="nm">Wireless Mouse</div><div class="pr">₱ 399.00</div></div>
+                    <div class="ui-prod"><div class="ph">⌨️</div><div class="nm">Mech. Keyboard</div><div class="pr">₱ 1,499.00</div></div>
+                    <div class="ui-prod"><div class="ph">🔌</div><div class="nm">USB-C Cable</div><div class="pr">₱ 120.00</div></div>
+                    <div class="ui-prod"><div class="ph">💻</div><div class="nm">Laptop Stand</div><div class="pr">₱ 799.00</div></div>
+                    <div class="ui-prod"><div class="ph">🔋</div><div class="nm">Power Bank</div><div class="pr">₱ 899.00</div></div>
+                    <div class="ui-prod"><div class="ph">🎧</div><div class="nm">Headset</div><div class="pr">₱ 1,250.00</div></div>
+                </div>
+                <div class="ui-cart">
+                    <div class="ci"><span>Wireless Mouse <span class="q">x2</span></span><span>₱ 798.00</span></div>
+                    <div class="ci"><span>USB-C Cable <span class="q">x1</span></span><span>₱ 120.00</span></div>
+                    <div class="ci"><span>Power Bank <span class="q">x1</span></span><span>₱ 899.00</span></div>
+                    <div class="tot">
+                        <div class="row"><span>Subtotal</span><span>₱ 1,817.00</span></div>
+                        <div class="row"><span>VAT (12%)</span><span>₱ 194.68</span></div>
+                        <div class="row"><span>Discount</span><span>₱ 0.00</span></div>
+                        <div class="row grand"><span>TOTAL</span><span>₱ 1,817.00</span></div>
+                        <div class="ui-btn primary" style="display:block;margin-top:0.5rem;">Charge ₱ 1,817.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>The Sale Flow</h4>
+    <div class="ui-steps-flow">
+        <span class="stp">Open Shift</span><span class="arw">→</span>
+        <span class="stp">Add Items to Cart</span><span class="arw">→</span>
+        <span class="stp">Apply Discount</span><span class="arw">→</span>
+        <span class="stp">Charge / Payment</span><span class="arw">→</span>
+        <span class="stp">Print Receipt</span><span class="arw">→</span>
+        <span class="stp">Close Shift</span>
+    </div>
+
     <h3 id="pos-shift">9.1 Shift Management</h3>
     <p>Before making sales, you must open a shift:</p>
 
     <h4>Opening a Shift</h4>
     <ol>
-        <li>Navigate to <strong>POS Terminal</strong> (left sidebar or Quick Access → Transactions → Sales History)</li>
+        <li>Navigate to <strong>POS Terminal</strong> (left sidebar)</li>
         <li>If no shift is open, you'll be prompted to open one</li>
         <li>Enter the <strong>Opening Amount</strong> (cash in drawer)</li>
         <li>Click <strong>Open Shift</strong></li>
@@ -650,7 +965,37 @@
 <!-- 10. Reports -->
 <section id="reports">
     <h2>10. Reports</h2>
-    <p>The system generates PDF reports organized in three categories. Access via <strong>Reports</strong> in the left sidebar or expand <strong>Reports</strong> in the Quick Access panel for direct links.</p>
+    <p>The system generates PDF reports organized in three categories. Access via <strong>Reports</strong> in the left sidebar.</p>
+
+    <div class="ui-mock">
+        <div class="ui-titlebar">
+            <span class="ui-dot r"></span><span class="ui-dot y"></span><span class="ui-dot g"></span>
+            <span>Reports</span>
+            <span class="ui-caption">UI preview — Sales report</span>
+        </div>
+        <div class="ui-body">
+            <div class="ui-pageheader"><div><h5>Sales Summary</h5><small>Last 7 days</small></div><span class="ui-btn primary">⬇ Export PDF</span></div>
+            <div style="display:flex;gap:0.6rem;margin-bottom:0.7rem;">
+                <div class="ui-field" style="flex:1;margin-bottom:0;"><label>Report Type</label><div class="ui-select">Sales Summary ▾</div></div>
+                <div class="ui-field" style="flex:1;margin-bottom:0;"><label>Date Range</label><div class="ui-select">Last 7 days ▾</div></div>
+            </div>
+            <div class="ui-panel">
+                <div class="ui-panel-head">Daily Sales (₱)</div>
+                <div class="ui-panel-body">
+                    <div class="ui-chart">
+                        <div class="bar" style="height:40px;"></div>
+                        <div class="bar" style="height:65px;"></div>
+                        <div class="bar" style="height:50px;"></div>
+                        <div class="bar" style="height:80px;"></div>
+                        <div class="bar" style="height:72px;"></div>
+                        <div class="bar" style="height:90px;"></div>
+                        <div class="bar" style="height:60px;"></div>
+                    </div>
+                    <div class="ui-chart-x"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <h3>Inventory Reports</h3>
     <table>
@@ -688,7 +1033,7 @@
 
     <h3>Generating a Report</h3>
     <ol>
-        <li>Go to <strong>Reports</strong> (left sidebar) or click a specific report in <strong>Quick Access → Reports</strong></li>
+        <li>Go to <strong>Reports</strong> (left sidebar) and select a specific report</li>
         <li>Select the report you want</li>
         <li>Set the <strong>Date Range</strong> and any filters</li>
         <li>Click <strong>Generate</strong></li>
@@ -699,7 +1044,7 @@
 <!-- 11. Settings -->
 <section id="settings">
     <h2>11. Settings</h2>
-    <p>Configure system behavior from <strong>Administration → Settings</strong> or via <strong>Quick Access → Settings</strong> (which links directly to each sub-section).</p>
+    <p>Configure system behavior from <strong>Administration → Settings</strong> (left sidebar), which links to each sub-section.</p>
 
     <p>Settings is organized into 6 tabs:</p>
 
@@ -747,24 +1092,15 @@
     </ul>
 
     <h3 id="settings-access">11.6 User Access Rights</h3>
-    <p>This tab allows you to configure <strong>default permission presets</strong> for each role. It shows a matrix table:</p>
+    <p>Permissions are now managed through <strong>dynamic roles</strong> rather than a fixed preset matrix. Each role carries its own set of permissions, and users inherit permissions from their assigned role.</p>
 
-    <table>
-        <tr><th>Columns</th><th>Description</th></tr>
-        <tr><td>Rows</td><td>25 individual permissions grouped by category (Dashboard, Inventory, POS, Contacts, Administration)</td></tr>
-        <tr><td>Columns</td><td>5 roles: Admin, Manager, Cashier, Inventory Clerk, Viewer</td></tr>
-    </table>
+    <div class="info">To create or edit roles and their permissions, go to <strong>Administration → Roles</strong>. See <a href="#roles">Section 14 — Roles &amp; Permissions</a> for step-by-step instructions.</div>
 
-    <p><strong>How to use:</strong></p>
+    <p>To change what a user can do:</p>
     <ol>
-        <li>Navigate to <strong>Settings → User Access Rights</strong> tab (or <strong>Quick Access → Settings → Access Rights</strong>)</li>
-        <li>Check/uncheck permissions for each role</li>
-        <li>Use <strong>Select All</strong> buttons to grant all permissions to a role</li>
-        <li>Use <strong>Clear All</strong> to reset</li>
-        <li>Click <strong>Save Settings</strong></li>
+        <li>Assign the user a different <strong>role</strong> in <a href="#users">User Management</a>, or</li>
+        <li>Edit the <strong>role itself</strong> to add or remove permissions (applies to every user with that role on their next login).</li>
     </ol>
-
-    <div class="info">Changes here set the <strong>default</strong> permissions for newly created users. To change an existing user's permissions, edit them in User Management.</div>
 
     <h4>Permission Groups</h4>
     <table>
@@ -773,27 +1109,82 @@
         <tr><td>Inventory</td><td>View/Manage Items, Categories, Stock Levels, Stock In/Out/Adjust, View/Approve/Cancel Transactions</td></tr>
         <tr><td>Point of Sale</td><td>Use POS, Void Sales, Manage Shifts, Reprint Receipts</td></tr>
         <tr><td>Contacts</td><td>View/Manage Customers, View/Manage Suppliers</td></tr>
-        <tr><td>Administration</td><td>View Reports, View Audit Trail, Manage Users, Manage Settings, Manage Add-ons</td></tr>
+        <tr><td>Administration</td><td>View Reports, View Audit Trail, Manage Users (includes managing roles), Manage Settings, Manage Add-ons</td></tr>
     </table>
 </section>
 
 <!-- 12. User Management -->
 <section id="users">
     <h2>12. User Management</h2>
-    <p>Manage user accounts from <strong>Administration → Users</strong> or <strong>Quick Access → Administration → Users</strong>.</p>
+    <p>Manage user accounts from <strong>Administration → Users</strong> (left sidebar). This area requires the <strong>Manage Users</strong> permission.</p>
 
-    <h3>Create a User</h3>
-    <ol>
-        <li>Click <strong>New User</strong></li>
-        <li>Fill in: Username, Password, Full Name, Email</li>
-        <li>Select <strong>Role</strong></li>
-        <li>Check the desired <strong>Permissions</strong> (checkboxes)</li>
-        <li>Use the <strong>Store Access</strong> multi-select to assign which stores the user can access</li>
-        <li>Click <strong>Create</strong></li>
+    <h3>The User List</h3>
+    <p>The Users screen lists all accounts with their assigned role and status. Click <strong>New User</strong> to add one, or the edit icon on a row to modify it.</p>
+
+    <div class="ui-mock">
+        <div class="ui-titlebar">
+            <span class="ui-dot r"></span><span class="ui-dot y"></span><span class="ui-dot g"></span>
+            <span>Users</span>
+            <span class="ui-caption">UI preview — Administration → Users</span>
+        </div>
+        <div class="ui-body">
+            <div class="ui-pageheader">
+                <div><h5>Users</h5><small>Manage system user accounts</small></div>
+                <span class="ui-btn primary">+ New User</span>
+            </div>
+            <table class="ui-table">
+                <tr><th>Username</th><th>Full Name</th><th>Role</th><th>Status</th><th>Actions</th></tr>
+                <tr><td>admin</td><td>System Administrator</td><td>ADMIN</td><td><span class="ui-badge green">ACTIVE</span></td><td><span class="ui-btn secondary sm">✎</span></td></tr>
+                <tr><td>jdelacruz</td><td>Juan Dela Cruz</td><td>Cashier</td><td><span class="ui-badge green">ACTIVE</span></td><td><span class="ui-btn secondary sm">✎</span></td></tr>
+                <tr><td>msantos</td><td>Maria Santos</td><td>Store Manager</td><td><span class="ui-badge gray">INACTIVE</span></td><td><span class="ui-btn secondary sm">✎</span></td></tr>
+            </table>
+        </div>
+    </div>
+
+    <h3>Create a User — Step by Step</h3>
+    <ol class="steps">
+        <li>Go to <strong>Administration → Users</strong> and click <strong>New User</strong>.</li>
+        <li>Enter the <strong>Username</strong>, <strong>Password</strong>, <strong>Full Name</strong>, and (optionally) <strong>Email</strong>.</li>
+        <li>Choose a <strong>Role</strong> from the dropdown. The role determines <em>all</em> of the user's permissions — you no longer set permissions per user.</li>
+        <li>Under <strong>Store Access</strong>, tick the store(s) this user may work in. At least one store is required for non-admin users.</li>
+        <li>Click <strong>Create</strong>. The user can now log in with the assigned role's permissions.</li>
     </ol>
 
+    <div class="ui-mock">
+        <div class="ui-titlebar">
+            <span class="ui-dot r"></span><span class="ui-dot y"></span><span class="ui-dot g"></span>
+            <span>New User</span>
+            <span class="ui-caption">UI preview — Users → New User</span>
+        </div>
+        <div class="ui-body">
+            <div class="ui-pageheader"><div><h5>New User</h5></div></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
+                <div class="ui-field"><label>Username *</label><div class="ui-input">jdelacruz</div></div>
+                <div class="ui-field"><label>Password *</label><div class="ui-input">••••••••</div></div>
+                <div class="ui-field"><label>Full Name *</label><div class="ui-input">Juan Dela Cruz</div></div>
+                <div class="ui-field"><label>Email</label><div class="ui-input">juan@store.ph</div></div>
+            </div>
+            <div class="ui-field">
+                <label>Role *</label>
+                <div class="ui-select">Cashier ▾</div>
+                <div class="ui-hint">The role determines this user's permissions.</div>
+            </div>
+            <div class="ui-field">
+                <label>Store Access</label>
+                <div class="ui-permgrid">
+                    <span class="ui-check"><input type="checkbox" checked disabled> Main Store (MAIN)</span>
+                    <span class="ui-check"><input type="checkbox" disabled> Branch 2 (BR2)</span>
+                    <span class="ui-check"><input type="checkbox" disabled> Warehouse (WH1)</span>
+                </div>
+            </div>
+            <span class="ui-btn primary">Create</span>
+            <span class="ui-btn secondary">Cancel</span>
+        </div>
+    </div>
+
+    <div class="info">Permissions come entirely from the selected <strong>Role</strong>. The old per-user permission checkboxes have been removed — to change what a user can do, either change their role or edit the role itself (see Section 14).</div>
+
     <h3>Store Access</h3>
-    <p>The User form includes a <strong>Store Access</strong> multi-select that controls which stores a user can work in:</p>
     <ul>
         <li><strong>At least one store</strong> must be assigned to non-admin users.</li>
         <li>Users only see the menu items and data for their <strong>assigned stores</strong>.</li>
@@ -801,18 +1192,6 @@
     </ul>
 
     <div class="info">Assigning stores here determines which stores appear in the user's Store Selector after login. A user assigned to a single store is taken straight into it; a user assigned to multiple stores chooses at the Store Selection screen.</div>
-
-    <h3>Role Presets</h3>
-    <table>
-        <tr><th>Role</th><th>Description</th></tr>
-        <tr><td>ADMIN</td><td>Full access to all features</td></tr>
-        <tr><td>MANAGER</td><td>All except user management and settings</td></tr>
-        <tr><td>CASHIER</td><td>POS terminal, view items and stock</td></tr>
-        <tr><td>INVENTORY CLERK</td><td>Stock operations, items, suppliers</td></tr>
-        <tr><td>VIEWER</td><td>View-only access to all modules</td></tr>
-    </table>
-
-    <div class="info">Permissions can be customized per user regardless of role preset. The role sets defaults, but you can check/uncheck individual permissions.</div>
 
     <h3>Other Actions</h3>
     <ul>
@@ -824,7 +1203,7 @@
 <!-- 13. Audit Trail -->
 <section id="audit">
     <h2>13. Audit Trail</h2>
-    <p>Every change in the system is automatically recorded. Access from <strong>Administration → Audit Trail</strong> or <strong>Quick Access → Administration → Audit Trail</strong>.</p>
+    <p>Every change in the system is automatically recorded. Access from <strong>Administration → Audit Trail</strong> (left sidebar).</p>
 
     <p>Each audit record shows:</p>
     <table>
@@ -842,7 +1221,90 @@
 <!-- 14. Roles & Permissions -->
 <section id="roles">
     <h2>14. Roles & Permissions</h2>
-    <p>The system uses a bitwise permission system with 25 individual permissions:</p>
+    <p>Roles are <strong>managed at runtime</strong> from <strong>Administration → Roles</strong> (left sidebar). Each role holds a set of permissions, and every user is assigned exactly one role. A user's effective permissions come entirely from their role — there are no per-user overrides. This area requires the <strong>Manage Users</strong> permission.</p>
+
+    <div class="info">Changes to a role's permissions take effect the <strong>next time the affected user logs in</strong> (or their session token is refreshed), because permissions are carried in the login token.</div>
+
+    <h3>The Roles List</h3>
+    <div class="ui-mock">
+        <div class="ui-titlebar">
+            <span class="ui-dot r"></span><span class="ui-dot y"></span><span class="ui-dot g"></span>
+            <span>Roles</span>
+            <span class="ui-caption">UI preview — Administration → Roles</span>
+        </div>
+        <div class="ui-body">
+            <div class="ui-pageheader">
+                <div><h5>Roles</h5><small>Define roles and their permissions</small></div>
+                <span class="ui-btn primary">+ New Role</span>
+            </div>
+            <table class="ui-table">
+                <tr><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr>
+                <tr><td>ADMIN <span class="ui-badge gray">System</span></td><td>System administrator with full access</td><td><span class="ui-badge green">ACTIVE</span></td><td><span class="ui-btn secondary sm ui-disabled">✎</span> <span class="ui-btn secondary sm ui-disabled">⊘</span></td></tr>
+                <tr><td>Store Manager</td><td>Manages a store, staff, and reports</td><td><span class="ui-badge green">ACTIVE</span></td><td><span class="ui-btn secondary sm">✎</span> <span class="ui-btn secondary sm">⊘</span></td></tr>
+                <tr><td>Cashier</td><td>POS terminal and shift operations</td><td><span class="ui-badge green">ACTIVE</span></td><td><span class="ui-btn secondary sm">✎</span> <span class="ui-btn secondary sm">⊘</span></td></tr>
+            </table>
+            <div class="ui-hint">The ADMIN role is reserved — its edit and deactivate actions are disabled.</div>
+        </div>
+    </div>
+
+    <h3>Create a Role — Step by Step</h3>
+    <ol class="steps">
+        <li>Go to <strong>Administration → Roles</strong> and click <strong>New Role</strong>.</li>
+        <li>Enter a <strong>Role Name</strong> (e.g. <em>Store Manager</em>) and an optional <strong>Description</strong>.</li>
+        <li>In the <strong>Permissions</strong> matrix, tick every permission this role should grant. Permissions are grouped (Dashboard, Inventory, Point of Sale, Contacts, Administration) for easy scanning.</li>
+        <li>Click <strong>Create</strong>. The new role is active immediately and appears in the User form's Role dropdown.</li>
+    </ol>
+
+    <div class="ui-mock">
+        <div class="ui-titlebar">
+            <span class="ui-dot r"></span><span class="ui-dot y"></span><span class="ui-dot g"></span>
+            <span>New Role</span>
+            <span class="ui-caption">UI preview — Roles → New Role</span>
+        </div>
+        <div class="ui-body">
+            <div class="ui-pageheader"><div><h5>New Role</h5></div></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
+                <div class="ui-field"><label>Role Name *</label><div class="ui-input">Store Manager</div></div>
+                <div class="ui-field"><label>Description</label><div class="ui-input">Manages a store, staff, and reports</div></div>
+            </div>
+            <div class="ui-field">
+                <label>Permissions</label>
+                <div class="ui-permgrid">
+                    <span class="grp">Dashboard</span>
+                    <span class="ui-check"><input type="checkbox" checked disabled> View Dashboard</span>
+                    <span class="grp">Inventory</span>
+                    <span class="ui-check"><input type="checkbox" checked disabled> View Items</span>
+                    <span class="ui-check"><input type="checkbox" checked disabled> Manage Items</span>
+                    <span class="ui-check"><input type="checkbox" checked disabled> View Stock</span>
+                    <span class="ui-check"><input type="checkbox" checked disabled> Stock In</span>
+                    <span class="ui-check"><input type="checkbox" disabled> Stock Out</span>
+                    <span class="ui-check"><input type="checkbox" checked disabled> Approve Transactions</span>
+                    <span class="grp">Point of Sale</span>
+                    <span class="ui-check"><input type="checkbox" checked disabled> Use POS</span>
+                    <span class="ui-check"><input type="checkbox" checked disabled> Void Sales</span>
+                    <span class="ui-check"><input type="checkbox" checked disabled> Manage Shifts</span>
+                    <span class="grp">Administration</span>
+                    <span class="ui-check"><input type="checkbox" checked disabled> View Reports</span>
+                    <span class="ui-check"><input type="checkbox" disabled> Manage Users</span>
+                    <span class="ui-check"><input type="checkbox" disabled> Manage Settings</span>
+                </div>
+            </div>
+            <span class="ui-btn primary">Create</span>
+            <span class="ui-btn secondary">Cancel</span>
+        </div>
+    </div>
+
+    <h3>Edit or Deactivate a Role</h3>
+    <ol class="steps">
+        <li>On the Roles list, click the <strong>edit (✎)</strong> icon on the role's row.</li>
+        <li>Adjust the name, description, or permission ticks, then click <strong>Update</strong>.</li>
+        <li>To disable a role without deleting it, click the <strong>deactivate (⊘)</strong> icon. Inactive roles no longer appear in the User form dropdown.</li>
+    </ol>
+
+    <div class="warning">The <strong>ADMIN role (the reserved system role)</strong> cannot be edited, deactivated, or deleted. It always holds every permission. Its edit and deactivate buttons are disabled in the UI, and the server rejects any attempt to modify it.</div>
+
+    <h3>Available Permissions</h3>
+    <p>The system provides 25 individual permissions that can be combined into any role:</p>
 
     <table>
         <tr><th>Permission</th><th>Description</th></tr>
@@ -861,21 +1323,18 @@
         <tr><td>MANAGE_SHIFTS</td><td>Open/close cashier shifts</td></tr>
         <tr><td>VIEW_REPORTS</td><td>Generate and view reports</td></tr>
         <tr><td>VIEW_AUDIT_TRAIL</td><td>View the audit trail</td></tr>
-        <tr><td>MANAGE_USERS</td><td>Create/edit user accounts</td></tr>
+        <tr><td>MANAGE_USERS</td><td>Create/edit user accounts <em>and manage roles</em></td></tr>
         <tr><td>MANAGE_SETTINGS</td><td>Modify system settings</td></tr>
         <tr><td>MANAGE_ADDONS</td><td>Manage add-on configurations</td></tr>
         <tr><td>REPRINT</td><td>Reprint transactions and receipts</td></tr>
     </table>
 
-    <div class="info">Permissions are stored as a single integer using bitwise operations. Each permission is a bit position (0–24). This allows efficient storage and fast permission checking.</div>
+    <div class="info">Permissions are stored on the role as a single integer using bitwise operations. Each permission is a bit position (0–24), which allows efficient storage and fast permission checking.</div>
 </section>
 
 <!-- 15. FAQ -->
 <section id="faq">
     <h2>15. FAQ & Troubleshooting</h2>
-
-    <h3>Q: Where is the Quick Access panel?</h3>
-    <p>Look for the small arrow tab on the <strong>right edge</strong> of your screen. Click it to slide open the Quick Access panel with shortcuts to Transactions, Reports, Settings, and more.</p>
 
     <h3>Q: How do I switch between stores?</h3>
     <p>Use the <strong>Store Selector</strong> dropdown in the top navbar. Click it and choose a different store — the system reloads store-scoped data (stock, sales, shifts, numbering) for the selected store.</p>
@@ -890,13 +1349,13 @@
     <p>No. <strong>Stock is per-store</strong> — each store tracks its own quantities, sales, and shifts. However, <strong>items, categories, customers, and suppliers are shared</strong> across all stores.</p>
 
     <h3>Q: How do I configure user access rights?</h3>
-    <p>Go to <strong>Settings → User Access Rights</strong> tab (the 6th tab). Or use the Quick Access panel → Settings → Access Rights. This shows a matrix of all permissions × roles.</p>
+    <p>Go to <strong>Settings → User Access Rights</strong> tab (the 6th tab). This shows a matrix of all permissions × roles.</p>
 
     <h3>Q: Why can't I see certain menu items?</h3>
-    <p>Your user account may not have the required permissions. Both the left sidebar and the Quick Access panel are filtered by your permissions. Contact your administrator to grant access.</p>
+    <p>Your user account may not have the required permissions. The left sidebar is filtered by your permissions. Contact your administrator to grant access.</p>
 
     <h3>Q: Why is my stock not updating after a stock-in?</h3>
-    <p>Stock transactions require <strong>approval</strong>. Go to Transactions (via left sidebar or Quick Access → Transactions → All Transactions), find the CREATED transaction, and click <strong>Approve</strong>.</p>
+    <p>Stock transactions require <strong>approval</strong>. Go to Transactions (via the left sidebar under Inventory → Transactions), find the CREATED transaction, and click <strong>Approve</strong>.</p>
 
     <h3>Q: Can I edit a completed sale?</h3>
     <p>No. Completed (PAID/CLOSED) sales cannot be edited. You must <strong>Void</strong> the sale and create a new one. This maintains audit integrity.</p>
@@ -923,13 +1382,15 @@
     <p>Yes. The system is responsive and works on desktop, tablet, and mobile devices. The left sidebar collapses on mobile, and the POS terminal adapts to smaller screens.</p>
 
     <h3>Q: How do I navigate faster between sections?</h3>
-    <p>Use the <strong>Quick Access panel</strong> (right sidebar). It provides direct links to all subsections without navigating through nested menus.</p>
+    <p>Use the <strong>left sidebar</strong>. Menu groups expand to reveal their pages, and the group containing your current page auto-expands. Every menu item navigates instantly with no page reload.</p>
 </section>
 
 </div>
 
 <footer>
-    <p>Inventory + POS System v1.2 — © 2026 Joven Q. Divinagracia Jr.</p>
+    <p>MaraCoder — Built to Endure</p>
+    <p>MaraCoder Inventory+POS v1.4 — © 2026 Joven Q. Divinagracia Jr.</p>
+    <p>Developed by Joven Q. Divinagracia Jr.</p>
     <p>For technical support, contact the system administrator.</p>
 </footer>
 

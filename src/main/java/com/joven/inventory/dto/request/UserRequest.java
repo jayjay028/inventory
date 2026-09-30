@@ -1,6 +1,5 @@
 package com.joven.inventory.dto.request;
 
-import com.joven.inventory.enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -40,10 +39,7 @@ public class UserRequest {
     private String email;
 
     @NotNull(message = "Role is required")
-    private UserRole role;
-
-    @NotNull(message = "Access rights is required")
-    private Long accessRights;
+    private Long roleId;
 
     /** IDs of stores this user is granted access to. */
     private List<Long> storeIds;

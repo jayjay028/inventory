@@ -1,6 +1,5 @@
 package com.joven.inventory.context;
 
-import com.joven.inventory.enums.UserRole;
 import com.joven.inventory.repository.StoreRepository;
 import com.joven.inventory.security.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,7 +54,7 @@ class StoreContextInterceptorTest {
 
     private void authenticateAs(Long userId) {
         CustomUserDetails principal = new CustomUserDetails(
-                userId, "user" + userId, "pwd", "User " + userId, UserRole.CASHIER, 0L, true);
+                userId, "user" + userId, "pwd", "User " + userId, "CASHIER", 0L, true);
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities()));
     }

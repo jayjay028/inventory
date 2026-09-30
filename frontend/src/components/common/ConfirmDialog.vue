@@ -116,7 +116,7 @@ watch(() => props.show, (visible) => {
 }
 
 .cd-modal {
-  background: #fff;
+  background: var(--color-card-bg);
   border-radius: 12px;
   padding: 2rem;
   max-width: 400px;
@@ -157,13 +157,13 @@ watch(() => props.show, (visible) => {
 .cd-title {
   font-size: 1.0625rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-heading);
   margin: 0 0 0.5rem;
 }
 
 .cd-message {
   font-size: 0.8125rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0 0 1.5rem;
   line-height: 1.5;
 }
@@ -188,14 +188,14 @@ watch(() => props.show, (visible) => {
 }
 
 .cd-btn-cancel {
-  background: #fff;
-  color: #374151;
-  border-color: #d1d5db;
+  background: var(--color-card-bg);
+  color: var(--color-text);
+  border-color: var(--color-border);
 }
 
 .cd-btn-cancel:hover {
-  background: #f9fafb;
-  border-color: #9ca3af;
+  background: var(--color-card-hover);
+  border-color: var(--color-border-light);
 }
 
 .cd-btn-danger {

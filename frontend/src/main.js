@@ -16,4 +16,8 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 
+// Apply the persisted (or default dark) theme before mount to avoid a flash.
+import { useAppStore } from '@/stores/app'
+useAppStore().applyTheme()
+
 app.mount('#app')

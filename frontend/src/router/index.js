@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore, PERMISSIONS } from '@/stores/auth'
+import { PERMISSIONS } from '@/constants/permissions'
+import { useAuthStore } from '@/stores/auth'
 import { useStoreStore } from '@/stores/store'
 
 const routes = [
@@ -242,6 +243,26 @@ const routes = [
     name: 'StoreEdit',
     component: () => import('@/views/stores/StoreForm.vue'),
     meta: { layout: 'app', requiresAuth: true, permission: PERMISSIONS.MANAGE_SETTINGS }
+  },
+
+  // Roles management (admin)
+  {
+    path: '/roles',
+    name: 'RoleList',
+    component: () => import('@/views/roles/RoleList.vue'),
+    meta: { layout: 'app', requiresAuth: true, permission: PERMISSIONS.MANAGE_USERS }
+  },
+  {
+    path: '/roles/new',
+    name: 'RoleCreate',
+    component: () => import('@/views/roles/RoleForm.vue'),
+    meta: { layout: 'app', requiresAuth: true, permission: PERMISSIONS.MANAGE_USERS }
+  },
+  {
+    path: '/roles/:id/edit',
+    name: 'RoleEdit',
+    component: () => import('@/views/roles/RoleForm.vue'),
+    meta: { layout: 'app', requiresAuth: true, permission: PERMISSIONS.MANAGE_USERS }
   },
 
   // Catch-all 404

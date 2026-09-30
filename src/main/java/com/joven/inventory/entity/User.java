@@ -1,11 +1,8 @@
 package com.joven.inventory.entity;
 
 import com.joven.inventory.common.BaseEntity;
-import com.joven.inventory.enums.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +22,8 @@ import java.util.Set;
 
 /**
  * JPA entity representing a system user. Maps to the users table.
- * Stores authentication credentials, role, and bitwise access rights.
+ * Stores authentication credentials and a reference to the user's role,
+ * which determines the user's permissions (access rights).
  *
  * @author Joven Q. Divinagracia Jr.
  */
@@ -51,13 +50,13 @@ public class User extends BaseEntity {
     @Column(name = "email", length = 150)
     private String email;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 30)
-    private UserRole role;
-
-    /** Bitwise access rights mask for granular permission control */
-    @Column(name = "access_rights", nullable = false)
-    private Long accessRights = 0L;
+    /**
+     * The role assigned to this user. The role determines the user's
+     * effective permissions via its bitwise access rights.
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 
     @Column(name = "active", nullable = false)
     private Boolean active = true;
@@ -76,4 +75,14 @@ public class User extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "store_id")
     )
     private Set<Store> accessibleStores = new HashSet<>();
+
+    /**
+     * Convenience accessor for the user's effective access rights,
+     * derived from the assigned role.
+     *
+     * @return the role's access rights, or 0 if no role is assigned
+     */
+    public Long getAccessRights() {
+        return role != null ? role.getAccessRights() : 0L;
+    }
 }

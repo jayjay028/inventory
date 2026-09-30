@@ -19,7 +19,8 @@ public class UserResponse {
     private String username;
     private String fullName;
     private String email;
-    private String role;
+    private Long roleId;
+    private String roleName;
     private Long accessRights;
     private Boolean active;
     private LocalDateTime lastLogin;

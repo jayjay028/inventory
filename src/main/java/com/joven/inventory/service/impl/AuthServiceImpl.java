@@ -199,7 +199,7 @@ public class AuthServiceImpl implements AuthService {
                 .username(user.getUsername())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
-                .role(user.getRole().name())
+                .role(user.getRole().getName())
                 .accessRights(user.getAccessRights())
                 .stores(stores)
                 .landingPage(LandingPageResolver.resolve(user.getAccessRights()))

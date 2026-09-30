@@ -2,8 +2,8 @@
   <aside class="sidebar" :class="{ collapsed: appStore.sidebarCollapsed }">
     <!-- Brand -->
     <div class="sidebar-brand">
-      <i class="bi bi-box-seam-fill brand-icon"></i>
-      <span class="brand-text">Inventory + POS</span>
+      <img src="/maracoder-logo.png" alt="MaraCoder" class="brand-logo" />
+      <span class="brand-text">MaraCoder</span>
     </div>
 
     <!-- Navigation -->
@@ -81,6 +81,18 @@
         </li>
       </ul>
     </div>
+
+    <!-- Register / Shift widget (static, md+ only) -->
+    <div class="register-widget d-none d-md-block">
+      <div class="register-widget-header">
+        <i class="bi bi-hdd-network register-widget-icon"></i>
+        <span class="register-widget-title">Register #01</span>
+      </div>
+      <div class="register-widget-status">Shift active</div>
+      <div class="register-widget-progress">
+        <div class="register-widget-progress-fill"></div>
+      </div>
+    </div>
   </aside>
 
   <!-- Backdrop for mobile -->
@@ -92,13 +104,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
 import transactionsApi from '@/api/transactions'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
+const route = useRoute()
 
 const expandedGroups = ref({})
 const recentTransactions = ref([])
@@ -142,6 +156,7 @@ const navigation = [
     icon: 'bi-gear',
     children: [
       { label: 'Users', route: '/users', permission: 19 },
+      { label: 'Roles', route: '/roles', permission: 19 },
       { label: 'Stores', route: '/stores', permission: 20 },
       { label: 'Add-ons', route: '/addons', permission: 21 },
       { label: 'Settings', route: '/settings', permission: 20 },
@@ -169,6 +184,31 @@ const filteredNavigation = computed(() => {
 function toggleGroup(label) {
   expandedGroups.value[label] = !expandedGroups.value[label]
 }
+
+/**
+ * Auto-expand the navigation group that contains the currently active route,
+ * so the active child is always visible (real-system behavior).
+ */
+function expandActiveGroup(path) {
+  navigation.forEach((item) => {
+    if (item.children && item.children.some((c) => path.startsWith(c.route))) {
+      expandedGroups.value[item.label] = true
+    }
+  })
+}
+
+// Expand the active group on load and whenever the route changes.
+watch(
+  () => route.path,
+  (path) => {
+    expandActiveGroup(path)
+    // On small screens, collapse the sidebar after navigating (drawer behavior).
+    if (window.innerWidth < 992 && !appStore.sidebarCollapsed) {
+      appStore.toggleSidebar()
+    }
+  },
+  { immediate: true }
+)
 
 function getTransactionIcon(type) {
   if (!type) return 'bi-arrow-left-right'
@@ -236,8 +276,8 @@ onBeforeUnmount(() => {
   left: 0;
   bottom: 0;
   width: 250px;
-  background-color: #0f172a;
-  color: #94a3b8;
+  background-color: var(--color-sidebar-bg);
+  color: var(--color-sidebar-text);
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 1030;
@@ -253,7 +293,7 @@ onBeforeUnmount(() => {
 }
 
 .sidebar::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: var(--color-sidebar-bg);
 }
 
 .sidebar::-webkit-scrollbar-thumb {
@@ -277,7 +317,16 @@ onBeforeUnmount(() => {
 
 .brand-icon {
   font-size: 1.25rem;
-  color: #818cf8;
+  color: #22d3ee;
+}
+
+.brand-logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  object-fit: cover;
+  background: #fff;
+  padding: 1px;
 }
 
 .brand-text {
@@ -301,7 +350,7 @@ onBeforeUnmount(() => {
 }
 
 .sidebar-nav::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: var(--color-sidebar-bg);
 }
 
 .sidebar-nav::-webkit-scrollbar-thumb {
@@ -332,25 +381,28 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  padding: 0.5rem 1.25rem;
-  color: #94a3b8;
+  margin: 2px 10px;
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  color: var(--color-sidebar-text);
   text-decoration: none;
   font-size: 0.8125rem;
   font-weight: 400;
   border-left: 2px solid transparent;
-  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  transition: color 0.15s ease, background-color 0.15s ease;
   cursor: pointer;
 }
 
 .nav-link:hover {
   color: #e2e8f0;
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .nav-link.active {
-  color: #f8fafc;
-  border-left-color: #818cf8;
-  background-color: rgba(255, 255, 255, 0.03);
+  color: #7dd3fc;
+  font-weight: 500;
+  border-left-color: transparent;
+  background-color: rgba(37, 99, 235, 0.18);
 }
 
 .nav-icon {
@@ -363,6 +415,7 @@ onBeforeUnmount(() => {
 
 .nav-link.active .nav-icon {
   opacity: 1;
+  color: #7dd3fc;
 }
 
 .nav-label {
@@ -376,9 +429,11 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  width: 100%;
-  padding: 0.5rem 1.25rem;
-  color: #94a3b8;
+  width: calc(100% - 20px);
+  margin: 2px 10px;
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  color: var(--color-sidebar-text);
   font-size: 0.8125rem;
   font-weight: 400;
   background: none;
@@ -391,7 +446,7 @@ onBeforeUnmount(() => {
 
 .nav-group-toggle:hover {
   color: #e2e8f0;
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .chevron-icon {
@@ -413,12 +468,15 @@ onBeforeUnmount(() => {
 }
 
 .child-link {
-  padding: 0.375rem 1.25rem 0.375rem 2.75rem;
+  padding: 0.4rem 0.85rem 0.4rem 2.25rem;
   font-size: 0.8125rem;
 }
 
 .child-link.active {
-  border-left-color: #818cf8;
+  color: #7dd3fc;
+  font-weight: 500;
+  border-left-color: transparent;
+  background-color: rgba(37, 99, 235, 0.18);
 }
 
 /* Transitions */
@@ -455,7 +513,7 @@ onBeforeUnmount(() => {
 }
 
 .sidebar-transactions::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: var(--color-sidebar-bg);
 }
 
 .sidebar-transactions::-webkit-scrollbar-thumb {
@@ -470,7 +528,7 @@ onBeforeUnmount(() => {
   padding: 0.75rem 1.25rem 0.5rem;
   position: sticky;
   top: 0;
-  background-color: #0f172a;
+  background-color: var(--color-sidebar-bg);
   z-index: 1;
 }
 
@@ -479,11 +537,11 @@ onBeforeUnmount(() => {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #64748b;
+  color: var(--color-sidebar-text);
 }
 
 .transactions-link {
-  color: #64748b;
+  color: var(--color-sidebar-text);
   text-decoration: none;
   font-size: 1rem;
   line-height: 1;
@@ -491,7 +549,7 @@ onBeforeUnmount(() => {
 }
 
 .transactions-link:hover {
-  color: #94a3b8;
+  color: var(--color-sidebar-text);
 }
 
 .transactions-loading {
@@ -571,6 +629,54 @@ onBeforeUnmount(() => {
   font-size: 0.6875rem;
   color: #475569;
   text-align: center;
+}
+
+/* Register / Shift widget */
+.register-widget {
+  flex-shrink: 0;
+  margin: 0.75rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.28), #1e293b);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: 12px;
+}
+
+.register-widget-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.register-widget-icon {
+  font-size: 0.9375rem;
+  color: #22d3ee;
+}
+
+.register-widget-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #7dd3fc;
+}
+
+.register-widget-status {
+  margin-top: 0.25rem;
+  font-size: 0.6875rem;
+  color: var(--color-sidebar-text);
+}
+
+.register-widget-progress {
+  margin-top: 0.5rem;
+  height: 4px;
+  border-radius: 999px;
+  background-color: rgba(148, 163, 184, 0.2);
+  overflow: hidden;
+}
+
+.register-widget-progress-fill {
+  height: 100%;
+  width: 60%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2563eb, #06b6d4);
 }
 
 /* Backdrop */

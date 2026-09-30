@@ -62,12 +62,13 @@
           </div>
 
           <FormInput
-            v-model="form.role"
+            v-model="form.roleId"
             label="Role"
             type="select"
             required
             :options="roleOptions"
-            :error="errors.role"
+            :error="errors.roleId"
+            help-text="The role determines this user's permissions."
           />
 
           <!-- Store Access -->
@@ -94,27 +95,6 @@
             <div v-if="errors.storeIds" class="text-danger small mt-1">{{ errors.storeIds }}</div>
           </div>
 
-          <!-- Permissions -->
-          <div class="mb-3">
-            <label class="form-label fw-medium">Permissions</label>
-            <div class="row g-2">
-              <div v-for="perm in permissionList" :key="perm.bit" class="col-md-6 col-lg-4">
-                <div class="form-check">
-                  <input
-                    :id="`perm-${perm.bit}`"
-                    class="form-check-input"
-                    type="checkbox"
-                    :checked="hasPermission(perm.bit)"
-                    @change="togglePermission(perm.bit)"
-                  />
-                  <label :for="`perm-${perm.bit}`" class="form-check-label small">
-                    {{ perm.label }}
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- Active toggle -->
           <div class="form-check mb-3" v-if="isEdit">
             <input id="activeToggle" v-model="form.active" class="form-check-input" type="checkbox" />
@@ -139,10 +119,10 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import usersApi from '@/api/users'
 import storesApi from '@/api/stores'
+import rolesApi from '@/api/roles'
 import PageHeader from '@/components/common/PageHeader.vue'
 import FormInput from '@/components/common/FormInput.vue'
 import { useAppStore } from '@/stores/app'
-import { PERMISSIONS } from '@/stores/auth'
 
 const route = useRoute()
 const router = useRouter()
@@ -152,65 +132,38 @@ const isEdit = computed(() => !!route.params.id)
 const pageLoading = ref(false)
 const submitting = ref(false)
 
-const roleOptions = [
-  { value: 'ADMIN', label: 'Administrator' },
-  { value: 'MANAGER', label: 'Manager' },
-  { value: 'CASHIER', label: 'Cashier' },
-  { value: 'INVENTORY_CLERK', label: 'Inventory Clerk' },
-  { value: 'VIEWER', label: 'Viewer' }
-]
-
-const permissionList = [
-  { bit: PERMISSIONS.VIEW_DASHBOARD, label: 'View Dashboard' },
-  { bit: PERMISSIONS.VIEW_ITEMS, label: 'View Items' },
-  { bit: PERMISSIONS.MANAGE_ITEMS, label: 'Manage Items' },
-  { bit: PERMISSIONS.VIEW_CATEGORIES, label: 'View Categories' },
-  { bit: PERMISSIONS.MANAGE_CATEGORIES, label: 'Manage Categories' },
-  { bit: PERMISSIONS.VIEW_CUSTOMERS, label: 'View Customers' },
-  { bit: PERMISSIONS.MANAGE_CUSTOMERS, label: 'Manage Customers' },
-  { bit: PERMISSIONS.VIEW_SUPPLIERS, label: 'View Suppliers' },
-  { bit: PERMISSIONS.MANAGE_SUPPLIERS, label: 'Manage Suppliers' },
-  { bit: PERMISSIONS.VIEW_STOCK, label: 'View Stock' },
-  { bit: PERMISSIONS.MANAGE_STOCK_IN, label: 'Stock In' },
-  { bit: PERMISSIONS.MANAGE_STOCK_OUT, label: 'Stock Out' },
-  { bit: PERMISSIONS.MANAGE_STOCK_ADJ, label: 'Stock Adjustment' },
-  { bit: PERMISSIONS.VIEW_TRANSACTIONS, label: 'View Transactions' },
-  { bit: PERMISSIONS.APPROVE_TRANSACTIONS, label: 'Approve Transactions' },
-  { bit: PERMISSIONS.CANCEL_TRANSACTIONS, label: 'Cancel Transactions' },
-  { bit: PERMISSIONS.USE_POS, label: 'Use POS' },
-  { bit: PERMISSIONS.VOID_SALES, label: 'Void Sales' },
-  { bit: PERMISSIONS.MANAGE_SHIFTS, label: 'Manage Shifts' },
-  { bit: PERMISSIONS.VIEW_REPORTS, label: 'View Reports' },
-  { bit: PERMISSIONS.VIEW_AUDIT_TRAIL, label: 'View Audit Trail' },
-  { bit: PERMISSIONS.MANAGE_USERS, label: 'Manage Users' },
-  { bit: PERMISSIONS.MANAGE_SETTINGS, label: 'Manage Settings' },
-  { bit: PERMISSIONS.MANAGE_ADDONS, label: 'Manage Add-ons' },
-  { bit: PERMISSIONS.REPRINT, label: 'Reprint' }
-]
+const roleOptions = ref([])
+const stores = ref([])
 
 const form = reactive({
   username: '',
   password: '',
   fullName: '',
   email: '',
-  role: '',
-  accessRights: 0,
+  roleId: '',
   storeIds: [],
   active: true
 })
-
-const stores = ref([])
 
 const errors = reactive({
   username: '',
   password: '',
   fullName: '',
   email: '',
-  role: '',
+  roleId: '',
   storeIds: ''
 })
 
 onMounted(async () => {
+  // Load active roles for the dropdown
+  try {
+    const { data } = await rolesApi.getActive()
+    const roles = data.data || data
+    roleOptions.value = roles.map(r => ({ value: r.id, label: r.name }))
+  } catch (error) {
+    appStore.showToast('Failed to load roles', 'error')
+  }
+
   // Load available stores for assignment
   try {
     const { data } = await storesApi.getActive()
@@ -227,8 +180,7 @@ onMounted(async () => {
       form.username = payload.username || ''
       form.fullName = payload.fullName || ''
       form.email = payload.email || ''
-      form.role = payload.role || ''
-      form.accessRights = payload.accessRights || 0
+      form.roleId = payload.roleId || ''
       form.storeIds = payload.storeIds || []
       form.active = payload.active !== false
     } catch (error) {
@@ -239,14 +191,6 @@ onMounted(async () => {
     }
   }
 })
-
-function hasPermission(bit) {
-  return (form.accessRights & (1 << bit)) !== 0
-}
-
-function togglePermission(bit) {
-  form.accessRights ^= (1 << bit)
-}
 
 function toggleStore(storeId) {
   const idx = form.storeIds.indexOf(storeId)
@@ -264,7 +208,7 @@ function validate() {
   if (!form.username.trim()) { errors.username = 'Username is required'; valid = false }
   if (!isEdit.value && !form.password) { errors.password = 'Password is required'; valid = false }
   if (!form.fullName.trim()) { errors.fullName = 'Full name is required'; valid = false }
-  if (!form.role) { errors.role = 'Role is required'; valid = false }
+  if (!form.roleId) { errors.roleId = 'Role is required'; valid = false }
   if (form.storeIds.length === 0) { errors.storeIds = 'Assign at least one store'; valid = false }
 
   if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
@@ -284,8 +228,7 @@ async function handleSubmit() {
       username: form.username,
       fullName: form.fullName,
       email: form.email || null,
-      role: form.role,
-      accessRights: form.accessRights,
+      roleId: form.roleId,
       storeIds: form.storeIds,
       active: form.active
     }

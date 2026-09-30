@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory + POS System — Technical Documentation</title>
+    <title>MaraCoder Inventory+POS — Technical Documentation</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -157,12 +157,12 @@
 <body>
 
 <header>
-    <h1>Inventory + POS System</h1>
+    <h1><img src="assets/maracoder-logo.png" alt="MaraCoder" style="height:48px;width:48px;border-radius:12px;background:#fff;padding:4px;vertical-align:middle;margin-right:0.5rem;">MaraCoder Inventory+POS</h1>
     <div class="subtitle">Technical Documentation</div>
     <div class="meta">
-        <span><strong>Version:</strong> 1.2</span>
+        <span><strong>Version:</strong> 1.5</span>
         <span><strong>Author:</strong> Joven Q. Divinagracia Jr.</span>
-        <span><strong>Date:</strong> August 2026</span>
+        <span><strong>Date:</strong> September 2026</span>
         <span><strong>Stack:</strong> Java 25 · Spring Boot 4.1.0 · Vue 3 · MySQL 8</span>
     </div>
 </header>
@@ -193,7 +193,7 @@
 <section id="overview">
     <h2>1. System Overview</h2>
     <h3>Purpose and Scope</h3>
-    <p>The Inventory + POS System is a comprehensive enterprise-grade application designed for small and medium enterprises (SMEs) in the Philippines. It provides end-to-end inventory management, point-of-sale operations, financial reporting, and compliance with Philippine regulatory requirements.</p>
+    <p>The MaraCoder Inventory+POS is a comprehensive enterprise-grade application designed for small and medium enterprises (SMEs) in the Philippines. It provides end-to-end inventory management, point-of-sale operations, financial reporting, and compliance with Philippine regulatory requirements.</p>
     <p>The system covers the complete business cycle from procurement (stock-in) through sales (POS) to reporting and auditing, all within a single integrated platform.</p>
 
     <h3>Target Users</h3>
@@ -208,6 +208,7 @@
     <h3>Key Features</h3>
     <ul>
         <li><strong>Multi-Store Support</strong> — Per-store stock, sales, and shifts; per-user store access with backend enforcement; per-store document numbering; shared global master data</li>
+        <li><strong>Dynamic Roles &amp; Permissions</strong> — Admin-managed roles holding a permission bitmask; users inherit permissions from their assigned role; reserved system ADMIN role; role management gated by <code>MANAGE_USERS</code></li>
         <li><strong>Inventory Management</strong> — Item catalog, categories, stock-in/out/adjust, stock level monitoring, reorder alerts</li>
         <li><strong>Point of Sale</strong> — Fast item lookup, barcode support, multiple payment methods, receipt generation, shift management</li>
         <li><strong>Customer &amp; Supplier Management</strong> — Contact database, transaction history, balance tracking</li>
@@ -287,6 +288,8 @@
         <tr><td>Build Tool</td><td>Apache Maven</td><td>3.9+</td></tr>
         <tr><td>Testing</td><td>JUnit 5, Mockito, Playwright</td><td>—</td></tr>
     </table>
+
+    <p><strong>Frontend theme:</strong> The UI supports <strong>both light and dark themes</strong>, driven by <strong>CSS custom properties</strong> (e.g. <code>--color-primary</code>, <code>--brand-gradient</code>, surface and text colors defined in <code>app.css</code>) whose values switch based on a <code>data-theme</code> attribute on the root <code>&lt;html&gt;</code> element. The brand identity is the <strong>MaraCoder blue-to-teal</strong> accent (primary <code>#2563eb</code>, cyan <code>#06b6d4</code>, teal <code>#14b8a6</code>) matching the MaraCoder logo, with the dark theme using dark slate surfaces (<code>#0f172a</code> / <code>#111c33</code>) and the light theme using light surfaces. A Pinia <strong>app-store</strong> action pair (<code>toggleTheme</code> / <code>applyTheme</code>) persists the user's choice in <code>localStorage</code> (key <code>theme</code>, default <code>dark</code>) and sets the <code>data-theme</code> attribute on <code>&lt;html&gt;</code>; <code>main.js</code> applies the persisted theme <strong>before mount</strong> to avoid a flash of the wrong theme. A <strong>sun/moon toggle button</strong> in the navbar lets users switch themes at any time. Theming is applied consistently across all views (dashboard, POS, inventory, and administration screens). Navigation is SPA-based (Vue Router): the top-bar brand links to the user's landing page, and the sidebar auto-expands the group containing the active route.</p>
 
     <h3>Security Architecture</h3>
     <ul>
@@ -395,7 +398,8 @@
     <h3>Table Overview</h3>
     <table>
         <tr><th>Table</th><th>Purpose</th><th>Key Fields</th></tr>
-        <tr><td><code>users</code></td><td>System users and authentication</td><td>id, username, password_hash, full_name, permissions, active</td></tr>
+        <tr><td><code>users</code></td><td>System users and authentication</td><td>id, username, password_hash, full_name, email, role_id, active</td></tr>
+        <tr><td><code>roles</code></td><td>Dynamic, admin-managed roles holding a permission bitmask</td><td>id, name (unique), description, access_rights, active, is_system</td></tr>
         <tr><td><code>stores</code></td><td>Physical stores/branches</td><td>id, code (unique), name, address, tin, phone, active</td></tr>
         <tr><td><code>user_stores</code></td><td>User&harr;store access (many-to-many join)</td><td>user_id, store_id</td></tr>
         <tr><td><code>categories</code></td><td>Item classification (global/shared)</td><td>id, name, description, active</td></tr>
@@ -414,11 +418,12 @@
     </table>
 
     <div class="note">
-        <strong>Data scoping:</strong> Master data (<code>items</code>, <code>categories</code>, <code>customers</code>, <code>suppliers</code>) is <strong>global/shared</strong> across all stores. Transactional data (<code>stock</code>, <code>stock_transactions</code>, <code>sales</code>, <code>shifts</code>) is scoped per store via a <code>store_id</code> foreign key. The <code>stock</code> table carries a <strong>composite unique constraint on (item_id, store_id)</strong> so each item has exactly one stock row per store.
+        <strong>Data scoping:</strong> Master data (<code>items</code>, <code>categories</code>, <code>customers</code>, <code>suppliers</code>) is <strong>global/shared</strong> across all stores. Transactional data (<code>stock</code>, <code>stock_transactions</code>, <code>sales</code>, <code>shifts</code>) is scoped per store via a <code>store_id</code> foreign key. The <code>stock</code> table carries a <strong>composite unique constraint on (item_id, store_id)</strong> so each item has exactly one stock row per store. Because the <code>stock</code> table requires a <code>store_id</code>, <strong>creating an item now initializes a per-store stock row (quantity 0) for every store</strong>; previously item creation failed when no stock row could be created without a store.
     </div>
 
     <h3>Key Relationships</h3>
     <ul>
+        <li><code>users.role_id</code> → <code>roles.id</code> (Many-to-One; a user's permissions are derived authoritatively from its role)</li>
         <li><code>user_stores.user_id</code> → <code>users.id</code> (Many-to-Many join with stores)</li>
         <li><code>user_stores.store_id</code> → <code>stores.id</code> (Many-to-Many join with users)</li>
         <li><code>stock.item_id</code> → <code>items.id</code> (Many-to-One; unique with store_id)</li>
@@ -448,6 +453,7 @@
         <tr><td>items</td><td>idx_items_category</td><td>category_id</td><td>Category filtering</td></tr>
         <tr><td>items</td><td>idx_items_name</td><td>name</td><td>Search by name</td></tr>
         <tr><td>stores</td><td>idx_stores_code</td><td>code</td><td>Unique store code lookup</td></tr>
+        <tr><td>roles</td><td>uq_roles_name</td><td>name</td><td>Unique role name lookup</td></tr>
         <tr><td>stock</td><td>uq_stock_item_store</td><td>item_id, store_id</td><td>Composite unique: one stock row per item per store</td></tr>
         <tr><td>stock_transactions</td><td>idx_stock_tx_store</td><td>store_id</td><td>Store-scoped transaction queries</td></tr>
         <tr><td>sales</td><td>idx_sales_store</td><td>store_id</td><td>Store-scoped sales reporting</td></tr>
@@ -505,6 +511,7 @@
       "id": 1,
       "username": "admin",
       "fullName": "System Administrator",
+      "role": "ADMIN",
       "permissions": 33554431,
       "landingPage": "DASHBOARD",
       "stores": [
@@ -514,7 +521,7 @@
   }
 }</code></pre>
     <div class="note">
-        <strong>Multi-store:</strong> The login response now includes <code>user.stores[]</code> (the stores the user may access) and <code>user.landingPage</code> (<code>POS</code> or <code>DASHBOARD</code>, resolved from the user's permissions). The frontend uses <code>landingPage</code> to route the user after login and <code>stores[]</code> to populate the store selector.
+        <strong>Multi-store &amp; roles:</strong> The login response includes <code>user.role</code> (the assigned role name) and <code>user.permissions</code> (the role's bitmask, carried in the JWT), plus <code>user.stores[]</code> (accessible stores) and <code>user.landingPage</code> (<code>POS</code> or <code>DASHBOARD</code>, resolved from permissions). The frontend uses <code>landingPage</code> to route after login and <code>stores[]</code> to populate the store selector.
     </div>
 
     <h3>CRUD Endpoints (Categories, Items, Customers, Suppliers)</h3>
@@ -530,7 +537,7 @@
     <p>Resources: <code>/api/categories</code>, <code>/api/items</code>, <code>/api/customers</code>, <code>/api/suppliers</code></p>
 
     <div class="note">
-        <strong>User store assignment:</strong> The user create/update payloads (<code>POST /api/users</code>, <code>PUT /api/users/{id}</code>) now accept a <code>storeIds[]</code> array specifying which stores the user may access. This drives the <code>user_stores</code> relationship enforced by <code>StoreContextInterceptor</code>. Example: <code>{ "username": "cashier1", "fullName": "...", "permissions": 213056, "storeIds": [1, 2] }</code>.
+        <strong>User role &amp; store assignment:</strong> The user create/update payloads (<code>POST /api/users</code>, <code>PUT /api/users/{id}</code>) accept a <code>roleId</code> (the assigned role — permissions are derived from it) and a <code>storeIds[]</code> array specifying which stores the user may access. <code>storeIds</code> drives the <code>user_stores</code> relationship enforced by <code>StoreContextInterceptor</code>. Example: <code>{ "username": "cashier1", "fullName": "...", "roleId": 3, "storeIds": [1, 2] }</code>.
     </div>
 
     <h3>Store Management Endpoints</h3>
@@ -543,6 +550,22 @@
         <tr><td><span class="badge badge-put">PUT</span></td><td><code>/api/stores/{id}</code></td><td>Update existing store</td><td>MANAGE_SETTINGS</td></tr>
         <tr><td><span class="badge badge-put">PATCH</span></td><td><code>/api/stores/{id}/status</code></td><td>Activate/deactivate a store</td><td>MANAGE_SETTINGS</td></tr>
     </table>
+
+    <h3>Role Management Endpoints</h3>
+    <p>Roles are managed dynamically at runtime. All endpoints are gated by the <code>MANAGE_USERS</code> permission.</p>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Description</th><th>Permission</th></tr>
+        <tr><td><span class="badge badge-get">GET</span></td><td><code>/api/roles</code></td><td>List all roles (paginated: ?page=0&amp;size=20)</td><td>MANAGE_USERS</td></tr>
+        <tr><td><span class="badge badge-get">GET</span></td><td><code>/api/roles/active</code></td><td>List active roles (for the User form dropdown)</td><td>MANAGE_USERS</td></tr>
+        <tr><td><span class="badge badge-get">GET</span></td><td><code>/api/roles/{id}</code></td><td>Get single role by ID</td><td>MANAGE_USERS</td></tr>
+        <tr><td><span class="badge badge-post">POST</span></td><td><code>/api/roles</code></td><td>Create new role (returns 201)</td><td>MANAGE_USERS</td></tr>
+        <tr><td><span class="badge badge-put">PUT</span></td><td><code>/api/roles/{id}</code></td><td>Update role (blocked for reserved ADMIN role id 1)</td><td>MANAGE_USERS</td></tr>
+        <tr><td><span class="badge badge-put">PATCH</span></td><td><code>/api/roles/{id}/status</code></td><td>Activate/deactivate (cannot deactivate ADMIN role)</td><td>MANAGE_USERS</td></tr>
+        <tr><td><span class="badge badge-delete">DELETE</span></td><td><code>/api/roles/{id}</code></td><td>Delete role (blocked for reserved/system roles)</td><td>MANAGE_USERS</td></tr>
+    </table>
+    <div class="note">
+        <strong>Role request payload:</strong> <code>{ "name": "Store Manager", "description": "...", "accessRights": 213056 }</code>. Attempting to update, deactivate, or delete the reserved ADMIN role (id 1) returns <strong>400 Bad Request</strong>.
+    </div>
 
     <h3>Store Context Header (<code>X-Store-Id</code>)</h3>
     <p>Store-scoped endpoints require the terminal to send the active store via the <code>X-Store-Id</code> header on every request. This applies to <strong>stock</strong>, <strong>POS</strong>, <strong>stock transactions</strong>, and <strong>shift</strong> endpoints.</p>
@@ -647,13 +670,15 @@ X-Store-Id: 1</code></pre>
     <p>On logout, the current access token's JTI (JWT ID) is added to an in-memory deny list. The deny list is checked on every request by the JWT authentication filter. Entries are auto-expired based on the token's original expiry time.</p>
 
     <h3>Permission Model</h3>
-    <p>The system uses a bitwise permission model where each user's permissions are stored as a single integer. Each bit position (0–24) represents a specific permission. This allows efficient storage and fast permission checks using bitwise AND operations.</p>
+    <p>The system uses a bitwise permission model where each bit position (0–24) represents a specific permission. The permission bitmask is stored on the <strong>role</strong> (<code>roles.access_rights</code>), not on the individual user. A user is assigned exactly one role via <code>users.role_id</code>, and the user's <strong>effective permissions are derived authoritatively from that role</strong> — there are no per-user permission overrides. Bitwise AND operations provide fast permission checks.</p>
+
+    <p>Roles are <strong>dynamic and admin-managed at runtime</strong> through the <code>/api/roles</code> endpoints (gated by <code>MANAGE_USERS</code>). Because the permission bitmask is embedded in the JWT at login, changes to a role's permissions take effect on the affected user's <strong>next login or token refresh</strong>, not instantly.</p>
 
     <h4>Permission Check: <code>@RequiresPermission</code></h4>
 <pre><code>@RequiresPermission(Permission.MANAGE_ITEMS)
 @PostMapping("/items")
 public ApiResponse&lt;ItemResponse&gt; createItem(@RequestBody ItemRequest request) {
-    // Only accessible if user's permission bitmask has bit 4 set
+    // Only accessible if the user's role bitmask has the MANAGE_ITEMS bit set
 }</code></pre>
 
     <h3>Complete Permission List (25 Permissions)</h3>
@@ -686,15 +711,20 @@ public ApiResponse&lt;ItemResponse&gt; createItem(@RequestBody ItemRequest reque
         <tr><td>24</td><td>VIEW_AUDIT_TRAIL</td><td>View audit log</td></tr>
     </table>
 
-    <h3>Role Presets</h3>
+    <h3>Dynamic Roles</h3>
+    <p>Roles are stored in the <code>roles</code> table and managed at runtime by administrators (no fixed enum). Each role holds its own permission bitmask in <code>access_rights</code>.</p>
     <table>
-        <tr><th>Role</th><th>Bitmask</th><th>Permissions Summary</th></tr>
-        <tr><td>Admin</td><td>33554431 (all bits)</td><td>All 25 permissions</td></tr>
-        <tr><td>Manager</td><td>Custom</td><td>All except MANAGE_USERS and MANAGE_SETTINGS</td></tr>
-        <tr><td>Cashier</td><td>Custom</td><td>VIEW_DASHBOARD, ACCESS_POS, MANAGE_SHIFTS, VIEW_SALES, VIEW_ITEMS</td></tr>
-        <tr><td>Inventory Clerk</td><td>Custom</td><td>VIEW_DASHBOARD, VIEW/MANAGE items, stock, categories, suppliers</td></tr>
-        <tr><td>Viewer</td><td>Custom</td><td>All VIEW_* permissions only (read-only access)</td></tr>
+        <tr><th>Column</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td>Primary key. <code>id = 1</code> is the reserved system ADMIN role.</td></tr>
+        <tr><td><code>name</code></td><td>Unique role name shown in the UI.</td></tr>
+        <tr><td><code>description</code></td><td>Optional human-readable description.</td></tr>
+        <tr><td><code>access_rights</code></td><td>Bitmask of granted permissions (bits 0–24).</td></tr>
+        <tr><td><code>active</code></td><td>Inactive roles are hidden from the User form's role dropdown.</td></tr>
+        <tr><td><code>is_system</code></td><td>Marks reserved roles that cannot be deleted.</td></tr>
     </table>
+    <div class="warning">
+        <strong>Reserved ADMIN role:</strong> Role <code>id = 1</code> is seeded with <code>access_rights = 33554431</code> (all 25 bits), <code>is_system = 1</code>. <code>RoleServiceImpl</code> rejects any attempt to update, deactivate, or delete it (returns 400). The UI also disables its edit/deactivate actions.
+    </div>
 
     <h3>Guards</h3>
     <ul>
@@ -1142,6 +1172,37 @@ set JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC</code></pre>
 <section id="changelog">
     <h2>13. Changelog</h2>
 
+    <h3>Version 1.5 — September 2026</h3>
+    <p><strong>Theme Toggle, Sidebar Cleanup &amp; Item Stock Fix</strong></p>
+    <ul>
+        <li>Added a <strong>light/dark theme toggle</strong> — themes are CSS-variable based and switch via a <code>data-theme</code> attribute on <code>&lt;html&gt;</code>; the choice is persisted in <code>localStorage</code> (key <code>theme</code>, default <code>dark</code>) by a Pinia app-store action (<code>toggleTheme</code>/<code>applyTheme</code>) and applied by <code>main.js</code> before mount to avoid a flash. A sun/moon toggle button lives in the navbar</li>
+        <li>Removed the redundant <strong>Quick Access</strong> right sidebar (<code>RightSidebar.vue</code>); navigation is now via the left sidebar only</li>
+        <li>Bug fix: creating an Item now initializes a per-store stock row (quantity 0) for every store — the <code>stock</code> table requires <code>store_id</code>, so item creation previously failed</li>
+    </ul>
+
+    <h3>Version 1.4 — September 2026</h3>
+    <p>Rebrand: renamed to MaraCoder Inventory+POS (company: MaraCoder — Built to Endure), added MC logo across the app and docs.</p>
+
+    <h3>Version 1.3.1 — September 2026</h3>
+    <p><strong>UI Retheme</strong></p>
+    <ul>
+        <li>Re-themed the frontend from the light/white professional theme to the new <strong>MaraCoder dark theme</strong> with the brand blue-to-teal accent; brand accent colors centralized in <code>app.css</code>; SPA navigation with clickable brand (links home) and auto-expanding sidebar groups; documentation UI previews updated to match</li>
+    </ul>
+
+    <h3>Version 1.3 — September 2026</h3>
+    <p><strong>Dynamic Database-Driven Roles</strong></p>
+    <ul>
+        <li>New <code>Role</code> entity and <code>roles</code> table (name, description, access_rights bitmask, active, is_system); roles are managed at runtime by administrators instead of a fixed enum</li>
+        <li><code>User</code> migrated from a <code>UserRole</code> enum + per-user <code>access_rights</code> column to a <code>role_id</code> foreign key; a user's effective permissions are derived authoritatively from its role (no per-user overrides)</li>
+        <li>Reserved system ADMIN role (id 1, all 25 permissions, <code>is_system = 1</code>) cannot be updated, deactivated, or deleted (server returns 400; UI disables the actions)</li>
+        <li>Role permissions are embedded in the JWT at login — changes to a role apply on the affected user's next login or token refresh</li>
+        <li>New Role REST endpoints under <code>/api/roles</code> (list, active, get, create, update, status, delete), all gated by <code>MANAGE_USERS</code></li>
+        <li>User create/update payloads now take <code>roleId</code> instead of <code>role</code> + <code>accessRights</code>; login/user responses expose <code>roleId</code>/<code>roleName</code></li>
+        <li>Frontend: new Roles CRUD screen with a grouped permission matrix; the User form now selects a role from a dropdown (per-user permission checkboxes removed)</li>
+        <li>Testing: backend suite grown to 109 tests (added <code>RoleServiceImplTest</code>; updated auth/interceptor tests for the Role entity)</li>
+        <li>Schema change: recreate the database fresh; seed creates the ADMIN role (id 1) before users and assigns the admin via <code>role_id = 1</code></li>
+    </ul>
+
     <h3>Version 1.2 — August 2026</h3>
     <p><strong>Multi-Store Support</strong></p>
     <ul>
@@ -1162,7 +1223,7 @@ set JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC</code></pre>
     <p><strong>UI Overhaul &amp; Quality Improvements</strong></p>
     <ul>
         <li>Complete UI redesign with modern dark navy theme and Inter font</li>
-        <li>Right sidebar layout for improved navigation and context</li>
+        <li>Right sidebar layout for improved navigation and context <em>(the Quick Access right sidebar / <code>RightSidebar.vue</code> was later removed as redundant in v1.5 — navigation is now via the left sidebar only)</em></li>
         <li>Security hardening: token deny list, permission validation fixes</li>
         <li>Improved form validation and error messaging across all modules</li>
         <li>Enhanced POS interface with faster item lookup and keyboard shortcuts</li>
@@ -1194,7 +1255,8 @@ set JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC</code></pre>
 </div>
 
 <footer>
-    <p>Inventory + POS System v1.2 — Technical Documentation</p>
+    <p>MaraCoder — Built to Endure</p>
+    <p>MaraCoder Inventory+POS v1.5 — Technical Documentation</p>
     <p>&copy; 2026 Joven Q. Divinagracia Jr. All rights reserved.</p>
     <p>Generated: August 14, 2026</p>
 </footer>

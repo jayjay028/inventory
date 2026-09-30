@@ -78,15 +78,15 @@ function choose(storeId) {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f4f6f9;
+  background-color: var(--color-body-bg);
   padding: 1rem;
 }
 
 .select-store-card {
   width: 100%;
   max-width: 440px;
-  background-color: #ffffff;
-  border: 1px solid #e0e4e8;
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 2.5rem 2rem;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
@@ -105,13 +105,13 @@ function choose(storeId) {
 .select-store-title {
   font-size: 1.375rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-heading);
   margin: 0.75rem 0 0.25rem;
 }
 
 .select-store-subtitle {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
@@ -127,8 +127,8 @@ function choose(storeId) {
   gap: 0.875rem;
   width: 100%;
   padding: 0.875rem 1rem;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
+  border: 1px solid var(--color-border);
+  background: var(--color-card-bg);
   border-radius: 8px;
   cursor: pointer;
   transition: border-color 0.15s ease, background-color 0.15s ease;
@@ -163,22 +163,22 @@ function choose(storeId) {
 .store-card-name {
   font-size: 0.9375rem;
   font-weight: 500;
-  color: #111827;
+  color: var(--color-text);
 }
 
 .store-card-code {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .store-card-arrow {
-  color: #d1d5db;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
 }
 
 .no-stores {
   text-align: center;
-  color: #6b7280;
+  color: var(--color-text-muted);
   padding: 1.5rem 0;
 }
 
@@ -195,7 +195,7 @@ function choose(storeId) {
 .btn-logout {
   border: none;
   background: none;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 0.8125rem;
   cursor: pointer;
 }

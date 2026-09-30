@@ -1,34 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* ============================================================
-   Enterprise ERP Theme — Classic Corporate
-   Design: Clean, refined, professional
+   MaraCoder Theme — Dark Slate + Indigo (Base UI)
+   Design: Modern dark dashboard, indigo accent, rounded cards
    ============================================================ */
 
 :root {
-  /* Primary Palette */
-  --color-primary: #1e40af;
-  --color-primary-hover: #1e3a8a;
-  --color-primary-light: #eff6ff;
+  /* Primary Palette (MaraCoder Brand — Blue → Teal) — shared by both themes */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #0b2545;
 
-  /* Sidebar */
-  --color-sidebar-bg: #0f172a;
-  --color-sidebar-hover: #1e293b;
-  --color-sidebar-text: #e2e8f0;
-  --color-sidebar-active: #1e40af;
+  /* Brand accents */
+  --color-brand-blue: #2563eb;
+  --color-brand-cyan: #06b6d4;
+  --color-brand-teal: #14b8a6;
+  --brand-gradient: linear-gradient(135deg, #2563eb 0%, #06b6d4 55%, #14b8a6 100%);
 
-  /* Layout */
-  --color-body-bg: #f9fafb;
-  --color-card-bg: #ffffff;
-  --color-text: #1f2937;
-  --color-text-muted: #6b7280;
-  --color-border: #e5e7eb;
-
-  /* Semantic Colors */
-  --color-success: #059669;
-  --color-warning: #d97706;
-  --color-danger: #dc2626;
-  --color-info: #0284c7;
+  /* Semantic Colors — shared */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #06b6d4;
 
   /* Layout Dimensions */
   --sidebar-width: 250px;
@@ -36,10 +29,56 @@
 
   /* Effects */
   --transition-speed: 0.2s;
-  --border-radius: 8px;
+  --border-radius: 12px;
+}
+
+/* ── DARK THEME (default) ───────────────────────────────────── */
+:root,
+[data-theme='dark'] {
+  --color-sidebar-bg: #0f172a;
+  --color-sidebar-hover: #1e293b;
+  --color-sidebar-text: #94a3b8;
+  --color-sidebar-active: #2563eb;
+
+  --color-body-bg: #020617;
+  --color-surface: #0f172a;
+  --color-surface-2: #111c33;
+  --color-card-bg: #0f172a;
+  --color-card-hover: #1e293b;
+  --color-text: #e2e8f0;
+  --color-heading: #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --color-border: #1e293b;
+  --color-border-light: #334155;
+  --color-input-bg: #0b1120;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ── LIGHT THEME ────────────────────────────────────────────── */
+[data-theme='light'] {
+  --color-sidebar-bg: #0f172a;      /* keep sidebar dark navy in light mode for contrast */
+  --color-sidebar-hover: #1e293b;
+  --color-sidebar-text: #94a3b8;
+  --color-sidebar-active: #2563eb;
+
+  --color-body-bg: #f1f5f9;
+  --color-surface: #ffffff;
+  --color-surface-2: #f8fafc;
+  --color-card-bg: #ffffff;
+  --color-card-hover: #f8fafc;
+  --color-text: #1e293b;
+  --color-heading: #0f172a;
+  --color-text-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-border-light: #cbd5e1;
+  --color-input-bg: #ffffff;
+
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 /* ============================================================
@@ -57,6 +96,33 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Global themed scrollbars */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-surface); }
+::-webkit-scrollbar-thumb { background: var(--color-border-light); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }
+
+/* Smooth transition when switching light/dark */
+body, .card, .app-navbar, .data-table, .form-control, .form-select {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Global element theming (variables flip with data-theme) */
+a { color: #60a5fa; }
+hr { border-color: var(--color-border); }
+.text-muted { color: var(--color-text-muted) !important; }
+.text-dark { color: var(--color-text) !important; }
+.bg-white { background-color: var(--color-card-bg) !important; }
+.border { border-color: var(--color-border) !important; }
+.modal-content { background-color: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+.dropdown-menu { background-color: var(--color-surface); border-color: var(--color-border); }
+.dropdown-item { color: var(--color-text); }
+.dropdown-item:hover { background-color: var(--color-card-hover); color: var(--color-heading); }
+.page-link { background-color: var(--color-surface); border-color: var(--color-border); color: var(--color-text-muted); }
+.page-link:hover { background-color: var(--color-card-hover); color: var(--color-heading); }
+.page-item.active .page-link { background-color: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+.page-item.disabled .page-link { background-color: var(--color-surface); border-color: var(--color-border); color: var(--color-text-muted); }
 
 /* ============================================================
    Sidebar
@@ -189,7 +255,7 @@ body {
 }
 
 .data-table thead th {
-  background-color: #f9fafb;
+  background-color: var(--color-surface-2);
   border-bottom: 1px solid var(--color-border);
   font-weight: 600;
   text-transform: uppercase;
@@ -203,12 +269,12 @@ body {
 .data-table tbody td {
   padding: 0.75rem 1rem;
   vertical-align: middle;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-border);
   color: var(--color-text);
 }
 
 .data-table tbody tr:hover {
-  background-color: #f9fafb;
+  background-color: var(--color-card-hover);
 }
 
 .data-table .text-end {
@@ -267,21 +333,42 @@ body {
 .form-control:focus,
 .form-select:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+  background-color: var(--color-input-bg);
+  color: var(--color-text);
 }
 
 .form-control {
   border-color: var(--color-border);
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 0.8125rem;
   padding: 0.5rem 0.75rem;
+  background-color: var(--color-input-bg);
+  color: var(--color-text);
   transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
+.form-control::placeholder { color: var(--color-text-muted); }
+.form-control:disabled, .form-control[readonly] { background-color: var(--color-surface); color: var(--color-text-muted); }
+
 .form-select {
   border-color: var(--color-border);
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 0.8125rem;
+  background-color: var(--color-input-bg);
+  color: var(--color-text);
+}
+
+.form-select:disabled { background-color: var(--color-surface); color: var(--color-text-muted); }
+
+.form-check-input {
+  background-color: var(--color-input-bg);
+  border-color: var(--color-border-light);
+}
+
+.form-check-input:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .form-label {
@@ -297,8 +384,9 @@ body {
 }
 
 .input-group-text {
-  background-color: #f9fafb;
+  background-color: var(--color-surface-2);
   border-color: var(--color-border);
+  color: var(--color-text-muted);
   font-size: 0.8125rem;
 }
 
@@ -392,15 +480,15 @@ body {
 }
 
 .btn-light {
-  background-color: #ffffff;
-  border-color: var(--color-border);
+  background-color: #1e293b;
+  border-color: var(--color-border-light);
   color: var(--color-text);
 }
 
 .btn-light:hover {
-  background-color: #f9fafb;
-  border-color: #d1d5db;
-  color: var(--color-text);
+  background-color: #334155;
+  border-color: #475569;
+  color: #ffffff;
 }
 
 .btn-outline-primary {
@@ -435,6 +523,97 @@ body {
   border-color: var(--color-danger);
   color: #ffffff;
 }
+
+/* ============================================================
+   Bootstrap Component Overrides (Dark)
+   ============================================================ */
+
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--color-text);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.table > :not(caption) > * > * {
+  background-color: transparent;
+  color: var(--color-text);
+  border-bottom-color: var(--color-border);
+}
+
+.table thead th {
+  background-color: var(--color-surface-2);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
+.table-hover > tbody > tr:hover > * {
+  background-color: var(--color-card-hover);
+  color: #fff;
+}
+
+.card-header,
+.card-footer {
+  background-color: var(--color-surface-2);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.card-body { color: var(--color-text); }
+
+.list-group-item {
+  background-color: var(--color-card-bg);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.nav-tabs { border-bottom-color: var(--color-border); }
+.nav-tabs .nav-link { color: var(--color-text-muted); }
+.nav-tabs .nav-link:hover { border-color: var(--color-border) var(--color-border) var(--color-border); color: var(--color-text); }
+.nav-tabs .nav-link.active {
+  background-color: var(--color-card-bg);
+  border-color: var(--color-border) var(--color-border) var(--color-card-bg);
+  color: var(--color-primary);
+}
+
+.modal-header, .modal-footer { border-color: var(--color-border); }
+.btn-close { filter: invert(1) grayscale(1) brightness(1.6); }
+
+.alert-info { background-color: #0b2942; border-color: #0e4a6e; color: #7dd3fc; }
+.alert-warning { background-color: #3a2c08; border-color: #6b4e0e; color: #fcd34d; }
+.alert-success { background-color: #05291d; border-color: #0b5138; color: #6ee7b7; }
+.alert-danger { background-color: #3a0f11; border-color: #6e1a1e; color: #fca5a5; }
+
+/* ============================================================
+   Dark-theme text contrast safety net
+   Ensures headings, labels, and common Bootstrap text utilities
+   remain readable on dark surfaces (overrides light-theme defaults).
+   ============================================================ */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 { color: var(--color-heading); }
+
+p, span, td, th, li, label, dd, dt, small, div { color: inherit; }
+body { color: var(--color-text); }
+
+.text-dark { color: var(--color-text) !important; }
+.text-body { color: var(--color-text) !important; }
+.text-secondary { color: var(--color-text-muted) !important; }
+.text-black, .text-black-50 { color: var(--color-text) !important; }
+
+.card, .card-body, .card-title, .card-text { color: var(--color-text); }
+.card-title { color: var(--color-heading); }
+
+.form-text { color: var(--color-text-muted); }
+.form-check-label { color: var(--color-text); }
+
+.breadcrumb, .breadcrumb-item, .breadcrumb-item a { color: var(--color-text-muted); }
+.breadcrumb-item.active { color: var(--color-text); }
+
+.modal-title { color: var(--color-heading); }
+.modal-body, .modal-body p, .modal-body span { color: var(--color-text); }
+
+/* Muted helper text should still be dim but legible in both themes */
+.text-muted, small.text-muted { color: var(--color-text-muted) !important; }
 
 /* ============================================================
    Toast Notifications
@@ -550,7 +729,7 @@ body {
 .pos-terminal .pos-cart-total {
   padding: 1rem;
   border-top: 1px solid var(--color-border);
-  background-color: #f9fafb;
+  background-color: var(--color-surface-2);
 }
 
 .pos-product-card {
@@ -648,14 +827,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(2, 6, 23, 0.85);
   z-index: 1100;
 }
 
 .loading-spinner {
   width: 2.5rem;
   height: 2.5rem;
-  border: 3px solid #e5e7eb;
+  border: 3px solid #1e293b;
   border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;

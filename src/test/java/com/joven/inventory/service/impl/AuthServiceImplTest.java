@@ -3,8 +3,8 @@ package com.joven.inventory.service.impl;
 import com.joven.inventory.dto.request.LoginRequest;
 import com.joven.inventory.dto.request.RefreshTokenRequest;
 import com.joven.inventory.dto.response.LoginResponse;
+import com.joven.inventory.entity.Role;
 import com.joven.inventory.entity.User;
-import com.joven.inventory.enums.UserRole;
 import com.joven.inventory.exception.ResourceNotFoundException;
 import com.joven.inventory.exception.UnauthorizedException;
 import com.joven.inventory.repository.UserRepository;
@@ -76,10 +76,22 @@ class AuthServiceImplTest {
         user.setPassword("encoded_password");
         user.setFullName("Admin User");
         user.setEmail("admin@example.com");
-        user.setRole(UserRole.ADMIN);
-        user.setAccessRights(255L);
+        user.setRole(createRole(1L, "ADMIN", 255L));
         user.setActive(true);
         return user;
+    }
+
+    /**
+     * Builds a {@link Role} entity for test users. Access rights are derived
+     * from the role, so tests set permissions via the role's accessRights.
+     */
+    private Role createRole(Long id, String name, Long accessRights) {
+        Role role = new Role();
+        role.setId(id);
+        role.setName(name);
+        role.setAccessRights(accessRights);
+        role.setActive(true);
+        return role;
     }
 
     private User createInactiveUser() {
@@ -188,7 +200,8 @@ class AuthServiceImplTest {
         // Arrange: user with USE_POS (bit 14) but NOT VIEW_DASHBOARD (bit 0)
         User user = createTestUser();
         user.setId(5L); // non-super-admin
-        user.setAccessRights(1L << 14); // USE_POS only
+        // Access rights are derived from the role: give this user a role with USE_POS only
+        user.setRole(createRole(2L, "CASHIER", 1L << 14)); // USE_POS only
         CustomUserDetails userDetails = CustomUserDetails.fromUser(user);
         LoginRequest request = createLoginRequest();
 

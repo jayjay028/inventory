@@ -3,7 +3,10 @@
 -- Database: inventory_db
 -- ============================================================
 
-USE inventory_db;
+-- Give audit timestamp columns sensible defaults so raw seed INSERTs
+-- (which don't set them explicitly) succeed under MySQL strict mode.
+ALTER TABLE app_settings MODIFY created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE app_settings MODIFY updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 -- ============================================================
 -- DEFAULT STORE (Main Store)
@@ -12,19 +15,26 @@ INSERT INTO stores (code, name, address, tin, phone, active, created_by, created
 VALUES ('MAIN', 'Main Store', '', '', '', 1, 'system', NOW(), NOW());
 
 -- ============================================================
+-- DEFAULT ADMIN ROLE
+-- ============================================================
+INSERT INTO roles (id, name, description, access_rights, active, is_system, created_by, created_at, updated_at)
+VALUES (1, 'ADMIN', 'System administrator with full access', 33554431, 1, 1, 'system', NOW(), NOW());
+
+-- ============================================================
 -- DEFAULT ADMIN USER
 -- Password: admin123 (BCrypt encoded)
 -- ============================================================
-INSERT INTO users (username, password, full_name, email, role, access_rights, active, created_by)
+INSERT INTO users (username, password, full_name, email, role_id, active, created_by, created_at, updated_at)
 VALUES (
     'admin',
     '$2a$10$nMSFToLukmFtMWEY0FKXTeFdB7TdTrWfom8fPLzToEpSFkeK.017u',
     'System Administrator',
     NULL,
-    'ADMIN',
-    33554431,
     1,
-    'system'
+    1,
+    'system',
+    NOW(),
+    NOW()
 );
 
 -- ============================================================

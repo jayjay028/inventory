@@ -204,24 +204,25 @@ function typeBadgeClass(type) {
   align-items: center;
   gap: 1rem;
   padding: 1.25rem;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  border-left: 4px solid transparent;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  border-left: 3px solid transparent;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   height: 100%;
-  transition: box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .summary-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  border-color: var(--color-border-light);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
-.summary-card--indigo { border-left-color: #4f46e5; }
-.summary-card--emerald { border-left-color: #059669; }
-.summary-card--amber { border-left-color: #d97706; }
-.summary-card--teal { border-left-color: #0d9488; }
-.summary-card--rose { border-left-color: #e11d48; }
+.summary-card--indigo { border-left-color: rgba(37, 99, 235, 0.6); }
+.summary-card--emerald { border-left-color: rgba(16, 185, 129, 0.6); }
+.summary-card--amber { border-left-color: rgba(245, 158, 11, 0.6); }
+.summary-card--teal { border-left-color: rgba(13, 148, 136, 0.6); }
+.summary-card--rose { border-left-color: rgba(244, 63, 94, 0.6); }
 
 .summary-card__icon {
   display: flex;
@@ -234,11 +235,11 @@ function typeBadgeClass(type) {
   flex-shrink: 0;
 }
 
-.summary-card__icon--indigo { background: #eef2ff; color: #4f46e5; }
-.summary-card__icon--emerald { background: #ecfdf5; color: #059669; }
-.summary-card__icon--amber { background: #fffbeb; color: #d97706; }
-.summary-card__icon--teal { background: #f0fdfa; color: #0d9488; }
-.summary-card__icon--rose { background: #fff1f2; color: #e11d48; }
+.summary-card__icon--indigo { background: rgba(37, 99, 235, 0.15); color: #60a5fa; }
+.summary-card__icon--emerald { background: rgba(16, 185, 129, 0.12); color: #34d399; }
+.summary-card__icon--amber { background: rgba(245, 158, 11, 0.12); color: #fbbf24; }
+.summary-card__icon--teal { background: rgba(13, 148, 136, 0.12); color: #2dd4bf; }
+.summary-card__icon--rose { background: rgba(244, 63, 94, 0.12); color: #fb7185; }
 
 .summary-card__content {
   min-width: 0;
@@ -247,7 +248,7 @@ function typeBadgeClass(type) {
 .summary-card__value {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-heading);
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -257,7 +258,7 @@ function typeBadgeClass(type) {
 .summary-card__label {
   font-size: 0.75rem;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.03em;
   margin-top: 0.125rem;
@@ -265,10 +266,10 @@ function typeBadgeClass(type) {
 
 /* Panel (Card) */
 .panel {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   overflow: hidden;
 }
 
@@ -277,13 +278,13 @@ function typeBadgeClass(type) {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .panel__title {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-heading);
   margin: 0;
 }
 
@@ -301,30 +302,30 @@ function typeBadgeClass(type) {
   align-items: center;
   font-size: 0.75rem;
   font-weight: 500;
-  color: #4f46e5;
+  color: #7dd3fc;
   text-decoration: none;
   padding: 0.3rem 0.7rem;
-  border: 1px solid #e0e7ff;
+  border: 1px solid rgba(37, 99, 235, 0.35);
   border-radius: 6px;
   transition: all 0.15s ease;
   background: transparent;
 }
 
 .btn-outline-action:hover {
-  background: #eef2ff;
-  border-color: #c7d2fe;
-  color: #4338ca;
+  background: rgba(37, 99, 235, 0.15);
+  border-color: rgba(37, 99, 235, 0.5);
+  color: #bae6fd;
 }
 
 .btn-outline-action--warning {
-  color: #d97706;
-  border-color: #fef3c7;
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
 }
 
 .btn-outline-action--warning:hover {
-  background: #fffbeb;
-  border-color: #fde68a;
-  color: #b45309;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fcd34d;
 }
 
 /* Transaction Table */
@@ -340,17 +341,17 @@ function typeBadgeClass(type) {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #6b7280;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-border);
   white-space: nowrap;
 }
 
 .txn-table tbody td {
   padding: 0.7rem 1.25rem;
   vertical-align: middle;
-  border-bottom: 1px solid #f3f4f6;
-  color: #374151;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
 }
 
 .txn-table tbody tr:last-child td {
@@ -358,23 +359,23 @@ function typeBadgeClass(type) {
 }
 
 .txn-table tbody tr:hover td {
-  background: #f8fafc;
+  background: var(--color-card-hover);
 }
 
 .txn-table__empty {
   text-align: center;
   padding: 2.5rem 1rem !important;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .txn-table__date {
-  color: #6b7280;
+  color: var(--color-text-muted);
   white-space: nowrap;
 }
 
 .txn-table__item {
   font-weight: 500;
-  color: #1e293b;
+  color: var(--color-heading);
 }
 
 /* Type Badge */
@@ -389,18 +390,18 @@ function typeBadgeClass(type) {
 }
 
 .type-badge--in {
-  background: #ecfdf5;
-  color: #065f46;
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
 }
 
 .type-badge--out {
-  background: #eff6ff;
-  color: #1e40af;
+  background: rgba(37, 99, 235, 0.18);
+  color: #7dd3fc;
 }
 
 .type-badge--adjust {
-  background: #f3f4f6;
-  color: #4b5563;
+  background: rgba(148, 163, 184, 0.15);
+  color: #cbd5e1;
 }
 
 /* Stock List */
@@ -409,7 +410,7 @@ function typeBadgeClass(type) {
   align-items: center;
   justify-content: center;
   padding: 2.5rem 1rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   font-size: 0.8125rem;
 }
 
@@ -418,7 +419,7 @@ function typeBadgeClass(type) {
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-border);
   transition: background 0.15s ease;
 }
 
@@ -427,18 +428,18 @@ function typeBadgeClass(type) {
 }
 
 .stock-list__item:hover {
-  background: #f8fafc;
+  background: var(--color-card-hover);
 }
 
 .stock-list__name {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: #1e293b;
+  color: var(--color-heading);
 }
 
 .stock-list__reorder {
   font-size: 0.7rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   margin-top: 0.125rem;
 }
 
@@ -449,8 +450,8 @@ function typeBadgeClass(type) {
   min-width: 32px;
   height: 24px;
   padding: 0 0.5rem;
-  background: #fef2f2;
-  color: #dc2626;
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: 4px;

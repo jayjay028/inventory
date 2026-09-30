@@ -6,11 +6,13 @@ import com.joven.inventory.dto.response.ItemResponse;
 import com.joven.inventory.entity.Category;
 import com.joven.inventory.entity.Item;
 import com.joven.inventory.entity.Stock;
+import com.joven.inventory.entity.Store;
 import com.joven.inventory.exception.ResourceNotFoundException;
 import com.joven.inventory.mapper.ItemMapper;
 import com.joven.inventory.repository.CategoryRepository;
 import com.joven.inventory.repository.ItemRepository;
 import com.joven.inventory.repository.StockRepository;
+import com.joven.inventory.repository.StoreRepository;
 import com.joven.inventory.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Implementation of {@link ItemService} providing inventory item management operations.
@@ -37,6 +40,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
     private final StockRepository stockRepository;
+    private final StoreRepository storeRepository;
 
     /**
      * {@inheritDoc}
@@ -117,12 +121,19 @@ public class ItemServiceImpl implements ItemService {
         item.setItemCode(itemCode);
         item = itemRepository.save(item);
 
-        // Create stock record with initial quantity of 0
-        Stock stock = new Stock();
-        stock.setItem(item);
-        stock.setQuantityOnHand(0);
-        stock.setLastUpdated(LocalDateTime.now());
-        stockRepository.save(stock);
+        // Create an initial stock record (quantity 0) for every store so the
+        // item is immediately available in each store's inventory. Stock is
+        // per-store (store_id is required), while the item itself is global.
+        List<Store> stores = storeRepository.findAll();
+        LocalDateTime now = LocalDateTime.now();
+        for (Store store : stores) {
+            Stock stock = new Stock();
+            stock.setItem(item);
+            stock.setStore(store);
+            stock.setQuantityOnHand(0);
+            stock.setLastUpdated(now);
+            stockRepository.save(stock);
+        }
 
         log.info("Created item '{}' with code '{}'", item.getName(), itemCode);
 

@@ -9,10 +9,21 @@ spring:
     password: "root"
 
   jpa:
+    hibernate:
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+
+  # NOTE: One-time DB bootstrap (ddl-auto=create + seed) was used to build the
+  # roles schema. It is disabled now so restarts do NOT wipe data. To rebuild
+  # the DB from scratch, temporarily set ddl-auto: create,
+  # defer-datasource-initialization: true, and sql.init.mode: always
+  # (data-locations: classpath:db/seed.sql), start once, then revert.
+  sql:
+    init:
+      mode: never
 
   devtools:
     restart:

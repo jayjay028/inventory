@@ -3,10 +3,13 @@
     <div class="login-card">
       <!-- Logo Area -->
       <div class="text-center mb-4">
-        <div class="logo-icon mb-3">
-          <i class="bi bi-box-seam-fill"></i>
-        </div>
-        <h4 class="brand-title">Inventory + POS</h4>
+        <img
+          src="/maracoder-brand.png"
+          alt="MaraCoder Inventory+POS"
+          class="brand-logo"
+        />
+        <h4 class="brand-title">MaraCoder Inventory+POS</h4>
+        <p class="brand-tagline">Built to Endure</p>
         <p class="brand-subtitle">Sign in to your account</p>
       </div>
 
@@ -115,10 +118,12 @@ async function handleLogin() {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
-.logo-icon {
-  font-size: 3rem;
-  color: #1b2a4a;
-  line-height: 1;
+.brand-logo {
+  display: block;
+  max-width: 220px;
+  width: 100%;
+  height: auto;
+  margin: 0 auto 1rem;
 }
 
 .brand-title {
@@ -127,6 +132,14 @@ async function handleLogin() {
   margin-bottom: 0.25rem;
   font-size: 1.35rem;
   letter-spacing: -0.02em;
+}
+
+.brand-tagline {
+  color: #98a2b3;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.5rem;
 }
 
 .brand-subtitle {
